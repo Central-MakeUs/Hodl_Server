@@ -41,6 +41,8 @@ public class UserService {
         if(userProvider.checkEmail(postUserReq.getEmail()) ==1){
             throw new BaseException(BaseResponseStatus.POST_USERS_EXISTS_EMAIL);
         }
+        String userInfoToString = "N";
+        if(postUserReq.getCheckedUserInfo()) userInfoToString = "Y";
 
         String pwd;
         try{
@@ -51,7 +53,7 @@ public class UserService {
             throw new BaseException(BaseResponseStatus.PASSWORD_ENCRYPTION_ERROR);
         }
         try{
-            int userIdx = userDao.createUser(postUserReq);
+            int userIdx = userDao.createUser(postUserReq, userInfoToString);
             logger.info(getClass().getSimpleName() + userIdx);
             return new PostUserRes(userIdx);
         } catch (Exception exception) {

@@ -85,13 +85,21 @@ public class UserController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
-        // TODO: email 관련한 짧은 validation 예시입니다. 그 외 더 부가적으로 추가해주세요!
         if(postUserReq.getEmail() == null){
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
         //이메일 정규표현
         if(!isRegexEmail(postUserReq.getEmail())){
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+        }
+        if(postUserReq.getPassword() == null){
+            return new BaseResponse<>(POST_USERS_EMPTY_PASSWORD);
+        }
+        if(postUserReq.getPassword().length() < 8 || postUserReq.getPassword().length() > 20){
+            return new BaseResponse<>(POST_USERS_INVALID_PASSWORD);
+        }
+        if(postUserReq.getCheckedUserInfo() == null){
+            return new BaseResponse<>(POST_USERS_EMPTY_USERINFO);
         }
         try{
             logger.info(getClass().getSimpleName() + " " + postUserReq.getEmail());

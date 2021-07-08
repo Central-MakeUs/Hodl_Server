@@ -10,4 +10,5 @@ import lombok.Setter;
 public class PostUserReq {
     private String email;
     private String password;
+    private Boolean checkedUserInfo;
 }
