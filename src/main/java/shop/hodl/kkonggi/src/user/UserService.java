@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.user.model.PostUserRes;
 
+import javax.transaction.Transactional;
+
 // Service Create, Update, Delete 의 로직 처리
 @Service
 public class UserService {
@@ -33,7 +35,7 @@ public class UserService {
 
     }
 
-    //POST
+    @Transactional
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
         //중복
         if(userProvider.checkEmail(postUserReq.getEmail()) ==1){
@@ -50,9 +52,8 @@ public class UserService {
         }
         try{
             int userIdx = userDao.createUser(postUserReq);
-            //jwt 발급.
-            String jwt = jwtService.createJwt(userIdx);
-            return new PostUserRes(jwt,userIdx);
+            logger.info(getClass().getSimpleName() + userIdx);
+            return new PostUserRes(userIdx);
         } catch (Exception exception) {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }

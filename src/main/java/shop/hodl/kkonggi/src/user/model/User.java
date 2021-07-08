@@ -1,15 +1,12 @@
 package shop.hodl.kkonggi.src.user.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class User {
     private int userIdx;
-    private String ID;
     private String userName;
     private String password;
     private String email;

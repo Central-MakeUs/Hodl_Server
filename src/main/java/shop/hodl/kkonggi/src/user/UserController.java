@@ -16,7 +16,7 @@ import static shop.hodl.kkonggi.config.BaseResponseStatus.*;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexEmail;
 
 @RestController
-@RequestMapping("/app/users")
+@RequestMapping("/app/v1/users")
 public class UserController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -26,9 +26,6 @@ public class UserController {
     private final UserService userService;
     @Autowired
     private final JwtService jwtService;
-
-
-
 
     public UserController(UserProvider userProvider, UserService userService, JwtService jwtService){
         this.userProvider = userProvider;
@@ -97,6 +94,7 @@ public class UserController {
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
         }
         try{
+            logger.info(getClass().getSimpleName() + " " + postUserReq.getEmail());
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
         } catch(BaseException exception){
