@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
-import shop.hodl.kkonggi.src.email.model.GetEmailReq;
+import shop.hodl.kkonggi.src.email.model.PostAuthReq;
 import shop.hodl.kkonggi.src.email.model.PostEmailReq;
 
 import static shop.hodl.kkonggi.config.BaseResponseStatus.*;
@@ -46,19 +46,19 @@ public class EmailController {
 
 
     @PostMapping("/verifyCode") // 이메일 인증 코드 검증
-    public BaseResponse<String> verifyCode(@RequestBody GetEmailReq getEmailReq) {
-        if(getEmailReq.getEmail() == null){
+    public BaseResponse<String> verifyCode(@RequestBody PostAuthReq postAuthReq) {
+        if(postAuthReq.getEmail() == null){
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
         //이메일 정규표현
-        if(!isRegexEmail(getEmailReq.getEmail())){
+        if(!isRegexEmail(postAuthReq.getEmail())){
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
         }
-        if(getEmailReq.getCode() == null){
+        if(postAuthReq.getCode() == null){
             return new BaseResponse<>(POST_AUTH_EMPTY_CODE);
         }
         try{
-            emailProvider.checkAuth(getEmailReq);
+            emailProvider.checkAuth(postAuthReq);
             return new BaseResponse<>("");
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));

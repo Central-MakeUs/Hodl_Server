@@ -5,8 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.email.model.GetEmailReq;
-import shop.hodl.kkonggi.src.email.model.GetEmailRes;
+import shop.hodl.kkonggi.src.email.model.PostAuthReq;
 
 @RequiredArgsConstructor
 @Service
@@ -22,12 +21,12 @@ public class EmailProvider {
         }
     }
 
-    public void checkAuth(GetEmailReq getEmailReq) throws BaseException {
+    public void checkAuth(PostAuthReq postAuthReq) throws BaseException {
         // 이메일 자체가 없음
-        if(emailDao.checkAuthEmail(getEmailReq.getEmail()) == 0) throw new BaseException(BaseResponseStatus.POST_USERS_EMPTY_EMAIL);
+        if(emailDao.checkAuthEmail(postAuthReq.getEmail()) == 0) throw new BaseException(BaseResponseStatus.POST_AUTH_EMPTY_EMAIL);
 
         // 인증 코드가 다름
-        if(emailDao.checkAuthCode(getEmailReq) == 0) throw new BaseException(BaseResponseStatus.INVALID_AUTH_EMAIL_CODE);
+        if(emailDao.checkAuthCode(postAuthReq) == 0) throw new BaseException(BaseResponseStatus.INVALID_AUTH_EMAIL_CODE);
     }
 
 }

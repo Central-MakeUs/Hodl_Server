@@ -1,11 +1,10 @@
 package shop.hodl.kkonggi.src.email;
 
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import shop.hodl.kkonggi.src.email.model.GetEmailReq;
+import shop.hodl.kkonggi.src.email.model.PostAuthReq;
 
 import javax.sql.DataSource;
 
@@ -43,10 +42,10 @@ public class EmailDao {
                 checkEmailParams);
     }
 
-    public int checkAuthCode(GetEmailReq getEmailReq){
+    public int checkAuthCode(PostAuthReq postAuthReq){
         String checkEmailQuery = "select exists(select email,code from Authentication where email = ? and code = ? and status = 'Y')";
-        String checkEmailParams = getEmailReq.getEmail();
-        int checkPwParams = getEmailReq.getCode();
+        String checkEmailParams = postAuthReq.getEmail();
+        int checkPwParams = postAuthReq.getCode();
         return this.jdbcTemplate.queryForObject(checkEmailQuery,
                 int.class,
                 checkEmailParams, checkPwParams);
