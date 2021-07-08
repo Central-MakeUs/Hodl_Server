@@ -53,7 +53,10 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter')
     compile('org.springframework.boot:spring-boot-starter-web')
 
-
+    // email
+    implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.5.1'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 
 

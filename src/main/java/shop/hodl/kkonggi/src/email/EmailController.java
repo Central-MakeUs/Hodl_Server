@@ -1,2 +1,47 @@
-package shop.hodl.kkonggi.src.email;public class EmailController {
+package shop.hodl.kkonggi.src.email;
+
+
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import shop.hodl.kkonggi.config.BaseException;
+import shop.hodl.kkonggi.config.BaseResponse;
+import shop.hodl.kkonggi.src.email.model.GetEmailReq;
+import shop.hodl.kkonggi.src.email.model.PostEmailReq;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/app/v1/email")
+public class EmailController {
+
+    @Autowired
+    private final EmailService emailService;
+    @Autowired
+    private final EmailProvider emailProvider;
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @PostMapping("/code") // 이메일 인증 코드 보내기
+    public BaseResponse<String> emailAuth(@RequestBody PostEmailReq postEmailReq) {
+        try{
+            logger.info(logger.getName()+ postEmailReq.getEmail());
+            emailService.sendEmailMessage(postEmailReq.getEmail());
+            return new BaseResponse<>("");
+        }
+        catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
+    @PostMapping("/verifyCode") // 이메일 인증 코드 검증
+    public BaseResponse<String> verifyCode(@RequestBody GetEmailReq getEmailReq) {
+        try{
+            emailProvider.checkAuth(getEmailReq);
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 }

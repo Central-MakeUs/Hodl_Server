@@ -30,6 +30,8 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
     POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
 
+    INVALID_AUTH_EMAIL_CODE(false, 2020, "인증코드가 틀렸습니다."),
+
 
 
     /**
@@ -54,7 +56,10 @@ public enum BaseResponseStatus {
     MODIFY_FAIL_USERNAME(false,4014,"유저네임 수정 실패"),
 
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
+
+    // Send Mail
+    SEND_MAIL_ERROR(false, 4020, "인증코드 전송에 실패하였습니다.");
 
 
     // 5000 : 필요시 만들어서 쓰세요
