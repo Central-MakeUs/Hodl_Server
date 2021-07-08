@@ -14,6 +14,14 @@ public class EmailProvider {
     @Autowired
     private final EmailDao emailDao;
 
+    public int checkEmail(String email) throws BaseException {
+        try{
+            return emailDao.checkAuthEmail(email);
+        } catch (Exception e){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
     public void checkAuth(GetEmailReq getEmailReq) throws BaseException {
         try{
             // 이메일 자체가 없음

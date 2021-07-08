@@ -31,6 +31,7 @@ public enum BaseResponseStatus {
     POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
 
     INVALID_AUTH_EMAIL_CODE(false, 2020, "인증코드가 틀렸습니다."),
+    POST_AUTH_EXISTS_EMAIL(false, 2021, "이미 인증된 이메일입니다."),
 
 
 

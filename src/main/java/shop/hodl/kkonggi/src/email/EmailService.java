@@ -31,6 +31,9 @@ public class EmailService {
 
     @Transactional
     public void sendEmailMessage(String email) throws BaseException {
+        // 이메일 중복 확인
+        if(emailProvider.checkEmail(email) == 1) throw new BaseException(BaseResponseStatus.POST_AUTH_EXISTS_EMAIL);
+
         String ePw = createKey();
         MimeMessage message = emailSender.createMimeMessage();
 
