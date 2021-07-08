@@ -11,6 +11,9 @@ import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.src.email.model.GetEmailReq;
 import shop.hodl.kkonggi.src.email.model.PostEmailReq;
 
+import static shop.hodl.kkonggi.config.BaseResponseStatus.*;
+import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexEmail;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/app/v1/email")
@@ -24,6 +27,13 @@ public class EmailController {
 
     @PostMapping("/code") // 이메일 인증 코드 보내기
     public BaseResponse<String> emailAuth(@RequestBody PostEmailReq postEmailReq) {
+        if(postEmailReq.getEmail() == null){
+            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        }
+        //이메일 정규표현
+        if(!isRegexEmail(postEmailReq.getEmail())){
+            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+        }
         try{
             logger.info(logger.getName()+ postEmailReq.getEmail());
             emailService.sendEmailMessage(postEmailReq.getEmail());
@@ -37,6 +47,16 @@ public class EmailController {
 
     @PostMapping("/verifyCode") // 이메일 인증 코드 검증
     public BaseResponse<String> verifyCode(@RequestBody GetEmailReq getEmailReq) {
+        if(getEmailReq.getEmail() == null){
+            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        }
+        //이메일 정규표현
+        if(!isRegexEmail(getEmailReq.getEmail())){
+            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+        }
+        if(getEmailReq.getCode() == null){
+            return new BaseResponse<>(POST_AUTH_EMPTY_CODE);
+        }
         try{
             emailProvider.checkAuth(getEmailReq);
             return new BaseResponse<>("");

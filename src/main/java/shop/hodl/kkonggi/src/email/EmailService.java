@@ -31,8 +31,6 @@ public class EmailService {
 
     @Transactional
     public void sendEmailMessage(String email) throws BaseException {
-        // 이메일 중복 확인
-        if(emailProvider.checkEmail(email) == 1) throw new BaseException(BaseResponseStatus.POST_AUTH_EXISTS_EMAIL);
 
         String ePw = createKey();
         MimeMessage message = emailSender.createMimeMessage();
@@ -46,6 +44,9 @@ public class EmailService {
             // message.setFrom(new InternetAddress([이메일 계정], [설정할 이름]));
 
             emailSender.send(message); // 이메일 전송
+
+            // 이메일 이미 있으면,
+            if(emailProvider.checkEmail(email) == 1) emailDao.updateAuthCode(email, ePw);
             emailDao.createAuth(email, ePw);
         }
         catch (MessagingException e){

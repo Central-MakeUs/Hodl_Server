@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 public class GetEmailReq {
     private String email;
-    private int code;
+    private Integer code;
 }

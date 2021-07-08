@@ -23,16 +23,11 @@ public class EmailProvider {
     }
 
     public void checkAuth(GetEmailReq getEmailReq) throws BaseException {
-        try{
-            // 이메일 자체가 없음
-            if(emailDao.checkAuthEmail(getEmailReq.getEmail()) == 0) throw new BaseException(BaseResponseStatus.POST_USERS_EMPTY_EMAIL);
+        // 이메일 자체가 없음
+        if(emailDao.checkAuthEmail(getEmailReq.getEmail()) == 0) throw new BaseException(BaseResponseStatus.POST_USERS_EMPTY_EMAIL);
 
-            // 인증 코드가 다름
-            if (emailDao.checkAuthCode(getEmailReq) == 0) throw new BaseException(BaseResponseStatus.INVALID_AUTH_EMAIL_CODE);
-        } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
-        }
-
+        // 인증 코드가 다름
+        if(emailDao.checkAuthCode(getEmailReq) == 0) throw new BaseException(BaseResponseStatus.INVALID_AUTH_EMAIL_CODE);
     }
 
 }

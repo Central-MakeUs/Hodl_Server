@@ -19,6 +19,13 @@ public class EmailDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    public int updateAuthCode(String email, String ePw){
+        String createAuthQuery = "update Authentication set code = ? where email = ? and status = 'Y'";
+        Object[] createAuthparamas = new Object[]{ePw, email};
+        return this.jdbcTemplate.update(createAuthQuery, createAuthparamas);
+    }
+
+
     public int createAuth(String email, String ePw){
         String createAuthQuery = "insert into Authentication (email, code) values (?,?)";
         Object[] createAuthparamas = new Object[]{email, ePw};
