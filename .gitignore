@@ -7,3 +7,7 @@ build
 logs
 
 application.yml
+
+Secret
+
+Secret.java
