@@ -6,12 +6,16 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.email.model.PostAuthReq;
+import shop.hodl.kkonggi.src.user.UserDao;
 
 @RequiredArgsConstructor
 @Service
 public class EmailProvider {
     @Autowired
     private final EmailDao emailDao;
+
+    @Autowired
+    private final UserDao userDao;
 
     public int checkEmail(String email) throws BaseException {
         try{
@@ -27,6 +31,10 @@ public class EmailProvider {
 
         // 인증 코드가 다름
         if(emailDao.checkAuthCode(postAuthReq) == 0) throw new BaseException(BaseResponseStatus.INVALID_AUTH_EMAIL_CODE);
+    }
+
+    public int checkDuplicateEmail(String email){
+        return userDao.checkEmail(email);
     }
 
 }

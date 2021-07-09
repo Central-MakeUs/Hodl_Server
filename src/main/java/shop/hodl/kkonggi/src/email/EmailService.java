@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
+import shop.hodl.kkonggi.src.user.UserDao;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -31,6 +32,9 @@ public class EmailService {
 
     @Transactional
     public void sendEmailMessage(String email) throws BaseException {
+
+        // 회원가입 된 이메일인지 확인
+        if(emailProvider.checkDuplicateEmail(email) == 1) throw new BaseException(BaseResponseStatus.POST_AUTH_EXISTS_EMAIL);
 
         String ePw = createKey();
         MimeMessage message = emailSender.createMimeMessage();

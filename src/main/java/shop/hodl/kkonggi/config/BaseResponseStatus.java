@@ -37,6 +37,7 @@ public enum BaseResponseStatus {
     INVALID_AUTH_EMAIL_CODE(false, 2020, "인증코드가 틀렸습니다."),
     POST_AUTH_EMPTY_CODE(false, 2021, "인증코드를 입력해주세요."),
     POST_AUTH_EMPTY_EMAIL(false, 2022, "인증코드를 보낸 이메일이 없습니다."),
+    POST_AUTH_EXISTS_EMAIL(false, 2023, "이미 회원가입이 완료된 이메일입니다."),
 
 
     /**
