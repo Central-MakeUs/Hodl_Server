@@ -51,7 +51,7 @@ public class EmailService {
 
             // 이메일 이미 있으면,
             if(emailProvider.checkEmail(email) == 1) emailDao.updateAuthCode(email, ePw);
-            emailDao.createAuth(email, ePw);
+            else emailDao.createAuth(email, ePw);
         }
         catch (MessagingException e){
             e.printStackTrace();
