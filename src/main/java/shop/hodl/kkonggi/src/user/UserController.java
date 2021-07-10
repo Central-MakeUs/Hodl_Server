@@ -1,7 +1,9 @@
 package shop.hodl.kkonggi.src.user;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.repository.query.Param;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.src.user.model.*;
@@ -128,13 +130,16 @@ public class UserController {
     }
 
     /**
-     * 유저정보변경 API
-     * [PATCH] /users/:userIdx
+     * 유저 닉네임 정보 변경 API
+     * [PATCH] /users/:userIdx/nickname
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PatchMapping("/{userIdx}")
-    public BaseResponse<String> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody User user){
+    @PatchMapping("/{userIdx}/nickname")
+    public BaseResponse<List<String>> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody  PatchNickNameReq patchNickNameReq){
+        if(patchNickNameReq.getNickname() == null){
+            return new BaseResponse<>(PATCH_USERS_EMPTY_NICKNAME);
+        }
         try {
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
@@ -143,15 +148,62 @@ public class UserController {
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
             //같다면 유저네임 변경
-            PatchUserReq patchUserReq = new PatchUserReq(userIdx,user.getUserName());
-            userService.modifyUserName(patchUserReq);
+            PatchUserReq patchUserReq = new PatchUserReq(userIdx, patchNickNameReq.getNickname());
+            return new BaseResponse<>(userService.modifyUserName(patchUserReq, 1));
 
-            String result = "";
-        return new BaseResponse<>(result);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
+    /**
+     * 유저 닉네임 정보 변경 재시도 API
+     * [PATCH] /users/:userIdx/nickname
+     * @return BaseResponse<String>
+     */
+    @ResponseBody
+    @PatchMapping("/{userIdx}/nickname/error")
+    public BaseResponse<List<String>> remodifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody  PatchNickNameReq patchNickNameReq){
+        if(patchNickNameReq.getNickname() == null){
+            return new BaseResponse<>(PATCH_USERS_EMPTY_NICKNAME);
+        }
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            //같다면 유저네임 변경
+            PatchUserReq patchUserReq = new PatchUserReq(userIdx, patchNickNameReq.getNickname());
+            return new BaseResponse<>(userService.modifyUserName(patchUserReq, 4));
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 다시 한 번 알려줄래요?
+     * @param userIdx
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}/nickname")
+    public BaseResponse<List<String>> getFailModifyNickName(@PathVariable("userIdx") int userIdx){
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+            return new BaseResponse<>(userProvider.getFailModifyNickName());
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 }

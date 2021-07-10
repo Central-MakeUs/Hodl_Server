@@ -77,11 +77,54 @@ public class UserDao {
     }
 
     public int modifyUserName(PatchUserReq patchUserReq){
-        String modifyUserNameQuery = "update UserInfo set userName = ? where userIdx = ? ";
-        Object[] modifyUserNameParams = new Object[]{patchUserReq.getUserName(), patchUserReq.getUserIdx()};
+        String modifyUserNameQuery = "update User set nickName = ? where userIdx = ?";
+        Object[] modifyUserNameParams = new Object[]{patchUserReq.getUserNickName(), patchUserReq.getUserIdx()};
 
         return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
     }
+
+    public List<String> getSuccessModifyUserNickName(int groupId){
+        String getPwdQuery = "select content from Chat where Chat.groupId = ? and status = 'Y'";
+        int getPwdParams = groupId;
+
+        List<String> chatArr = this.jdbcTemplate.queryForList(
+                getPwdQuery,
+                String.class,
+                getPwdParams
+        );
+        return chatArr;
+    }
+
+    public List<String> getFalseModifyUserNickName(){
+        String getPwdQuery = "select content from Chat where Chat.groupId = ? and status = 'Y'";
+        int getPwdParams = 3;
+
+        List<String> chatArr = this.jdbcTemplate.queryForList(
+                getPwdQuery,
+                String.class,
+                getPwdParams
+        );
+        return chatArr;
+    }
+
+    public List<String> getFailModifyNickName(){
+        String getPwdQuery = "select content from Chat where Chat.groupId = ? and status = 'Y'";
+        int getPwdParams = 4;
+
+        List<String> chatArr = this.jdbcTemplate.queryForList(
+                getPwdQuery,
+                String.class,
+                getPwdParams
+        );
+        return chatArr;
+    }
+
+    public String getUserNickName(int userIdx){
+        String getNickNameQuery = "select ifnull(nickName, \"\") as nickName from User where userIdx = ? and status = 'Y'";
+
+        return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
+    }
+
 
     public User getPwd(PostLoginReq postLoginReq){
         String getPwdQuery = "select userIdx, email, password, ifnull(nickName, '') as  nickName from User where email = ? and status = 'Y'";

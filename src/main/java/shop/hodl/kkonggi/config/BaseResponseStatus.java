@@ -39,6 +39,9 @@ public enum BaseResponseStatus {
     POST_AUTH_EMPTY_EMAIL(false, 2022, "인증코드를 보낸 이메일이 없습니다."),
     POST_AUTH_EXISTS_EMAIL(false, 2023, "이미 회원가입이 완료된 이메일입니다."),
 
+    PATCH_USERS_EMPTY_NICKNAME(false, 2024, "닉네임을 입력해주세요."),
+    PATCH_USERS_ALREADY_NICKNAME(false, 2025, "똑같은 닉네임입니다."),
+
 
     /**
      * 3000 : Response 오류

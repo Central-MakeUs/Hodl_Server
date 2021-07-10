@@ -94,4 +94,17 @@ public class UserProvider {
 
     }
 
+    public String getUserNickName(int userIdx){
+        return userDao.getUserNickName(userIdx);
+    }
+
+    public List<String> getFailModifyNickName() throws BaseException{
+        try{
+
+            return userDao.getFailModifyNickName();
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
 }
