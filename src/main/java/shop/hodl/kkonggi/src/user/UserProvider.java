@@ -3,8 +3,7 @@ package shop.hodl.kkonggi.src.user;
 
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.secret.Secret;
-import shop.hodl.kkonggi.src.user.model.GetUserRes;
-import shop.hodl.kkonggi.src.user.model.PostLoginReq;
+import shop.hodl.kkonggi.src.user.model.*;
 import shop.hodl.kkonggi.utils.AES128;
 import shop.hodl.kkonggi.utils.JwtService;
 import org.slf4j.Logger;
@@ -12,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.user.model.PostLoginRes;
-import shop.hodl.kkonggi.src.user.model.User;
 
 import java.util.List;
 
@@ -100,11 +97,24 @@ public class UserProvider {
 
     public List<String> getFailModifyNickName() throws BaseException{
         try{
-
             return userDao.getFailModifyNickName();
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
 
+    public GetChatRes getNickNameInput(String name) throws BaseException{
+        try{
+            GetChatRes getChatRes = userDao.getNickNameInput();
+            String toReplcae = "%User_Nickname%";
+            for(int i = 0; i < getChatRes.getChat().size(); i++){
+                if(getChatRes.getChat().get(i).getContent().contains(toReplcae)){
+                    getChatRes.getChat().get(i).setContent(getChatRes.getChat().get(i).getContent().replace(toReplcae, name));
+                }
+            }
+            return getChatRes;
+        } catch (Exception exception) {
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
 }

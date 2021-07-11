@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.query.Param;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
+import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.user.model.*;
 import shop.hodl.kkonggi.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +112,7 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
     /**
      * 로그인 API
      * [POST] /users/logIn
@@ -125,6 +127,28 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 닉네임 초기 설정 API
+     * @param name
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/nickname")
+    public BaseResponse<GetChatRes> getUserNickName(@RequestParam("name") String name){
+        if(name.isEmpty()){
+            return new BaseResponse<>(BaseResponseStatus.PATCH_USERS_EMPTY_NICKNAME);   // 닉네임을 입력해주세요.
+        }
+        try{
+            int userIdx = jwtService.getUserIdx();
+            logger.info("userIdx : " + userIdx, ", name : " + name);
+            GetChatRes getChatRes = userProvider.getNickNameInput(name);
+            return new BaseResponse<>(getChatRes);
+        }
+        catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }

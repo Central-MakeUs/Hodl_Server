@@ -125,6 +125,34 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
     }
 
+    public GetChatRes getNickNameInput(){
+        String groupId = "NICKNAME_INPUT";
+        int scenarioIdx = 1;    // 닉네임 시나리오 idx = 1
+        String getChatQuery = "select chatType, target, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
+        String getActionQuery = "select distinct actionType, target from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
+        String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
+
+        return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum)-> new GetChatRes.Chat(
+                        rs.getString("chatType"),
+                        rs.getString("target"),
+                        rs.getString("date"),
+                        rs.getString("time"),
+                        rs.getString("content")
+                ), groupId, scenarioIdx),
+
+                this.jdbcTemplate.queryForObject(getActionQuery,
+                        (rs, rowNum)-> new GetChatRes.Action(
+                                rs.getString("actionType"),
+                                rs.getString("target"),
+                                this.jdbcTemplate.query(getActionContentQuery,
+                                        (rk, rkNum)-> new GetChatRes.Action.Choice(
+                                                rk.getString("actionId"),
+                                                rk.getString("content")
+                                        ), groupId, scenarioIdx)
+                        ), groupId, scenarioIdx)
+                );
+    }
 
     public User getPwd(PostLoginReq postLoginReq){
         String getPwdQuery = "select userIdx, email, password, ifnull(nickName, '') as  nickName from User where email = ? and status = 'Y'";
