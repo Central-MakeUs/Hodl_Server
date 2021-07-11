@@ -109,7 +109,7 @@ public class UserDao {
 
     public List<String> getFailModifyNickName(){
         String getPwdQuery = "select content from Chat where Chat.groupId = ? and status = 'Y'";
-        int getPwdParams = 4;
+        int getPwdParams = 2;
 
         List<String> chatArr = this.jdbcTemplate.queryForList(
                 getPwdQuery,
