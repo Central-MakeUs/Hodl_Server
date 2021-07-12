@@ -43,6 +43,9 @@ public enum BaseResponseStatus {
     PATCH_USERS_ALREADY_NICKNAME(false, 2025, "똑같은 닉네임입니다."),
 
 
+    GET_MEDICINE_EMPTY_NAME(false, 2030, "약 이름을 입력해주세요."),
+
+
     /**
      * 3000 : Response 오류
      */
