@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import shop.hodl.kkonggi.src.medicine.model.GetMedAddTime;
 import shop.hodl.kkonggi.src.medicine.model.GetStepperChatRes;
+import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
 import javax.sql.DataSource;
@@ -149,5 +150,22 @@ public class MedicineDao {
         String getNickNameQuery = "select ifnull(nickName, \"\") as nickName from User where userIdx = ? and status = 'Y'";
 
         return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
+    }
+
+    public int checkMedicine(int userIdx, String medicineRealName){
+        String checkMedicineQuery = "select exists(select medicineRealName from Medicine where userIdx= ? and medicineRealName = ? and status = 'Y')";
+        Object[] checkMedicineParams = new Object[]{userIdx, medicineRealName};
+
+        return this.jdbcTemplate.queryForObject(checkMedicineQuery, int.class, checkMedicineParams);
+    }
+
+    public int createMedicine(PostMedicineReq postMedicineReq){
+        String createMedicineQuery = "INSERT INTO  Medicine (userIdx, medicineRealName, cycle, days, takeTimes, startDay, endDay) values (?, ?, ?, ?, ?, ?, ?)";
+        Object[] createMedicineParams = new Object[]{postMedicineReq.getUserIdx(), postMedicineReq.getMedicineRealName(), postMedicineReq.getCycle(), postMedicineReq.getDays(), postMedicineReq.getTakeTimes(), postMedicineReq.getStartDay(), postMedicineReq.getEndDay()};
+
+        this.jdbcTemplate.update(createMedicineQuery, createMedicineParams);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
     }
 }

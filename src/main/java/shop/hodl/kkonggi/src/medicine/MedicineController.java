@@ -9,7 +9,7 @@ import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedAddTime;
 import shop.hodl.kkonggi.src.medicine.model.GetStepperChatRes;
-import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
+import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
@@ -76,7 +76,7 @@ public class MedicineController {
     @GetMapping("/cycle")
     public BaseResponse<GetStepperChatRes> getMedAddCycle(@RequestParam("name") String name){
         if(name.isEmpty()){
-            return new BaseResponse<>(BaseResponseStatus.GET_MEDICINE_EMPTY_NAME);
+            return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_NAME);
         }
         try {
             int userIdx = jwtService.getUserIdx();
@@ -144,26 +144,40 @@ public class MedicineController {
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_IS_OK";
-            GetChatRes getChatRes = medicineProvider.getMedModify(userIdx, groupId, scenarioIdx);
+            GetChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
             return new BaseResponse<>(getChatRes);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
-    /**
+
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<GetChatRes> createMedicine(@RequestBody PostMedicineReq postMedicineReq){
+    public BaseResponse<GetChatRes> createMedicine(@RequestBody MedicineDTO medicineDTO){
         try {
+            if(medicineDTO.getName().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_NAME);
+            if(medicineDTO.getStart().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_START);
+            if(medicineDTO.getDays() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_DAYS);
+            if(medicineDTO.getTimes() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_TIME);
+
+            if(medicineDTO.getDays().length != 7){
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+            }
+
+            if(medicineDTO.getTimes().length != 5){
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_INVALID_TIME);
+            }
+
             int userIdx = jwtService.getUserIdx();
-            medicineService.createMedicine(userIdx, postMedicineReq);
+             GetChatRes getChatRes = medicineService.createMedicine(userIdx, medicineDTO);
+            return new BaseResponse<>(getChatRes);
 
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }
-     */
+
 
     @ResponseBody
     @GetMapping("modify")
@@ -171,7 +185,7 @@ public class MedicineController {
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_MODIFY";
-            GetChatRes getChatRes = medicineProvider.getMedModify(userIdx, groupId, scenarioIdx);
+            GetChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
             return new BaseResponse<>(getChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());

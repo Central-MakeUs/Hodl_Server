@@ -42,8 +42,14 @@ public enum BaseResponseStatus {
     PATCH_USERS_EMPTY_NICKNAME(false, 2024, "닉네임을 입력해주세요."),
     PATCH_USERS_ALREADY_NICKNAME(false, 2025, "똑같은 닉네임입니다."),
 
+    POST_MEDICINE_EMPTY_NAME(false, 2030, "약 이름을 입력해주세요."),
+    POST_MEDICINE_EMPTY_START(false, 2031, "약을 처음 먹은 날짜를 입력해주세요."),
+    POST_MEDICINE_EMPTY_DAYS(false, 2032, "약 먹는 날을 입력해주세요."),
+    POST_MEDICINE_EMPTY_TIME(false, 2033, "약 먹는 시간을 입력해주세요."),
+    POST_MEDICINE_INVALID_DAYS(false, 2034, "약 먹는 날의 형식을 확인해주세요."),
+    POST_MEDICINE_INVALID_TIME(false, 2035, "약 먹는 시간의 형식을 확인해주세요."),
+    POST_MEDICINE_EXISTS(false, 2036, "중복된 약물입니다."),
 
-    GET_MEDICINE_EMPTY_NAME(false, 2030, "약 이름을 입력해주세요."),
 
 
     /**

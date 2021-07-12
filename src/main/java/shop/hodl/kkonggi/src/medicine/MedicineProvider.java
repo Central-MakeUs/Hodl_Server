@@ -86,13 +86,17 @@ public class MedicineProvider {
         }
     }
 
-    public GetChatRes getMedModify(int userIdx, String groupId, int scenarioIdx) throws BaseException {
+    public GetChatRes getMedChats(int userIdx, String groupId, int scenarioIdx) throws BaseException {
         try{
             GetChatRes getChatRes = medicineDao.getChats(groupId, scenarioIdx);
 
             // 닉네임 변경
             String replace = "%user_nickname%";
-            getChatRes.getChat().get(0).setContent(getChatRes.getChat().get(0).getContent().replace(replace, getUserNickName(userIdx)));
+            for(int i = 0; i < getChatRes.getChat().size(); i++){
+                if(getChatRes.getChat().get(i).getContent().contains(replace)){
+                    getChatRes.getChat().get(i).setContent(getChatRes.getChat().get(i).getContent().replace(replace, getUserNickName(userIdx)));
+                }
+            }
 
             return getChatRes;
         } catch (Exception exception){
@@ -107,5 +111,14 @@ public class MedicineProvider {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
+
+    public int checkMedicine(int userIdx, String medicineRealName) throws BaseException{
+        try{
+            return medicineDao.checkMedicine(userIdx, medicineRealName);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
 
 }
