@@ -95,9 +95,12 @@ public class UserProvider {
         return userDao.getUserNickName(userIdx);
     }
 
-    public List<String> getFailModifyNickName() throws BaseException{
+    public GetChatRes getFailModifyNickName() throws BaseException{
         try{
-            return userDao.getFailModifyNickName();
+            String groupId = "NICKNAME_RE_ENTER";
+            int scenarioIdx = 1;    // 닉네임 시나리오 idx = 1
+
+            return userDao.getChats(groupId, scenarioIdx);
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -105,7 +108,10 @@ public class UserProvider {
 
     public GetChatRes getNickNameInput(String name) throws BaseException{
         try{
-            GetChatRes getChatRes = userDao.getNickNameInput();
+            String groupId = "NICKNAME_INPUT";  // 처음 닉네임 설정
+            int scenarioIdx = 1;    // 닉네임 시나리오 idx = 1
+
+            GetChatRes getChatRes = userDao.getChats(groupId, scenarioIdx);
             String toReplcae = "%User_Nickname%";
             for(int i = 0; i < getChatRes.getChat().size(); i++){
                 if(getChatRes.getChat().get(i).getContent().contains(toReplcae)){

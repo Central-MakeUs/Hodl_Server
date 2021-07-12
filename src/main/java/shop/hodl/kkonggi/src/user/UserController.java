@@ -154,26 +154,44 @@ public class UserController {
     }
 
     /**
-     * 유저 닉네임 정보 변경 API
-     * [PATCH] /users/:userIdx/nickname
+     * 유저 닉네임 정보 변경 API [응!맞아] 클릭시
+     * [PATCH] app/v1/users/nickname/yes
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PatchMapping("/{userIdx}/nickname")
-    public BaseResponse<List<String>> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody  PatchNickNameReq patchNickNameReq){
+    @PatchMapping("/nickname/yes")
+    public BaseResponse<GetChatRes> modifyUserName(@RequestBody  PatchNickNameReq patchNickNameReq){
         if(patchNickNameReq.getNickname() == null){
             return new BaseResponse<>(PATCH_USERS_EMPTY_NICKNAME);
         }
         try {
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
-            //userIdx와 접근한 유저가 같은지 확인
-            if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
-            }
+
             //같다면 유저네임 변경
-            PatchUserReq patchUserReq = new PatchUserReq(userIdx, patchNickNameReq.getNickname());
-            return new BaseResponse<>(userService.modifyUserName(patchUserReq, 1));
+            PatchUserReq patchUserReq = new PatchUserReq(userIdxByJwt, patchNickNameReq.getNickname());
+            String groupId = "NICKNAME_SUCCESS";
+            return new BaseResponse<>(userService.modifyUserName(patchUserReq, groupId));
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 앗 잘못 말했어 클릭
+     * [GET] app/v1/users/nickname/no
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/nickname/no")
+    public BaseResponse<GetChatRes> getFailModifyNickName(){
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+
+            return new BaseResponse<>(userProvider.getFailModifyNickName());
 
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
@@ -182,48 +200,22 @@ public class UserController {
 
     /**
      * 유저 닉네임 정보 변경 재시도 API
-     * [PATCH] /users/:userIdx/nickname
+     * [PATCH] app/v1/users/nickname
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PatchMapping("/{userIdx}/nickname/error")
-    public BaseResponse<List<String>> remodifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody  PatchNickNameReq patchNickNameReq){
+    @PatchMapping("/nickname/error")
+    public BaseResponse<GetChatRes> remodifyUserName(@RequestBody  PatchNickNameReq patchNickNameReq){
         if(patchNickNameReq.getNickname() == null){
             return new BaseResponse<>(PATCH_USERS_EMPTY_NICKNAME);
         }
         try {
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
-            //userIdx와 접근한 유저가 같은지 확인
-            if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
-            }
             //같다면 유저네임 변경
-            PatchUserReq patchUserReq = new PatchUserReq(userIdx, patchNickNameReq.getNickname());
-            return new BaseResponse<>(userService.modifyUserName(patchUserReq, 4));
-
-        } catch (BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
-
-    /**
-     * 다시 한 번 알려줄래요?
-     * @param userIdx
-     * @return
-     */
-    @ResponseBody
-    @GetMapping("/{userIdx}/nickname")
-    public BaseResponse<List<String>> getFailModifyNickName(@PathVariable("userIdx") int userIdx){
-        try {
-            //jwt에서 idx 추출.
-            int userIdxByJwt = jwtService.getUserIdx();
-            //userIdx와 접근한 유저가 같은지 확인
-            if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
-            }
-
-            return new BaseResponse<>(userProvider.getFailModifyNickName());
+            String groupId = "NICKNAME_RE_SUCCESS";
+            PatchUserReq patchUserReq = new PatchUserReq(userIdxByJwt, patchNickNameReq.getNickname());
+            return new BaseResponse<>(userService.modifyUserName(patchUserReq, groupId));
 
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
