@@ -193,4 +193,17 @@ public class MedicineController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    @ResponseBody
+    @GetMapping("no")
+    public BaseResponse<GetMedChatRes> getMEdAddNo(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "COM_OK";
+            GetMedChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, 0);
+            return new BaseResponse<>(getChatRes);
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

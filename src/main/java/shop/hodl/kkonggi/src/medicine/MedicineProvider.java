@@ -94,7 +94,9 @@ public class MedicineProvider {
 
     public GetMedChatRes getMedChats(int userIdx, String groupId, int scenarioIdx) throws BaseException {
         try{
-            GetMedChatRes getChatRes = medicineDao.getChats(groupId, scenarioIdx);
+            GetMedChatRes getChatRes;
+            if(scenarioIdx == 0) getChatRes = medicineDao.getChatsNoAction(groupId, scenarioIdx);
+            else getChatRes = medicineDao.getChats(groupId, scenarioIdx);
 
             // 닉네임 변경
             String replace = "%user_nickname%";

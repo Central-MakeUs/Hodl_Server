@@ -44,11 +44,11 @@ public class MedicineDao {
         );
     }
 
-    public GetChatRes getChatsNoAction(String groupId, int scenarioIdx){
+    public GetMedChatRes getChatsNoAction(String groupId, int scenarioIdx){
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
 
-        return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
-                (rs, rowNum)-> new GetChatRes.Chat(
+        return new GetMedChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum)-> new GetMedChatRes.Chat(
                         rs.getString("chatType"),
                         rs.getString("date"),
                         rs.getString("time"),
@@ -97,7 +97,7 @@ public class MedicineDao {
 
         if(i == 0){
             // Chat에 추가
-            getMedChatRes.setChat(this.jdbcTemplate.query(getChatQuery,
+            getMedChatRes.setChat(this.jdbcTemplate.query(getStepChatQuery,
                     (rs, rowNum) -> new GetMedChatRes.StepperChat(
                             rs.getString("chatType"),
                             getTotalStepNumber(scenarioIdx),
@@ -120,7 +120,7 @@ public class MedicineDao {
         }
         if (i == 1) {
             // Chat에 추가
-            getMedChatRes.getChat().add(this.jdbcTemplate.queryForObject(getStepChatQuery,
+            getMedChatRes.getChat().add(this.jdbcTemplate.queryForObject(getChatQuery,
                     (rs, rowNum) -> new GetMedChatRes.Chat(
                             rs.getString("chatType"),
                             rs.getString("date"),
