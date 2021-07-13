@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.medicine.model.GetMedAddTime;
-import shop.hodl.kkonggi.src.medicine.model.GetStepperChatRes;
+import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
@@ -36,11 +35,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<GetChatRes> getMedAddInput(){
+    public BaseResponse<GetMedChatRes> getMedAddInput(){
 
         try {
             int userIdx = jwtService.getUserIdx();
-            GetChatRes getChatRes = medicineProvider.getMedAddInput();
+            GetMedChatRes getChatRes = medicineProvider.getMedAddInput();
             return new BaseResponse<>(getChatRes);
 
         } catch (BaseException exception){
@@ -54,14 +53,14 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/name")
-    public BaseResponse<GetStepperChatRes> getMedAddName(){
+    public BaseResponse<GetMedChatRes> getMedAddName(){
         try {
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_NAME";
             int stepNumber = 1;
 
-            GetStepperChatRes getStepperChatRes = medicineProvider.getMedAdd(groupId, scenarioIdx, stepNumber);
-            return new BaseResponse<>(getStepperChatRes);
+            GetMedChatRes getMedChatRes = medicineProvider.getMedAdd(groupId, scenarioIdx, stepNumber);
+            return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -74,14 +73,17 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/cycle")
-    public BaseResponse<GetStepperChatRes> getMedAddCycle(@RequestParam("name") String name){
+    public BaseResponse<GetMedChatRes> getMedAddCycle(@RequestParam("name") String name){
         if(name.isEmpty()){
             return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_NAME);
         }
         try {
             int userIdx = jwtService.getUserIdx();
-            GetStepperChatRes getStepperChatRes = medicineProvider.getMedAddCycle(name);
-            return new BaseResponse<>(getStepperChatRes);
+            String groupId = "MED_ADD_CYCLE";
+            int scenarioIdx = 2;
+            int stepNumber = 2;
+            GetMedChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx,name, groupId, scenarioIdx, stepNumber);
+            return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -94,13 +96,13 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/start")
-    public BaseResponse<GetStepperChatRes> getMedAddStart(){
+    public BaseResponse<GetMedChatRes> getMedAddStart(){
         try {
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_START";
             int stepNumber = 3;
-            GetStepperChatRes getStepperChatRes = medicineProvider.getMedAdd(groupId, scenarioIdx, stepNumber);
-            return new BaseResponse<>(getStepperChatRes);
+            GetMedChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx, "", groupId, scenarioIdx, stepNumber);
+            return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -113,13 +115,13 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/end")
-    public BaseResponse<GetStepperChatRes> getMedAddEnd(){
+    public BaseResponse<GetMedChatRes> getMedAddEnd(){
         try {
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_END";
             int stepNumber = 4;
-            GetStepperChatRes getStepperChatRes = medicineProvider.getMedAdd(groupId, scenarioIdx, stepNumber);
-            return new BaseResponse<>(getStepperChatRes);
+            GetMedChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx, "", groupId, scenarioIdx, stepNumber);
+            return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -128,11 +130,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("/time")
-    public BaseResponse<GetMedAddTime> getMedAddTime(){
+    public BaseResponse<GetMedChatRes> getMedAddTime(){
         try{
             int userIdx = jwtService.getUserIdx();
-            GetMedAddTime getMedAddTime = medicineProvider.getMedAddTime();
-            return new BaseResponse<>(getMedAddTime);
+            GetMedChatRes getMedChatRes = medicineProvider.getMedAddTime();
+            return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
@@ -140,11 +142,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("check")
-    public BaseResponse<GetChatRes> getMedAddCheck(){
+    public BaseResponse<GetMedChatRes> getMedAddCheck(){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_IS_OK";
-            GetChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
+            GetMedChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
             return new BaseResponse<>(getChatRes);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -154,7 +156,7 @@ public class MedicineController {
 
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<GetChatRes> createMedicine(@RequestBody MedicineDTO medicineDTO){
+    public BaseResponse<GetMedChatRes> createMedicine(@RequestBody MedicineDTO medicineDTO){
         try {
             if(medicineDTO.getName().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_NAME);
             if(medicineDTO.getStart().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_START);
@@ -170,7 +172,7 @@ public class MedicineController {
             }
 
             int userIdx = jwtService.getUserIdx();
-             GetChatRes getChatRes = medicineService.createMedicine(userIdx, medicineDTO);
+            GetMedChatRes getChatRes = medicineService.createMedicine(userIdx, medicineDTO);
             return new BaseResponse<>(getChatRes);
 
         } catch (BaseException exception){
@@ -181,11 +183,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("modify")
-    public BaseResponse<GetChatRes> getMedAddModify(){
+    public BaseResponse<GetMedChatRes> getMedAddModify(){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_MODIFY";
-            GetChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
+            GetMedChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
             return new BaseResponse<>(getChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());

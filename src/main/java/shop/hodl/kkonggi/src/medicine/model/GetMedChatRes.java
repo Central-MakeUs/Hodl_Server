@@ -11,17 +11,30 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetStepperChatRes {
-    private int stepperChatCnt; // 스탭퍼 챗 전체 갯수
-    private List<StepperChat> stepperChat;
+public class GetMedChatRes {
+
+    private List<Chat> chat;
     private Action action;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class StepperChat {   // 말풍선
+    public static class Chat {   // 말풍선
         private String chatType; //  텍스트 : NORMAL, 이미지 : IMAGE, 리스트 : LIST, 스태퍼 챗 : STEPPER,
+        //private String chatId; // 챗봇 시나리오에 있는 CHAT_ID
+        private String date; // YYYYMMDD
+        private String time;    // hh:ss (pm/am)
+        private String content; // 실제 내용
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class StepperChat extends Chat {   // 말풍선
+        private String chatType; //  텍스트 : NORMAL, 이미지 : IMAGE, 리스트 : LIST, 스태퍼 챗 : STEPPER,
+        private int stepperChatCnt;
         private int chatOrder;  // stepperchat 순서
         private String date; // YYYYMMDD
         private String time;    // hh:ss (pm/am)

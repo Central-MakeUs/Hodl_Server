@@ -3,8 +3,7 @@ package shop.hodl.kkonggi.src.medicine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import shop.hodl.kkonggi.src.medicine.model.GetMedAddTime;
-import shop.hodl.kkonggi.src.medicine.model.GetStepperChatRes;
+import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
@@ -19,14 +18,14 @@ public class MedicineDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public GetChatRes getChats(String groupId, int scenarioIdx){
+    public GetMedChatRes getChats(String groupId, int scenarioIdx){
 
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
         String getActionQuery = "select distinct actionType from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
         String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
 
-        return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
-                (rs, rowNum)-> new GetChatRes.Chat(
+        return new GetMedChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum)-> new GetMedChatRes.Chat(
                         rs.getString("chatType"),
                         rs.getString("date"),
                         rs.getString("time"),
@@ -34,10 +33,10 @@ public class MedicineDao {
                 ), groupId, scenarioIdx),
 
                 this.jdbcTemplate.queryForObject(getActionQuery,
-                        (rs, rowNum)-> new GetChatRes.Action(
+                        (rs, rowNum)-> new GetMedChatRes.Action(
                                 rs.getString("actionType"),
                                 this.jdbcTemplate.query(getActionContentQuery,
-                                        (rk, rkNum)-> new GetChatRes.Action.Choice(
+                                        (rk, rkNum)-> new GetMedChatRes.Action.Choice(
                                                 rk.getString("actionId"),
                                                 rk.getString("content")
                                         ), groupId, scenarioIdx)
@@ -64,86 +63,73 @@ public class MedicineDao {
         return this.jdbcTemplate.queryForObject(getQuery, int.class, scenarioIdx);
     }
 
-    public GetStepperChatRes getStepperChats(String groupId, int scenarioIdx, int stepNumber){
-
+    public GetMedChatRes getMedChatRes(String groupId, int scenarioIdx, int stepNumber){
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and Chat.chatType = 'BOT_STEPPER' and scenarioIdx = ?";
         String getActionQuery = "select distinct actionType from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
         String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
 
-        return this.jdbcTemplate.queryForObject(getChatQuery,
-                ((rs, rowNum) -> new GetStepperChatRes(
+        return new GetMedChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum) -> new GetMedChatRes.StepperChat(
+                        rs.getString("chatType"),
                         getTotalStepNumber(scenarioIdx),
-                        this.jdbcTemplate.query(getChatQuery,
-                                (rr, rrNum)-> new GetStepperChatRes.StepperChat(
-                                        rr.getString("chatType"),
-                                        stepNumber,
-                                        rr.getString("date"),
-                                        rr.getString("time"),
-                                        rr.getString("content")
-                                ), groupId, scenarioIdx),
-                        this.jdbcTemplate.queryForObject(getActionQuery,
-                                (rf, rfNum)-> new GetStepperChatRes.Action(
-                                        rf.getString("actionType"),
-                                        this.jdbcTemplate.query(getActionContentQuery,
-                                                (rk, rkNum)-> new GetStepperChatRes.Action.Choice(
-                                                        rk.getString("actionId"),
-                                                        rk.getString("content")
-                                                ), groupId, scenarioIdx)
-                                ), groupId, scenarioIdx)
-                )), groupId, scenarioIdx);
-
+                        stepNumber,
+                        rs.getString("date"),
+                        rs.getString("time"),
+                        rs.getString("content")
+                ), groupId, scenarioIdx),
+                this.jdbcTemplate.queryForObject(getActionQuery,
+                        (rs, rowNum)-> new GetMedChatRes.Action(
+                                rs.getString("actionType"),
+                                this.jdbcTemplate.query(getActionContentQuery,
+                                        (rk, rkNum)-> new GetMedChatRes.Action.Choice(
+                                                rk.getString("actionId"),
+                                                rk.getString("content")
+                                        ), groupId, scenarioIdx)
+                        ), groupId, scenarioIdx
+                ));
     }
 
-    public GetStepperChatRes getStepperChatsNoAction(String groupId, int scenarioIdx, int stepNumber){
-        String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and Chat.chatType = 'BOT_STEPPER' and scenarioIdx = ?";
-
-        return this.jdbcTemplate.queryForObject(getChatQuery,
-                ((rs, rowNum) -> new GetStepperChatRes(
-                getTotalStepNumber(scenarioIdx),
-                this.jdbcTemplate.query(getChatQuery,
-                        (rr, rrNum)-> new GetStepperChatRes.StepperChat(
-                                rr.getString("chatType"),
-                                stepNumber,
-                                rr.getString("date"),
-                                rr.getString("time"),
-                                rr.getString("content")
-                        ), groupId, scenarioIdx),
-                        null
-                )), groupId, scenarioIdx);
-    }
-
-    public GetMedAddTime getMedAddTime(String groupId, int scenarioIdx, int stepNumber){
+    public GetMedChatRes getMedAddTime(String groupId, int scenarioIdx, int stepNumber, GetMedChatRes getMedChatRes, int i){
         String getStepChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and Chat.chatType = 'BOT_STEPPER' and scenarioIdx = ?";
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and Chat.chatType = 'BOT_NORMAL' and scenarioIdx = ?";
         String getActionQuery = "select distinct actionType from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
         String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
 
-        return new GetMedAddTime(
-                getTotalStepNumber(scenarioIdx),
-                this.jdbcTemplate.queryForObject(getStepChatQuery,
-                        (rs, rowNum) -> new GetMedAddTime.StepperChat(
-                                rs.getString("chatType"),
-                                stepNumber,
-                                rs.getString("date"),
-                                rs.getString("time"),
-                                rs.getString("content")
-                        ), groupId, scenarioIdx),
-                        this.jdbcTemplate.queryForObject(getChatQuery, (rs, rowNum) -> new GetMedAddTime.Chat(
-                                rs.getString("chatType"),
-                                rs.getString("date"),
-                                rs.getString("time"),
-                                rs.getString("content")
-                        ), groupId, scenarioIdx),
-                        this.jdbcTemplate.queryForObject(getActionQuery,
-                        (rs, rowNum)-> new GetMedAddTime.Action(
-                                rs.getString("actionType"),
-                                this.jdbcTemplate.query(getActionContentQuery,
-                                        (rk, rkNum)-> new GetMedAddTime.Action.Choice(
-                                                rk.getString("actionId"),
-                                                rk.getString("content")
-                                        ), groupId, scenarioIdx)
-                        ), groupId, scenarioIdx)
-                );
+        if(i == 0){
+            // Chat에 추가
+            getMedChatRes.setChat(this.jdbcTemplate.query(getChatQuery,
+                    (rs, rowNum) -> new GetMedChatRes.StepperChat(
+                            rs.getString("chatType"),
+                            getTotalStepNumber(scenarioIdx),
+                            stepNumber,
+                            rs.getString("date"),
+                            rs.getString("time"),
+                            rs.getString("content")
+                    ), groupId, scenarioIdx));
+
+            // Action
+            getMedChatRes.setAction(this.jdbcTemplate.queryForObject(getActionQuery,
+                    (rs, rowNum)-> new GetMedChatRes.Action(
+                            rs.getString("actionType"),
+                            this.jdbcTemplate.query(getActionContentQuery,
+                                    (rk, rkNum)-> new GetMedChatRes.Action.Choice(
+                                            rk.getString("actionId"),
+                                            rk.getString("content")
+                                    ), groupId, scenarioIdx)
+                    ), groupId, scenarioIdx));
+        }
+        if (i == 1) {
+            // Chat에 추가
+            getMedChatRes.getChat().add(this.jdbcTemplate.queryForObject(getStepChatQuery,
+                    (rs, rowNum) -> new GetMedChatRes.Chat(
+                            rs.getString("chatType"),
+                            rs.getString("date"),
+                            rs.getString("time"),
+                            rs.getString("content")
+                    ), groupId, scenarioIdx));
+
+        }
+        return getMedChatRes;
     }
 
     public String getUserNickName(int userIdx){

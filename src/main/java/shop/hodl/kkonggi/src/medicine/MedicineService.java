@@ -3,14 +3,13 @@ package shop.hodl.kkonggi.src.medicine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
+import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
 import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
-import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
@@ -33,7 +32,7 @@ public class MedicineService {
 
 
     @Transactional
-    public GetChatRes createMedicine(int userIdx, MedicineDTO medicineDTO) throws BaseException {
+    public GetMedChatRes createMedicine(int userIdx, MedicineDTO medicineDTO) throws BaseException {
 
         String cycle = "";
         int days = intArrayToInt(medicineDTO.getDays());
