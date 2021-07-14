@@ -174,7 +174,23 @@ public class MedicineController {
             // 채팅 실패
             GetMedChatRes getSaveFailedChats = medicineProvider.getSaveFailedChats(userIdx);
 
-            if(getChatRes.equals(getSaveFailedChats)) return new BaseResponse<>(getChatRes, BaseResponseStatus.CHAT_ERROR);
+            if(getChatRes.equals(getSaveFailedChats)) {
+                String actionType = "MEDICINE_ADD_FAIL";
+                String actionIdRe = "MED_ADD_FAIL_RETRY";
+                String actionIdFail = "MED_ADD_FAIL_DISCARD";
+
+                getChatRes.getAction().setActionType(actionType);
+                for(int i= 0; i < getChatRes.getAction().getChoiceList().size(); i++){
+                    if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("취소")){
+                        getChatRes.getAction().getChoiceList().get(i).setActionId(actionIdFail);
+                    }
+                    if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("재전송")){
+                        getChatRes.getAction().getChoiceList().get(i).setActionId(actionIdRe);
+                    }
+                }
+                return new BaseResponse<>(getChatRes, BaseResponseStatus.CHAT_ERROR);
+            }
+
 
             return new BaseResponse<>(getChatRes);
         } catch (BaseException exception){
