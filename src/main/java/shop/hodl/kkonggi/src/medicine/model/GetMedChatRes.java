@@ -59,4 +59,32 @@ public class GetMedChatRes {
             private String content; // 내용
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof GetMedChatRes){
+            for (int i = 0; i < this.getChat().size(); i++){
+                if(!this.getChat().get(i).getContent().equals(((GetMedChatRes) obj).getChat().get(i).getContent()))
+                    return false;
+                if(!this.getChat().get(i).getChatType().equals(((GetMedChatRes) obj).getChat().get(i).getChatType()))
+                    return false;
+                if(!this.getChat().get(i).getDate().equals(((GetMedChatRes) obj).getChat().get(i).getDate()))
+                    return false;
+                if(!this.getChat().get(i).getTime().equals(((GetMedChatRes) obj).getChat().get(i).getTime()))
+                    return false;
+            }
+            if(!this.getAction().getActionType().equals(((GetMedChatRes) obj).getAction().getActionType())) return false;
+
+            for (int i = 0; i < this.getAction().getChoiceList().size(); i++){
+                if(!this.getAction().getChoiceList().get(i).getActionId().equals(((GetMedChatRes) obj).getAction().getChoiceList().get(i).getActionId()))
+                    return false;
+                if(!this.getAction().getChoiceList().get(i).getContent().equals(((GetMedChatRes) obj).getAction().getChoiceList().get(i).getContent()))
+                    return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -57,7 +57,7 @@ public class MedicineService {
             int scenarioIdx;
             String groupId;
 
-            if(medicineIdx > 0){
+            if(medicineIdx > 1000){
                 scenarioIdx = 2;
                 groupId = "MED_ADD_SUCCESS";
             } else{

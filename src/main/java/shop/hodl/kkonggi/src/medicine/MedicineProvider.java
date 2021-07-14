@@ -95,7 +95,7 @@ public class MedicineProvider {
     public GetMedChatRes getMedChats(int userIdx, String groupId, int scenarioIdx) throws BaseException {
         try{
             GetMedChatRes getChatRes;
-            if(scenarioIdx == 0) getChatRes = medicineDao.getChatsNoAction(groupId, scenarioIdx);
+            if(groupId.equals("COM_OK")) getChatRes = medicineDao.getChatsNoAction(groupId, scenarioIdx);
             else getChatRes = medicineDao.getChats(groupId, scenarioIdx);
 
             // 닉네임 변경
@@ -107,6 +107,18 @@ public class MedicineProvider {
             }
 
             return getChatRes;
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public GetMedChatRes getSaveFailedChats(int userIdx) throws BaseException{
+        int scenarioIdx = 0;
+        String groupId = "SAVE_FAIL";
+
+        try{
+            GetMedChatRes getMedChatRes = medicineDao.getChats(groupId, scenarioIdx);
+            return getMedChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -127,6 +139,7 @@ public class MedicineProvider {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
+
 
 
 }

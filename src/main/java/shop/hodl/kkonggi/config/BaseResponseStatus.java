@@ -77,8 +77,10 @@ public enum BaseResponseStatus {
     PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
 
     // Send Mail
-    SEND_MAIL_ERROR(false, 4020, "인증코드 전송에 실패하였습니다.");
+    SEND_MAIL_ERROR(false, 4020, "인증코드 전송에 실패하였습니다."),
 
+    // 채팅으로 요청 실패한 경우
+    CHAT_ERROR(false, 4100, "요청에 실패하였습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요

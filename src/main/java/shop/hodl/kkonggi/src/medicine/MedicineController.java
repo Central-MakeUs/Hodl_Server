@@ -18,7 +18,7 @@ public class MedicineController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // 약물 추가 시나리오 Idx
-    private static int scenarioIdx = 2;
+    private static final int scenarioIdx = 2;
 
     @Autowired
     private final MedicineProvider medicineProvider;
@@ -163,18 +163,20 @@ public class MedicineController {
             if(medicineDTO.getDays() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_DAYS);
             if(medicineDTO.getTimes() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_TIME);
 
-            if(medicineDTO.getDays().length != 7){
+            if(medicineDTO.getDays().length != 7)
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
-            }
 
-            if(medicineDTO.getTimes().length != 5){
+            if(medicineDTO.getTimes().length != 5)
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_INVALID_TIME);
-            }
 
             int userIdx = jwtService.getUserIdx();
             GetMedChatRes getChatRes = medicineService.createMedicine(userIdx, medicineDTO);
-            return new BaseResponse<>(getChatRes);
+            // 채팅 실패
+            GetMedChatRes getSaveFailedChats = medicineProvider.getSaveFailedChats(userIdx);
 
+            if(getChatRes.equals(getSaveFailedChats)) return new BaseResponse<>(getChatRes, BaseResponseStatus.CHAT_ERROR);
+
+            return new BaseResponse<>(getChatRes);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
@@ -196,7 +198,7 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("no")
-    public BaseResponse<GetMedChatRes> getMEdAddNo(){
+    public BaseResponse<GetMedChatRes> getMedAddNo(){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "COM_OK";

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import static shop.hodl.kkonggi.config.BaseResponseStatus.SUCCESS;
+import static shop.hodl.kkonggi.config.BaseResponseStatus.CHAT_ERROR;
 
 @Getter
 @AllArgsConstructor
@@ -27,11 +28,19 @@ public class BaseResponse<T> {
         this.result = result;
     }
 
-    // 요청에 실패한 경우
+    // [기본] 요청에 실패한 경우
     public BaseResponse(BaseResponseStatus status) {
         this.isSuccess = status.isSuccess();
         this.message = status.getMessage();
         this.code = status.getCode();
+    }
+
+    // [채팅] 요청에 실패한 경우
+    public BaseResponse(T result, BaseResponseStatus status) {
+        this.isSuccess = status.isSuccess();
+        this.message = status.getMessage();
+        this.code = status.getCode();
+        this.result = result;
     }
 }
 
