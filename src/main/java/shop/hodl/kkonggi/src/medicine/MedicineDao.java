@@ -8,6 +8,7 @@ import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 
 @Repository
 public class MedicineDao {
@@ -146,12 +147,19 @@ public class MedicineDao {
     }
 
     public int createMedicine(PostMedicineReq postMedicineReq){
-        String createMedicineQuery = "INSERT INTO  Medicine (userIdx, medicineRealName, cycle, days, takeTimes, startDay, endDay) values (?, ?, ?, ?, ?, ?, ?)";
-        Object[] createMedicineParams = new Object[]{postMedicineReq.getUserIdx(), postMedicineReq.getMedicineRealName(), postMedicineReq.getCycle(), postMedicineReq.getDays(), postMedicineReq.getTakeTimes(), postMedicineReq.getStartDay(), postMedicineReq.getEndDay()};
+        String createMedicineQuery = "INSERT INTO  Medicine (userIdx, medicineRealName, cycle, days, startDay, endDay) values (?, ?, ?, ?, ?, ?)";
+        Object[] createMedicineParams = new Object[]{postMedicineReq.getUserIdx(), postMedicineReq.getMedicineRealName(), postMedicineReq.getCycle(), postMedicineReq.getDays(), postMedicineReq.getStartDay(), postMedicineReq.getEndDay()};
 
         this.jdbcTemplate.update(createMedicineQuery, createMedicineParams);
 
         String lastInserIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    }
+
+    public int createMedicineTime(int medicineIdx, String timeSlot){
+        String createMedicineTimeQuery = "insert into MedicineTime (medicineIdx, slot) values (?, ?)";
+        Object[] createMedicineTimeParams = new Object[]{medicineIdx, timeSlot};
+
+        return this.jdbcTemplate.update(createMedicineTimeQuery, createMedicineTimeParams);
     }
 }

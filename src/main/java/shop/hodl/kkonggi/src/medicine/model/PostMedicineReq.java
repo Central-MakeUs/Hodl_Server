@@ -14,7 +14,7 @@ public class PostMedicineReq {
     private String medicineRealName;
     private String cycle;
     private int days;
-    private int takeTimes;
+    // private int takeTimes;
     private String startDay;
     private String endDay;
 }
