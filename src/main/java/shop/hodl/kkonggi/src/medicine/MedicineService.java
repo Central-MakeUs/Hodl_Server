@@ -35,7 +35,6 @@ public class MedicineService {
     @Transactional
     public GetMedChatRes createMedicine(int userIdx, MedicineDTO medicineDTO) throws BaseException {
 
-        String cycle = "";
         int days = intArrayToInt(medicineDTO.getDays());
         ArrayList<String> timeSlot = toTimeSlot(medicineDTO.getTimes());
 
@@ -46,13 +45,8 @@ public class MedicineService {
             throw new BaseException(BaseResponseStatus.POST_MEDICINE_EXISTS);
 
         try{
-            // 2일에 한 번씩
-            if(medicineDTO.getDays()[0] == 2) {
-                cycle = "2";
-                days = 0;
-            }
-            else cycle = "S";
-            PostMedicineReq postMedicineReq = new PostMedicineReq(userIdx, medicineDTO.getName(), cycle, days, medicineDTO.getStart(), medicineDTO.getEnd());
+
+            PostMedicineReq postMedicineReq = new PostMedicineReq(userIdx, medicineDTO.getName(), days, medicineDTO.getStart(), medicineDTO.getEnd());
 
             int medicineIdx = medicineDao.createMedicine(postMedicineReq);
             int medicineTime = 0;
@@ -68,13 +62,14 @@ public class MedicineService {
                 scenarioIdx = 2;
                 groupId = "MED_ADD_SUCCESS";
             } else{
+                logger.error( "약물 저장 실패 시나리오,  " + "userIdx = " + userIdx);
                 scenarioIdx = 0;
                 groupId = "SAVE_FAIL";
             }
             return medicineProvider.getMedChats(postMedicineReq.getUserIdx(), groupId, scenarioIdx);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            logger.error( "약물 저장 실패 DB, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

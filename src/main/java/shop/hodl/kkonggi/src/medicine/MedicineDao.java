@@ -147,8 +147,8 @@ public class MedicineDao {
     }
 
     public int createMedicine(PostMedicineReq postMedicineReq){
-        String createMedicineQuery = "INSERT INTO  Medicine (userIdx, medicineRealName, cycle, days, startDay, endDay) values (?, ?, ?, ?, ?, ?)";
-        Object[] createMedicineParams = new Object[]{postMedicineReq.getUserIdx(), postMedicineReq.getMedicineRealName(), postMedicineReq.getCycle(), postMedicineReq.getDays(), postMedicineReq.getStartDay(), postMedicineReq.getEndDay()};
+        String createMedicineQuery = "INSERT INTO  Medicine (userIdx, medicineRealName, days, startDay, endDay) values (?, ?, ?, ?, ?)";
+        Object[] createMedicineParams = new Object[]{postMedicineReq.getUserIdx(), postMedicineReq.getMedicineRealName(), postMedicineReq.getDays(), postMedicineReq.getStartDay(), postMedicineReq.getEndDay()};
 
         this.jdbcTemplate.update(createMedicineQuery, createMedicineParams);
 

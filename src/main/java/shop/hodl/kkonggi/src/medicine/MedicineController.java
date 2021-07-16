@@ -170,6 +170,7 @@ public class MedicineController {
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_INVALID_TIME);
 
             int userIdx = jwtService.getUserIdx();
+            logger.info("userIdx = " + userIdx);
             GetMedChatRes getChatRes = medicineService.createMedicine(userIdx, medicineDTO);
             // 채팅 실패
             GetMedChatRes getSaveFailedChats = medicineProvider.getSaveFailedChats(userIdx);
@@ -224,4 +225,23 @@ public class MedicineController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+
+    /**
+    // Record 시작
+    // scenarioIdx = 3;
+    @ResponseBody
+    @GetMapping
+    public BaseResponse<GetMedChatRes> getMedRecInput(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            int scenarioIdx = 3;
+
+
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+    */
+
 }

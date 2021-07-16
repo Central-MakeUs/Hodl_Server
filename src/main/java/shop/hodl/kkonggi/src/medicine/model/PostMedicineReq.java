@@ -12,7 +12,7 @@ import lombok.Setter;
 public class PostMedicineReq {
     private int userIdx;
     private String medicineRealName;
-    private String cycle;
+    // private String cycle;
     private int days;
     // private int takeTimes;
     private String startDay;
