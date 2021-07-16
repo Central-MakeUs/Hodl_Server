@@ -50,6 +50,14 @@ public enum BaseResponseStatus {
     POST_MEDICINE_INVALID_TIME(false, 2035, "약 먹는 시간의 형식을 확인해주세요."),
     POST_MEDICINE_EXISTS(false, 2036, "중복된 약물입니다."),
 
+    POST_MEDICINE_RECORD_ALL_EMPTY_SLOT(false, 2040, "시간대를 입력해주세요."),
+    POST_MEDICINE_RECORD_ALL_EMPTY_MEDICINES(false, 2041, "약물 식별자를 입력해주세요."),
+    POST_MEDICINE_RECORD_ALL_EMPTY_DATE(false, 2042, "날짜를 입력해주세요."),
+    POST_MEDICINE_RECORD_ALL_EMPTY_TIME(false, 2043, "복용 시간을 입력해주세요."),
+    POST_MEDICINE_RECORD_ALL_INVALID_DATE(false, 2044, "날짜 형식을 확인해주세요."),
+    POST_MEDICINE_RECORD_ALL_INVALID_TIME(false, 2045, "시간 형식을 확인해주세요."),
+    POST_MEDICINE_RECORD_ALL_INVALID_SLOT(false, 2046, "시간대 형식을 확인해주세요."),
+
 
 
     /**
@@ -78,6 +86,8 @@ public enum BaseResponseStatus {
 
     // Send Mail
     SEND_MAIL_ERROR(false, 4020, "인증코드 전송에 실패하였습니다."),
+
+    CREATE_FAIL_MEDICINE_RECORD(false, 4030, "약 복용을 저장에 실패하였스빈다."),
 
     // 채팅으로 요청 실패한 경우
     CHAT_ERROR(false, 4100, "요청에 실패하였습니다.");

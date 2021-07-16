@@ -1,4 +1,4 @@
-package shop.hodl.kkonggi.record.medicine.model;
+package shop.hodl.kkonggi.src.record.medicine.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,6 @@ import java.util.List;
 public class GetMedicineListRes {
     private String timeSlot;
     private List<Medicine> medicineList;
-
 
     @Getter
     @Setter

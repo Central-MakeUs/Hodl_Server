@@ -1,9 +1,10 @@
-package shop.hodl.kkonggi.record.medicine;
+package shop.hodl.kkonggi.src.record.medicine;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import shop.hodl.kkonggi.record.medicine.model.GetMedicineListRes;
+import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
+import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 
 import javax.sql.DataSource;
@@ -32,7 +33,7 @@ public class RecordMedicineDao {
                 "           end  as timeTime,\n" +
                 "               (DATE_FORMAT(MedicineRecord.time,'%h:%i %p')) as recordTime, MedicineRecord.status as status from Medicine\n" +
                 "    inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx and slot = ?\n" +
-                "    left join MedicineRecord on MedicineTime.slot = MedicineRecord.slot and MedicineTime.medicineIdx = MedicineRecord.medicineIdx\n" +
+                "    left join MedicineRecord on MedicineTime.slot = MedicineRecord.slot and MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineRecord.time = now()\n" +
                 "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1) MedicineInfo";
         Object[] getMedicineParams = new Object[]{defaultTime, timeSlot, userIdx};
 
@@ -46,6 +47,55 @@ public class RecordMedicineDao {
                         ), getMedicineParams)
         );
     }
+
+    public GetMedicineListRes getTodayMedicineList(int userIdx, String timeSlot, String defaultTime, String date) {
+        String getMedicineQuery = "select medicineIdx, medicineRealName,\n" +
+                "       case\n" +
+                "           when MedicineInfo.status is null then concat(MedicineInfo.timeTime, ' 미복용')\n" +
+                "           when MedicineInfo.status = 'N' then '안먹음'\n" +
+                "               else MedicineInfo.recordTime\n" +
+                "       end as taking, status from\n" +
+                "       (select Medicine.medicineIdx, medicineRealName ,case\n" +
+                "           when MedicineTime.time is null then DATE_FORMAT(TIME(?),'%h:%i %p')\n" +
+                "           else (DATE_FORMAT(MedicineTime.time,'%h:%i %p'))\n" +
+                "           end  as timeTime,\n" +
+                "               (DATE_FORMAT(MedicineRecord.time,'%h:%i %p')) as recordTime, MedicineRecord.status as status from Medicine\n" +
+                "    inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx and slot = ?\n" +
+                "    left join MedicineRecord on MedicineTime.slot = MedicineRecord.slot and MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineRecord.day = ?\n" +
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1) MedicineInfo";
+        Object[] getMedicineParams = new Object[]{defaultTime, timeSlot, date, userIdx, date, date};
+
+        return new GetMedicineListRes(timeSlot,
+                this.jdbcTemplate.query(getMedicineQuery,
+                        (rs, rowNum) -> new GetMedicineListRes.Medicine(
+                                rs.getInt("medicineIdx"),
+                                rs.getString("medicineRealName"),
+                                rs.getString("taking"),
+                                rs.getString("status")
+                        ), getMedicineParams)
+        );
+    }
+
+    public int createAllMedicineRecord(PostAllMedicineRecordReq postReq, int index, double amount){
+        String createMedicieRecordQuery = "insert into MedicineRecord (medicineIdx, slot, day, time, amount) values (?, ?, ?, ?, ?)";
+        Object[] createMedicieRecordParmas = new Object[]{postReq.getMedicineIdx()[index], postReq.getTimeSlot(), postReq.getDate(), postReq.getTime(), amount};
+
+        this.jdbcTemplate.update(createMedicieRecordQuery, createMedicieRecordParmas);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    }
+
+    public int checMedicineRecord(int medicineIdx, String timeSlot){
+        String checkMedicineRecordQuery = "select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')";
+        return this.jdbcTemplate.queryForObject(checkMedicineRecordQuery, int.class, medicineIdx, timeSlot);
+    }
+
+    public double getLatestMedicineAmount(int medicineIdx, String timeSlot){
+        String getAmountQuery = "select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc limit 1";
+        return this.jdbcTemplate.queryForObject(getAmountQuery, double.class, medicineIdx, timeSlot);
+    }
+
 
     public int checkUserMedicine(int userIdx){
         String checkMedicineQuery = "select exists(select userIdx from Medicine where userIdx= ? and status = 'Y')";

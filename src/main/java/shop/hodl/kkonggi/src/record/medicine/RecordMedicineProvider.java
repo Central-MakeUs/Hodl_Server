@@ -1,18 +1,21 @@
-package shop.hodl.kkonggi.record.medicine;
+package shop.hodl.kkonggi.src.record.medicine;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.record.medicine.model.GetMedicineListRes;
+import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+
+import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
 @Service
 public class RecordMedicineProvider {
@@ -114,20 +117,29 @@ public class RecordMedicineProvider {
     }
 
 
-    public List<GetMedicineListRes> getTodayMedicineList(int userIdx) throws BaseException{
+    public List<GetMedicineListRes> getTodayMedicineList(int userIdx, String date) throws BaseException{
+        // 시간대 list에
+        List<String> timeSlot = Arrays.asList("D", "M", "L", "E", "N");
+        List<String> defaultSlot = Arrays.asList("06:00", "09:00", "12:00", "18:00", "21:00");
+        List<GetMedicineListRes> getMedicineListRes = new ArrayList<>();
+
+        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+        Date current = new Date();
+        String currentTimeStr = dtFormat.format(current);
+
+        if(date == null || currentTimeStr.equals(date) || date.isEmpty()) date = currentTimeStr;
+        else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+
+        logger.info("date after = " + date);
+
         try{
-            // 시간대 list에
-            List<String> timeSlot = Arrays.asList("D", "M", "L", "E", "N");
-            List<String> defaultSlot = Arrays.asList("06:00", "09:00", "12:00", "18:00", "21:00");
-            List<GetMedicineListRes> getMedicineListRes = new ArrayList<>();
-            for(int i = 0; i < timeSlot.size(); i++){
-                //if(i == 0) getMedicineListRes.set(recordMedicineDao.getTodayMedicineList(userIdx, timeSlot.get(i), defaultSlot.get(i)));
-                getMedicineListRes.add(recordMedicineDao.getTodayMedicineList(userIdx, timeSlot.get(i), defaultSlot.get(i)));
+            for(int i = 0; i < timeSlot.size(); i++) {
+                getMedicineListRes.add(recordMedicineDao.getTodayMedicineList(userIdx, timeSlot.get(i), defaultSlot.get(i), date));
             }
             return getMedicineListRes;
-
         }
         catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -145,6 +157,24 @@ public class RecordMedicineProvider {
         try{
             return recordMedicineDao.checkTodayMedicine(userIdx);
         } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int checMedicineRecord(int medicineIdx, String timeSlot) throws BaseException {
+        try{
+            return recordMedicineDao.checMedicineRecord(medicineIdx, timeSlot);
+        }catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public double getLatestMedicineAmount(int medicineIdx, String timeSlot) throws BaseException{
+        try{
+            int checkMedicineRecord = checMedicineRecord(medicineIdx, timeSlot);
+            if (checkMedicineRecord > 0) return recordMedicineDao.getLatestMedicineAmount(medicineIdx, timeSlot);
+            return 1;
+        }catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
