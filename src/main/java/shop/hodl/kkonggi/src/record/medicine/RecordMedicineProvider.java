@@ -169,6 +169,8 @@ public class RecordMedicineProvider {
                 toReturn.setStatus("record");
                 getMedicine = recordMedicineDao.getSpecificMedicineRecord(medicineIdx, timeSlot);
             }
+            toReturn.setMedicineIdx(getMedicine.getMedicineIdx());
+            toReturn.setMedicineName(getMedicine.getMedicineName());
             toReturn.setDate(getMedicine.getDate());
             toReturn.setTime(getMedicine.getTime());
             toReturn.setAmount(getMedicine.getAmount());

@@ -13,6 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 public class GetMedicineRecordRes {
     private String status; // record : 기록 화면, modify : 수정 화면
+    private int medicineIdx;
+    private String medicineName;
     private String date;    // 날짜
     private String time;    // 투약 시간
     private double amount;  // 투약량

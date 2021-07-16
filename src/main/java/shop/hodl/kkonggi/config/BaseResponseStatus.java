@@ -87,7 +87,7 @@ public enum BaseResponseStatus {
     // Send Mail
     SEND_MAIL_ERROR(false, 4020, "인증코드 전송에 실패하였습니다."),
 
-    CREATE_FAIL_MEDICINE_RECORD(false, 4030, "약 복용을 저장에 실패하였스빈다."),
+    CREATE_FAIL_MEDICINE_RECORD(false, 4030, "약 복용을 저장에 실패하였습니다."),
 
     // 채팅으로 요청 실패한 경우
     CHAT_ERROR(false, 4100, "요청에 실패하였습니다.");

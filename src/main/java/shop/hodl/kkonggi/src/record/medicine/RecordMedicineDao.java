@@ -91,7 +91,7 @@ public class RecordMedicineDao {
     }
 
     public GetMedicine getSpecificMedicineRecordModify(int medicineIdx, String timeSlot, String date){
-        String getMedicineQuery = "select MedicineRecord.medicineIdx, medicineRealName, day, time, amount, ifnull(memo, \"\") as memo, days  from MedicineRecord\n" +
+        String getMedicineQuery = "select MedicineRecord.medicineIdx, medicineRealName, day, DATE_FORMAT(time,'%H:%i') as time, amount, ifnull(memo, \"\") as memo, days  from MedicineRecord\n" +
                 "    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
                 "where Medicine.medicineIdx = ? and slot = ? and day = ? and MedicineRecord.status = 'Y'";
         Object[] getMedicineParams = new Object[]{medicineIdx, timeSlot, date};
@@ -100,7 +100,7 @@ public class RecordMedicineDao {
                 (rs, rowNum) -> new GetMedicine (
                         rs.getInt("medicineIdx"),
                         rs.getString("medicineRealName"),
-                        rs.getString("date"),
+                        rs.getString("day"),
                         rs.getString("time"),
                         rs.getDouble("amount"),
                         rs.getString("memo"),
@@ -109,7 +109,7 @@ public class RecordMedicineDao {
     }
 
     public GetMedicine getSpecificMedicineRecord(int medicineIdx, String timeSlot){
-        String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, now() as day, time, (select lastAmount from (select distinct medicineIdx ,case\n" +
+        String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, now() as day, DATE_FORMAT(time,'%H:%i') as time, (select lastAmount from (select distinct medicineIdx ,case\n" +
                 "        when (select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')) = 1\n" +
                 "            then (select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc limit 1)\n" +
                 "        else 1\n" +
@@ -122,7 +122,7 @@ public class RecordMedicineDao {
                 (rs, rowNum) -> new GetMedicine (
                         rs.getInt("medicineIdx"),
                         rs.getString("medicineRealName"),
-                        rs.getString("date"),
+                        rs.getString("day"),
                         rs.getString("time"),
                         rs.getDouble("amount"),
                         rs.getString("memo"),
