@@ -32,17 +32,39 @@ public class RecordMedicineProvider {
 
             // 유저가 약을 등록했는지??
             int isMedicine = checkUserMedicine(userIdx);
-            if(isMedicine == 0){
-                // todo : 등록된 약이 없네요, 약을 추가하세요.
+            if(isMedicine == 0) {
+                gorupId = "MED_REC_INPUT_ADD";
+                return recordMedicineDao.getChats(gorupId, scscenarioIdx);
             }
 
             int isTodayMedicine = checkTodayMedicine(userIdx);
+
             // 유저가 오늘 먹을 약물이 있는 경우
-            if(isMedicine > 0) gorupId = "MED_REC_INPUT_EXIST";
+            if(isTodayMedicine > 0) gorupId = "MED_REC_INPUT_EXIST";
             // 유저가 오늘 먹을 약물이 없는 경우
             else gorupId = "MED_REC_INPUT_NONE";
 
             GetMedChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scscenarioIdx);
+
+            String nickNameReplace = "%user_nickname%";
+            String timeSlotReplace = "%time_slot%";
+            String timeSlotCntReplace = "%time_slot_cnt%";
+            String medicineTypeCntReplace = "%medicine_type_cnt%";
+            for(int i = 0; i < getMedChatRes.getChat().size(); i++){
+                if(getMedChatRes.getChat().get(i).getContent().contains(nickNameReplace)){
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(nickNameReplace, getUserNickName(userIdx)));
+                }
+                if(getMedChatRes.getChat().get(i).getContent().contains(timeSlotReplace)){
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(timeSlotReplace, getTimeSlot(userIdx)));
+                }
+                if(getMedChatRes.getChat().get(i).getContent().contains(timeSlotCntReplace)){
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(timeSlotCntReplace, Integer.toString(getTimeSlotCnt(userIdx))));
+                }
+                if(getMedChatRes.getChat().get(i).getContent().contains(medicineTypeCntReplace)){
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(medicineTypeCntReplace,Integer.toString(getMedicineType(userIdx))));
+                }
+            }
+
             return getMedChatRes;
         }
         catch (Exception exception){
@@ -50,10 +72,52 @@ public class RecordMedicineProvider {
         }
     }
 
+    public String getTimeSlot(int userIdx) throws BaseException{
+        try{
+            List<String> timeSlot = recordMedicineDao.getTimeSlot(userIdx);
+            String resultSlot = "";
+
+            for(int i = 0; i < timeSlot.size(); i++){
+                if(i == 0) resultSlot += timeSlot.get(i);
+                else resultSlot += "," + timeSlot.get(i);
+            }
+
+            return resultSlot;
+        }catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int getTimeSlotCnt(int userIdx) throws BaseException{
+        try{
+            return recordMedicineDao.getTimeSlotCnt(userIdx);
+        }catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int getMedicineType(int userIdx) throws BaseException{
+        try{
+            return recordMedicineDao.getMedicineType(userIdx);
+        }catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+
+    public String getUserNickName(int userIdx) throws BaseException{
+        try{
+            return recordMedicineDao.getUserNickName(userIdx);
+        }catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+
     public List<GetMedicineListRes> getTodayMedicineList(int userIdx) throws BaseException{
         try{
             // 시간대 list에
-            List<String> timeSlot = Arrays.asList("D", "M", "L", "D", "N");
+            List<String> timeSlot = Arrays.asList("D", "M", "L", "E", "N");
             List<String> defaultSlot = Arrays.asList("06:00", "09:00", "12:00", "18:00", "21:00");
             List<GetMedicineListRes> getMedicineListRes = new ArrayList<>();
             for(int i = 0; i < timeSlot.size(); i++){

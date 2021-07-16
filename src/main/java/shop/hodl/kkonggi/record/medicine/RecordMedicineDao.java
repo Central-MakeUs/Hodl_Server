@@ -53,9 +53,60 @@ public class RecordMedicineDao {
     }
 
     public int checkTodayMedicine(int userIdx){
-        String checkMedicineQuery = "select exists(select medicineIDx from Medicine where userIdx = ? and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and status = 'Y')";
+        String checkMedicineQuery = "select exists(select medicineIdx from Medicine where userIdx = ? and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and status = 'Y')";
         return this.jdbcTemplate.queryForObject(checkMedicineQuery, int.class, userIdx);
     }
+
+    public String getUserNickName(int userIdx){
+        String getNickNameQuery = "select ifnull(nickName, \"\") as nickName from User where userIdx = ? and status = 'Y'";
+        return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
+    }
+
+    public List<String> getTimeSlot(int userIdx){
+        String getSlotsQuery = "select distinct\n" +
+                "        case\n" +
+                "            when slot = 'D' then '새벽'\n" +
+                "            when slot = 'M' then '아침'\n" +
+                "            when slot = 'L' then '점심'\n" +
+                "            when slot = 'E' then '저녁'\n" +
+                "            when slot = 'N' then '자기전'\n" +
+                "            end as slot\n" +
+                "                 from MedicineTime\n" +
+                "    inner join Medicine\n" +
+                "        where Medicine.medicineIdx = MedicineTime.medicineIdx and MedicineTime.status = 'Y' and Medicine.status = 'Y'\n" +
+                "          and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and userIdx = ?";
+
+        List<String> slots = this.jdbcTemplate.queryForList(
+                getSlotsQuery,
+                String.class,
+                userIdx
+        );
+        return slots;
+    }
+
+    public int getTimeSlotCnt(int userIdx){
+        String getSlotCntQuery = "select count(slot) from (select distinct\n" +
+                "    case\n" +
+                "            when slot = 'D' then '새벽'\n" +
+                "            when slot = 'M' then '아침'\n" +
+                "            when slot = 'L' then '점심'\n" +
+                "            when slot = 'E' then '저녁'\n" +
+                "            when slot = 'N' then '자기전'\n" +
+                "            end as slot\n" +
+                "                 from MedicineTime\n" +
+                "    inner join Medicine\n" +
+                "        where Medicine.medicineIdx = MedicineTime.medicineIdx and MedicineTime.status = 'Y' and Medicine.status = 'Y'\n" +
+                "          and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and userIdx = ?) slot";
+
+        return this.jdbcTemplate.queryForObject(getSlotCntQuery, int.class, userIdx);
+    }
+
+    public int getMedicineType(int userIdx){
+        String getMedicineTypeQuery = "select count(medicineIdx) from (select medicineIdx from Medicine where Medicine.status = 'Y'\n" +
+                "          and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and userIdx = ?) Medicines";
+        return this.jdbcTemplate.queryForObject(getMedicineTypeQuery, int.class, userIdx);
+    }
+
 
     public GetMedChatRes getChats(String groupId, int scenarioIdx){
 
