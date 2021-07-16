@@ -8,6 +8,7 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
+import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineRecordRes;
 import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
 import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
@@ -65,8 +66,9 @@ public class RecordMedicineController {
         }
     }
 
+    // 넘어 오는 약물값들은 전
     @ResponseBody
-    @PostMapping
+    @PostMapping("/all")
     public BaseResponse<PostAllMedicineRecordRes> createAllMedicineRecord(@RequestBody PostAllMedicineRecordReq postReq){
         try{
             if(postReq.getTimeSlot().isEmpty() || postReq.getTimeSlot() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_EMPTY_SLOT);
@@ -76,8 +78,6 @@ public class RecordMedicineController {
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_EMPTY_MEDICINES);
             if(postReq.getTime().isEmpty() || postReq.getTime() == null)
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_EMPTY_TIME);
-            if(!isRegexDate(postReq.getDate()))
-                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
             if(!isRegexTime(postReq.getTime()))
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
 
@@ -90,12 +90,21 @@ public class RecordMedicineController {
         }
     }
 
-    /**
-    @ResponseBody
-    @PostMapping
-    public BaseResponse<> createSpecificMedicineRecord(){
 
+    @ResponseBody
+    @GetMapping("/{medicineIdx}/{timeslot}")
+    public BaseResponse<GetMedicineRecordRes> getSpecificMedicineRecord(@PathVariable("medicineIdx") int medicineIdx, @PathVariable("timeslot") String timeSlot,
+                                                                        @RequestParam(required = false) String date){
+        try{
+            if(!(timeSlot.equals("D") || timeSlot.equals("M") || timeSlot.equals("L") || timeSlot.equals("E")
+                    || timeSlot.equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
+            int userIdx = jwtService.getUserIdx();
+            GetMedicineRecordRes getMedicineRecordRes = recordMedicineProvider.getSpecificMedicineRecord(medicineIdx, timeSlot, date);
+            return new BaseResponse<>(getMedicineRecordRes);
+
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
     }
-    */
     // 오늘 먹을 약이 없는 경우
 }

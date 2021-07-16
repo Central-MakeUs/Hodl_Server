@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
+import shop.hodl.kkonggi.src.record.medicine.model.GetMedicine;
 import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineRecordRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.text.ParseException;
@@ -16,6 +18,7 @@ import java.util.*;
 
 
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
+import static shop.hodl.kkonggi.utils.days.getDays;
 
 @Service
 public class RecordMedicineProvider {
@@ -139,6 +142,51 @@ public class RecordMedicineProvider {
             return getMedicineListRes;
         }
         catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public GetMedicineRecordRes getSpecificMedicineRecord(int medicineIdx, String timeSlot, String date) throws BaseException{
+        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+        Date current = new Date();
+        String currentTimeStr = dtFormat.format(current);
+
+        if(date == null || currentTimeStr.equals(date) || date.isEmpty()) date = currentTimeStr;
+        else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+
+        try{
+            GetMedicineRecordRes toReturn = new GetMedicineRecordRes();
+            // MedicineRecord에 있는 지 확인!
+            int isRecorded = checkSpecificMedicineRecord(medicineIdx, timeSlot, date);
+            GetMedicine getMedicine = null;
+            // 수정 화면
+            if(isRecorded == 1) {
+                toReturn.setStatus("modify");
+                getMedicine = recordMedicineDao.getSpecificMedicineRecordModify(medicineIdx, timeSlot, date);
+            }
+            // 입력 화면
+            else{
+                toReturn.setStatus("record");
+                getMedicine = recordMedicineDao.getSpecificMedicineRecord(medicineIdx, timeSlot);
+            }
+            toReturn.setDate(getMedicine.getDate());
+            toReturn.setTime(getMedicine.getTime());
+            toReturn.setAmount(getMedicine.getAmount());
+            toReturn.setMemo(getMedicine.getMemo());
+            toReturn.setDays(getDays(getMedicine.getDays()));
+
+            return toReturn;
+
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int checkSpecificMedicineRecord(int medicineIdx, String timeSlot, String date) throws BaseException{
+        try{
+            return recordMedicineDao.checkSpecificMedicineRecord(medicineIdx, timeSlot, date);
+        }catch (Exception exception){
             exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -161,17 +209,18 @@ public class RecordMedicineProvider {
         }
     }
 
-    public int checMedicineRecord(int medicineIdx, String timeSlot) throws BaseException {
+    public int checMedicineRecordAmount(int medicineIdx, String timeSlot) throws BaseException {
         try{
-            return recordMedicineDao.checMedicineRecord(medicineIdx, timeSlot);
+            return recordMedicineDao.checMedicineRecordAmount(medicineIdx, timeSlot);
         }catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
 
+    // 가장 최근 복용량
     public double getLatestMedicineAmount(int medicineIdx, String timeSlot) throws BaseException{
         try{
-            int checkMedicineRecord = checMedicineRecord(medicineIdx, timeSlot);
+            int checkMedicineRecord = checMedicineRecordAmount(medicineIdx, timeSlot);
             if (checkMedicineRecord > 0) return recordMedicineDao.getLatestMedicineAmount(medicineIdx, timeSlot);
             return 1;
         }catch (Exception exception){

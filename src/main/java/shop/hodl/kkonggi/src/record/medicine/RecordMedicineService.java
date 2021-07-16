@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
+import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
 import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordRes;
@@ -12,6 +13,8 @@ import shop.hodl.kkonggi.utils.JwtService;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
 @Service
 public class RecordMedicineService {
@@ -40,6 +43,8 @@ public class RecordMedicineService {
             String timeSlot = postReq.getTimeSlot();
             if (postReq.getDate() == null || postReq.getDate().equals(currentTimeStr) || postReq.getDate().isEmpty())  // 오늘일 경우, Date 설정
                 postReq.setDate(currentTimeStr);
+            if(!isRegexDate(postReq.getDate()))
+                throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
 
             for(int i = 0; i < postReq.getMedicineIdx().length; i++) {
                 amount = recordMedicineProvider.getLatestMedicineAmount(postReq.getMedicineIdx()[i], timeSlot);  // 가장  최근 복용량
