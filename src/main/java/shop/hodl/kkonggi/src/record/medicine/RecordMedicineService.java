@@ -108,6 +108,7 @@ public class RecordMedicineService {
 
         } catch (Exception exception) {
             logger.error("userIdx = " + userIdx);
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

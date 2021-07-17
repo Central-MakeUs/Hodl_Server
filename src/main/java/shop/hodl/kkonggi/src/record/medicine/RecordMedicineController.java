@@ -131,12 +131,14 @@ public class RecordMedicineController {
 
     @ResponseBody
     @PatchMapping("/{medicineIdx}/{timeslot}")
-    public BaseResponse<Integer> updateMedicineRecord(PatchMedicineRecordReq patchReq,
+    public BaseResponse<Integer> updateMedicineRecord(@RequestBody PatchMedicineRecordReq patchReq,
                                                @PathVariable("medicineIdx") int medicineIdx, @PathVariable("timeslot") String timeSlot){
         try{
             if(!(timeSlot.equals("D") || timeSlot.equals("M") || timeSlot.equals("L") || timeSlot.equals("E")
                     || timeSlot.equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
 
+            logger.info("patch" + patchReq.getAmount());
+            logger.info("time = " + patchReq.getTime());
             if(!isRegexTime(patchReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
 
             int userIdx = jwtService.getUserIdx();

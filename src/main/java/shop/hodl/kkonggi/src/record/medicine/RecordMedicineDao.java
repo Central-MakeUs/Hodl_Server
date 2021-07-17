@@ -99,7 +99,7 @@ public class RecordMedicineDao {
     public int updateMedicineRecord(int recordIdx, PatchMedicineRecordReq patchReq, String status){
         String updateRecordIdxQuery = "update MedicineRecord set amount = ?, time = ?, memo = ?, status = ? where recordIdx = ?;";
         Object[] updateRecordIdxQueryRecordIdxParams = new Object[]{patchReq.getAmount(), patchReq.getTime(), patchReq.getMemo(), status, recordIdx};
-        return this.jdbcTemplate.queryForObject(updateRecordIdxQuery, int.class, updateRecordIdxQueryRecordIdxParams);
+        return this.jdbcTemplate.update(updateRecordIdxQuery, updateRecordIdxQueryRecordIdxParams);
     }
 
     public int checkSpecificMedicineRecord(int medicineIdx, String timeSlot, String day){

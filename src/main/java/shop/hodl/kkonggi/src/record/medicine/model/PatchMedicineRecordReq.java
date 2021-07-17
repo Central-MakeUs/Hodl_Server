@@ -1,10 +1,7 @@
 package shop.hodl.kkonggi.src.record.medicine.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
