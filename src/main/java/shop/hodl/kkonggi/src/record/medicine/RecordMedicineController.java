@@ -114,8 +114,8 @@ public class RecordMedicineController {
 
             if(!isRegexTime(postReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
 
-            if( postReq.getStatus().equals("N") && postReq.getAmount() == 1)
-                postReq.setAmount(0);
+            if( !postReq.getStatus().equals("N") ||  !postReq.getStatus().equals("Y") )
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_STATUS);
 
             int userIdx = jwtService.getUserIdx();
 
@@ -137,9 +137,9 @@ public class RecordMedicineController {
             if(!(timeSlot.equals("D") || timeSlot.equals("M") || timeSlot.equals("L") || timeSlot.equals("E")
                     || timeSlot.equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
 
-            logger.info("patch" + patchReq.getAmount());
-            logger.info("time = " + patchReq.getTime());
             if(!isRegexTime(patchReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
+            if( !patchReq.getStatus().equals("N") ||  !patchReq.getStatus().equals("Y") )
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_STATUS);
 
             int userIdx = jwtService.getUserIdx();
             recordMedicineService.updateMedicineRecord(userIdx ,patchReq, medicineIdx, timeSlot);
@@ -151,6 +151,16 @@ public class RecordMedicineController {
         }
     }
 
+    @ResponseBody
+    @GetMapping("list/ok")
+    public BaseResponse<GetMedChatRes> getTodayMedicineStatus(@RequestParam(required = false) String date){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            GetMedChatRes getMedChatRes = recordMedicineProvider.getTodayMedicineStatus(userIdx, date, scenarioIdx);
+            return new BaseResponse<>(getMedChatRes);
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
-    // 오늘 먹을 약이 없는 경우
 }

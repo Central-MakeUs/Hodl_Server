@@ -63,6 +63,8 @@ public class RecordMedicineService {
         Date current = new Date();
         String currentTimeStr = dtFormat.format(current);
 
+        if(postReq.getStatus().equals("N")) postReq.setAmount(0);
+
         int result = 0;
         if (postReq.getDate() == null || postReq.getDate().equals(currentTimeStr) || postReq.getDate().isEmpty())  // 오늘일 경우, Date 설정
             postReq.setDate(currentTimeStr);
@@ -88,8 +90,7 @@ public class RecordMedicineService {
         Date current = new Date();
         String currentTimeStr = dtFormat.format(current);
 
-        String status = "Y";
-        if(patchReq.getAmount() == 0) status = "N";
+        if(patchReq.getStatus().equals("N")) patchReq.setAmount(0);
 
         int result = 0;
         if (patchReq.getDate() == null || patchReq.getDate().equals(currentTimeStr) || patchReq.getDate().isEmpty())  // 오늘일 경우, Date 설정
@@ -101,9 +102,7 @@ public class RecordMedicineService {
             if(recordMedicineProvider.checkRecordIdx(patchReq, medicineIdx, timeSlot) == 0)  // 레코드 된 것이 없는 경우
                 throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
             int recordIdx = recordMedicineProvider.getRecordIdx(patchReq, medicineIdx, timeSlot);
-            result = recordMedicineDao.updateMedicineRecord(recordIdx, patchReq, status);
-            if(result == 0)
-                new BaseException(BaseResponseStatus.CREATE_FAIL_MEDICINE_RECORD);
+            result = recordMedicineDao.updateMedicineRecord(recordIdx, patchReq);
             return result;
 
         } catch (Exception exception) {

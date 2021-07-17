@@ -96,9 +96,9 @@ public class RecordMedicineDao {
         return this.jdbcTemplate.queryForObject(getRecordIdxQuery, int.class, getRecordIdxParams);
     }
 
-    public int updateMedicineRecord(int recordIdx, PatchMedicineRecordReq patchReq, String status){
+    public int updateMedicineRecord(int recordIdx, PatchMedicineRecordReq patchReq){
         String updateRecordIdxQuery = "update MedicineRecord set amount = ?, time = ?, memo = ?, status = ? where recordIdx = ?;";
-        Object[] updateRecordIdxQueryRecordIdxParams = new Object[]{patchReq.getAmount(), patchReq.getTime(), patchReq.getMemo(), status, recordIdx};
+        Object[] updateRecordIdxQueryRecordIdxParams = new Object[]{patchReq.getAmount(), patchReq.getTime(), patchReq.getMemo(), patchReq.getStatus(), recordIdx};
         return this.jdbcTemplate.update(updateRecordIdxQuery, updateRecordIdxQueryRecordIdxParams);
     }
 
@@ -123,11 +123,48 @@ public class RecordMedicineDao {
         return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
     }
 
+    public int getTodayRecordCnt(int userIdx, String date){
+        String query = "select count(*) from (select Medicine.medicineIdx, medicineRealName, slot, days from MedicineTime inner join Medicine on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1) Cnt";
+        Object[] params = new Object[]{userIdx, date, date};
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
+
+    public int getTodayYesCnt(int userIdx, String date){
+        String query = "select count(*) from\n" +
+                "(select MedicineRecord.slot from MedicineRecord\n" +
+                "    inner join MedicineTime on MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineTime.slot = MedicineRecord.slot\n" +
+                "    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1 and MedicineRecord.status = 'Y') yes";
+        Object[] params = new Object[]{userIdx, date, date};
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
+
+    public int getTodayNoCnt(int userIdx, String date){
+        String query = "select count(*) from\n" +
+                "(select MedicineRecord.slot from MedicineRecord\n" +
+                "    inner join MedicineTime on MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineTime.slot = MedicineRecord.slot\n" +
+                "    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1 and MedicineRecord.status = 'N') noRecord";
+        Object[] params = new Object[]{userIdx, date, date};
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
+
+
     public GetMedicine getSpecificMedicineRecordModify(int medicineIdx, String timeSlot, String date){
         String getMedicineQuery = "select MedicineRecord.medicineIdx, medicineRealName, day, DATE_FORMAT(time,'%H:%i') as time, amount, ifnull(memo, \"\") as memo, days  from MedicineRecord\n" +
                 "    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
                 "where Medicine.medicineIdx = ? and slot = ? and day = ? and MedicineRecord.status = 'Y'";
         Object[] getMedicineParams = new Object[]{medicineIdx, timeSlot, date};
+        String getSlotQuery = "select\n" +
+                "       case\n" +
+                "       when slot = 'D' then '새벽'\n" +
+                "            when slot = 'M' then '아침'\n" +
+                "            when slot = 'L' then '점심'\n" +
+                "            when slot = 'E' then '저녁'\n" +
+                "            when slot = 'N' then '자기전'\n" +
+                "            end as slot\n" +
+                "       from MedicineTime where medicineIdx = ?";
 
         return this.jdbcTemplate.queryForObject(getMedicineQuery,
                 (rs, rowNum) -> new GetMedicine (
@@ -137,12 +174,14 @@ public class RecordMedicineDao {
                         rs.getString("time"),
                         rs.getDouble("amount"),
                         rs.getString("memo"),
-                        rs.getInt("days")
+                        rs.getInt("days"),
+                        this.jdbcTemplate.queryForList(getSlotQuery, String.class, medicineIdx),
+                        0
                 ), getMedicineParams);
     }
 
-    public GetMedicine getSpecificMedicineRecord(String defaultTime ,int medicineIdx, String timeSlot){
-        String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, DATE_FORMAT(now(), '%Y-%m-%d') as day,\n" +
+    public GetMedicine getSpecificMedicineRecord(String date,String defaultTime ,int medicineIdx, String timeSlot){
+        String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, DATE_FORMAT(?, '%Y-%m-%d') as day,\n" +
                 "       ifnull(DATE_FORMAT(time,'%H:%i'), ?) as time,ifnull((select lastAmount from (select distinct medicineIdx ,case\n" +
                 "        when (select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')) = 1\n" +
                 "            then (select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc limit 1)\n" +
@@ -150,7 +189,16 @@ public class RecordMedicineDao {
                 "    end as lastAmount from MedicineRecord  where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc) last), 1) as amount, \"\" as memo, days\n" +
                 "from Medicine inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
                 "where Medicine.medicineIdx = ? and slot = ? and MedicineTime.status = 'Y'";
-        Object[] getMedicineParams = new Object[]{defaultTime, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot};
+        Object[] getMedicineParams = new Object[]{date ,defaultTime, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot};
+        String getSlotQuery = "select\n" +
+                "       case\n" +
+                "       when slot = 'D' then '새벽'\n" +
+                "            when slot = 'M' then '아침'\n" +
+                "            when slot = 'L' then '점심'\n" +
+                "            when slot = 'E' then '저녁'\n" +
+                "            when slot = 'N' then '자기전'\n" +
+                "            end as slot\n" +
+                "       from MedicineTime where medicineIdx = ?";
 
         return this.jdbcTemplate.queryForObject(getMedicineQuery,
                 (rs, rowNum) -> new GetMedicine (
@@ -160,7 +208,9 @@ public class RecordMedicineDao {
                         rs.getString("time"),
                         rs.getDouble("amount"),
                         rs.getString("memo"),
-                        rs.getInt("days")
+                        rs.getInt("days"),
+                        this.jdbcTemplate.queryForList(getSlotQuery, String.class, medicineIdx),
+                        0
                 ), getMedicineParams);
     }
 

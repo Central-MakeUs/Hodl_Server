@@ -170,9 +170,9 @@ public class RecordMedicineProvider {
                 for(int i = 0; i < Constant.TIMES.get(0).size(); i++){
                     if(Constant.TIMES.get(0).get(i).equals(timeSlot)) defulatTime = Constant.TIMES.get(1).get(i);
                 }
-
-                getMedicine = recordMedicineDao.getSpecificMedicineRecord(defulatTime, medicineIdx, timeSlot);
+                getMedicine = recordMedicineDao.getSpecificMedicineRecord(date,defulatTime, medicineIdx, timeSlot);
             }
+            getMedicine.setSlotCnt(getMedicine.getSlot().size());
             toReturn.setMedicineIdx(getMedicine.getMedicineIdx());
             toReturn.setMedicineName(getMedicine.getMedicineName());
             toReturn.setDate(getMedicine.getDate());
@@ -180,6 +180,8 @@ public class RecordMedicineProvider {
             toReturn.setAmount(getMedicine.getAmount());
             toReturn.setMemo(getMedicine.getMemo());
             toReturn.setDays(getDays(getMedicine.getDays()));
+            toReturn.setSlot(getMedicine.getSlot());
+            toReturn.setSlotCnt(getMedicine.getSlotCnt());
 
             return toReturn;
 
@@ -248,7 +250,65 @@ public class RecordMedicineProvider {
             int checkMedicineRecord = checMedicineRecordAmount(medicineIdx, timeSlot);
             if (checkMedicineRecord > 0) return recordMedicineDao.getLatestMedicineAmount(medicineIdx, timeSlot);
             return 1;
-        }catch (Exception exception){
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public GetMedChatRes getTodayMedicineStatus(int userIdx, String date, int scenarioIdx) throws BaseException{
+        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+        Date current = new Date();
+        String currentTimeStr = dtFormat.format(current);
+
+        if(date == null || currentTimeStr.equals(date) || date.isEmpty()) date = currentTimeStr;
+        else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+
+        try{
+            // 오늘 기록되어야하는 record 수
+            int totalCnt = getTodayRecordCnt(userIdx, date);
+            int yesCnt = getTodayYesCnt(userIdx, date);
+            int noCnt = getTodayNoCnt(userIdx, date);
+
+            String gorupId;
+            // 오늘 약 다 먹음
+            if(totalCnt == yesCnt){
+                gorupId = "MED_REC_ALL_TAKE";
+            }
+            // 오늘 약 다 안먹음
+            else if (totalCnt == noCnt) {
+                gorupId = "MED_REC_NO_TAKE";
+            }
+            else{
+                gorupId = "MED_REC_OK";
+            }
+            GetMedChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scenarioIdx);
+            return getMedChatRes;
+
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int getTodayRecordCnt(int userIdx, String date) throws  BaseException{
+        try{
+            return recordMedicineDao.getTodayRecordCnt(userIdx, date);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int getTodayYesCnt(int userIdx, String date) throws  BaseException{
+        try{
+            return recordMedicineDao.getTodayYesCnt(userIdx, date);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int getTodayNoCnt(int userIdx, String date) throws  BaseException{
+        try{
+            return recordMedicineDao.getTodayNoCnt(userIdx, date);
+        } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

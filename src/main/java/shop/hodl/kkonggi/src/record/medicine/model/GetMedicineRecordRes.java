@@ -15,6 +15,8 @@ public class GetMedicineRecordRes {
     private String status; // record : 기록 화면, modify : 수정 화면
     private int medicineIdx;
     private String medicineName;
+    private List<String> slot;  // 새벽, 오전, 점심, 저녁, 자기전
+    private int slotCnt; // 총 몇 번?
     private String date;    // 날짜
     private String time;    // 투약 시간
     private double amount;  // 투약량

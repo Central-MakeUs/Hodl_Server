@@ -20,4 +20,7 @@ public class GetMedicine {
     private double amount;  // 투약량
     private String memo;    // 투약 관련 메모
     private int days;  // 매일 혹은 월, 화, 금, 토, 일
+
+    private List<String> slot;  // 새벽, 오전, 점심, 저녁, 자기전
+    private int slotCnt; // 총 몇 번?
 }
