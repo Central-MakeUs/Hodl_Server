@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
-import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineRecordRes;
-import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
-import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordRes;
+import shop.hodl.kkonggi.src.record.medicine.model.*;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
@@ -106,5 +103,32 @@ public class RecordMedicineController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    @ResponseBody
+    @PostMapping("/{medicineIdx}/{timeslot}")
+    public BaseResponse<PostMedicineRecordRes> createMedicineRecord(@RequestBody PostMedicineRecordReq postReq,
+                                                     @PathVariable("medicineIdx") int medicineIdx, @PathVariable("timeslot") String timeSlot){
+        try{
+            if(!(timeSlot.equals("D") || timeSlot.equals("M") || timeSlot.equals("L") || timeSlot.equals("E")
+                    || timeSlot.equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
+
+            if(isRegexTime(postReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
+
+            if( postReq.getStatus().equals("Y") && postReq.getAmount() <= 0) ;  // todo : 약 복용했어인데, 0개를 복용함
+
+            if( postReq.getStatus().equals("N") && postReq.getAmount() == 1)
+                postReq.setAmount(0);
+
+            int userIdx = jwtService.getUserIdx();
+
+            PostMedicineRecordRes postMedicineRecordRes = recordMedicineService.createMedicineRecord(userIdx ,postReq, medicineIdx, timeSlot);
+
+            return new BaseResponse<>(postMedicineRecordRes);
+
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
     // 오늘 먹을 약이 없는 경우
 }

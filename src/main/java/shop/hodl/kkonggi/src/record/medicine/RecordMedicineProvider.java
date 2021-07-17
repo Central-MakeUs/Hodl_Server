@@ -1,6 +1,7 @@
 package shop.hodl.kkonggi.src.record.medicine;
 
 import com.fasterxml.jackson.databind.ser.Serializers;
+import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,13 +13,16 @@ import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineRecordRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 import static shop.hodl.kkonggi.utils.days.getDays;
+import shop.hodl.kkonggi.config.Constant;
 
 @Service
 public class RecordMedicineProvider {
@@ -121,9 +125,6 @@ public class RecordMedicineProvider {
 
 
     public List<GetMedicineListRes> getTodayMedicineList(int userIdx, String date) throws BaseException{
-        // 시간대 list에
-        List<String> timeSlot = Arrays.asList("D", "M", "L", "E", "N");
-        List<String> defaultSlot = Arrays.asList("06:00", "09:00", "12:00", "18:00", "21:00");
         List<GetMedicineListRes> getMedicineListRes = new ArrayList<>();
 
         SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
@@ -136,8 +137,8 @@ public class RecordMedicineProvider {
         logger.info("date after = " + date);
 
         try{
-            for(int i = 0; i < timeSlot.size(); i++) {
-                getMedicineListRes.add(recordMedicineDao.getTodayMedicineList(userIdx, timeSlot.get(i), defaultSlot.get(i), date));
+            for(int i = 0; i < Constant.TIMES.get(0).size() ; i++) {
+                getMedicineListRes.add(recordMedicineDao.getTodayMedicineList(userIdx, Constant.TIMES.get(0).get(i), Constant.TIMES.get(1).get(i), date));
             }
             return getMedicineListRes;
         }
@@ -167,7 +168,12 @@ public class RecordMedicineProvider {
             // 입력 화면
             else{
                 toReturn.setStatus("record");
-                getMedicine = recordMedicineDao.getSpecificMedicineRecord(medicineIdx, timeSlot);
+                String defulatTime = "";
+                for(int i = 0; i < Constant.TIMES.get(0).size(); i++){
+                    if(Constant.TIMES.get(0).get(i).equals(timeSlot)) defulatTime = Constant.TIMES.get(1).get(i);
+                }
+
+                getMedicine = recordMedicineDao.getSpecificMedicineRecord(defulatTime, medicineIdx, timeSlot);
             }
             toReturn.setMedicineIdx(getMedicine.getMedicineIdx());
             toReturn.setMedicineName(getMedicine.getMedicineName());

@@ -7,6 +7,7 @@ import shop.hodl.kkonggi.src.record.medicine.model.GetMedicine;
 import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
 import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.record.medicine.model.PostMedicineRecordReq;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -55,6 +56,15 @@ public class RecordMedicineDao {
 
         this.jdbcTemplate.update(createMedicieRecordQuery, createMedicieRecordParmas);
 
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    }
+
+    public int createMedicineRecord(PostMedicineRecordReq postReq, int medicineIdx, String timeSlot){
+        String createMedicieRecordQuery = "insert into MedicineRecord (medicineIdx, slot, day, time, amount, status) values (?, ?, ?, ?, ?, ?)";
+        Object[] createMedicieRecordParmas = new Object[]{medicineIdx, timeSlot, postReq.getDate(), postReq.getTime(), postReq.getAmount(), postReq.getStatus()};
+
+        this.jdbcTemplate.update(createMedicieRecordQuery, createMedicieRecordParmas);
         String lastInserIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
     }
@@ -108,15 +118,16 @@ public class RecordMedicineDao {
                 ), getMedicineParams);
     }
 
-    public GetMedicine getSpecificMedicineRecord(int medicineIdx, String timeSlot){
-        String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, now() as day, DATE_FORMAT(time,'%H:%i') as time, (select lastAmount from (select distinct medicineIdx ,case\n" +
+    public GetMedicine getSpecificMedicineRecord(String defaultTime ,int medicineIdx, String timeSlot){
+        String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, DATE_FORMAT(now(), '%Y-%m-%d') as day,\n" +
+                "       ifnull(DATE_FORMAT(time,'%H:%i'), ?) as time,ifnull((select lastAmount from (select distinct medicineIdx ,case\n" +
                 "        when (select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')) = 1\n" +
                 "            then (select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc limit 1)\n" +
                 "        else 1\n" +
-                "    end as lastAmount from MedicineRecord  where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc) last) as amount, \"\" as memo, days\n" +
+                "    end as lastAmount from MedicineRecord  where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc) last), 1) as amount, \"\" as memo, days\n" +
                 "from Medicine inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
                 "where Medicine.medicineIdx = ? and slot = ? and MedicineTime.status = 'Y'";
-        Object[] getMedicineParams = new Object[]{medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot};
+        Object[] getMedicineParams = new Object[]{defaultTime, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot};
 
         return this.jdbcTemplate.queryForObject(getMedicineQuery,
                 (rs, rowNum) -> new GetMedicine (
