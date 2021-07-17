@@ -87,6 +87,29 @@ public class RecordMedicineController {
         }
     }
 
+    @ResponseBody
+    @PatchMapping("/all")
+    public BaseResponse<PostAllMedicineRecordRes> updateAllMedicineRecord(@RequestBody PostAllMedicineRecordReq postReq){
+        try{
+            if(postReq.getTimeSlot().isEmpty() || postReq.getTimeSlot() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_EMPTY_SLOT);
+            if(!(postReq.getTimeSlot().equals("D") || postReq.getTimeSlot().equals("M") || postReq.getTimeSlot().equals("L") || postReq.getTimeSlot().equals("E")
+                    || postReq.getTimeSlot().equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
+            if(postReq.getMedicineIdx().length == 0 || postReq.getMedicineIdx() == null)
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_EMPTY_MEDICINES);
+            if(postReq.getTime().isEmpty() || postReq.getTime() == null)
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_EMPTY_TIME);
+            if(!isRegexTime(postReq.getTime()))
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
+
+            int userIdx = jwtService.getUserIdx();
+            PostAllMedicineRecordRes postAllMedicineRecordRes = recordMedicineService.updateAllMedicineRecord(userIdx, postReq);
+            return new BaseResponse<>(postAllMedicineRecordRes);
+
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 
     @ResponseBody
     @GetMapping("/{medicineIdx}/{timeslot}")
@@ -138,7 +161,7 @@ public class RecordMedicineController {
                     || timeSlot.equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
 
             if(!isRegexTime(patchReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
-            if( !patchReq.getStatus().equals("N") ||  !patchReq.getStatus().equals("Y") )
+            if( !patchReq.getStatus().equals("N") &&  !patchReq.getStatus().equals("Y") )
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_STATUS);
 
             int userIdx = jwtService.getUserIdx();

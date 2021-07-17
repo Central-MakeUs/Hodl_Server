@@ -59,6 +59,8 @@ public enum BaseResponseStatus {
     POST_MEDICINE_RECORD_ALL_INVALID_SLOT(false, 2046, "시간대 형식을 확인해주세요."),
     POST_MEDICINE_RECORD_ALL_INVALID_STATUS(false, 2047, "상태 형식을 확인해주세요."),
 
+    PATCH_MEDICINE_RECORD_INVALID(false, 2050, "상태가 이상한 약물입니다."),
+
 
 
     /**

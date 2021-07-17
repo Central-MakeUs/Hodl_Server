@@ -65,6 +65,16 @@ public class RecordMedicineDao {
         return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
     }
 
+    public int updateAllMedicineRecord(PostAllMedicineRecordReq postReq, int index, double amount, int recordIdx){
+        String createMedicieRecordQuery = "update MedicineRecord set medicineIdx =?, slot = ?, day =?, time = ?, amount =?, status = 'Y' where recordIdx = ?";
+        Object[] createMedicieRecordParmas = new Object[]{postReq.getMedicineIdx()[index], postReq.getTimeSlot(), postReq.getDate(), postReq.getTime(), amount, recordIdx};
+
+        this.jdbcTemplate.update(createMedicieRecordQuery, createMedicieRecordParmas);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    }
+
     public int createMedicineRecord(PostMedicineRecordReq postReq, int medicineIdx, String timeSlot){
         String createMedicieRecordQuery = "insert into MedicineRecord (medicineIdx, slot, day, time, amount, status) values (?, ?, ?, ?, ?, ?)";
         Object[] createMedicieRecordParmas = new Object[]{medicineIdx, timeSlot, postReq.getDate(), postReq.getTime(), postReq.getAmount(), postReq.getStatus()};
@@ -90,9 +100,21 @@ public class RecordMedicineDao {
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
     }
 
+    public int checkRecordIdx(int medicineIdx, String slot, String date){
+        String checkQuery = "select (exists(select recordIdx from MedicineRecord where medicineIdx = ? and slot = ? and day = ?))";
+        Object[] checkParams = new Object[]{medicineIdx, slot, date};
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
+    }
+
     public int getRecordIdx(PatchMedicineRecordReq patchReq, int medicineIdx, String timeSlot){
         String getRecordIdxQuery = "select recordIdx from MedicineRecord where medicineIdx = ? and slot = ? and day = ?";
         Object[] getRecordIdxParams = new Object[]{medicineIdx, timeSlot, patchReq.getDate()};
+        return this.jdbcTemplate.queryForObject(getRecordIdxQuery, int.class, getRecordIdxParams);
+    }
+
+    public int getRecordIdx(int medicineIdx, String slot, String date){
+        String getRecordIdxQuery = "select recordIdx from MedicineRecord where medicineIdx = ? and slot = ? and day = ?";
+        Object[] getRecordIdxParams = new Object[]{medicineIdx, slot, date};
         return this.jdbcTemplate.queryForObject(getRecordIdxQuery, int.class, getRecordIdxParams);
     }
 

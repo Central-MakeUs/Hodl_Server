@@ -54,7 +54,41 @@ public class RecordMedicineService {
             logger.error("userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
+    }
 
+    @Transactional
+    public PostAllMedicineRecordRes updateAllMedicineRecord(int userIdx, PostAllMedicineRecordReq patchReq) throws BaseException {
+        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+        Date current = new Date();
+        String currentTimeStr = dtFormat.format(current);
+
+        double amount = 1;
+        int result = 0;
+        int recordIdx = 0;
+        String timeSlot = patchReq.getTimeSlot();
+        if (patchReq.getDate() == null || patchReq.getDate().equals(currentTimeStr) || patchReq.getDate().isEmpty())  // 오늘일 경우, Date 설정
+            patchReq.setDate(currentTimeStr);
+        if(!isRegexDate(patchReq.getDate()))
+            throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
+
+        try{
+            for(int i = 0; i < patchReq.getMedicineIdx().length; i++) {
+                if(recordMedicineProvider.checkRecordIdx(patchReq.getMedicineIdx()[i], patchReq.getTimeSlot(), patchReq.getDate()) == 0)  // 레코드 된 것이 없는 경우
+                    throw new BaseException(BaseResponseStatus.PATCH_MEDICINE_RECORD_INVALID);
+
+                recordIdx = recordMedicineProvider.getRecordIdx(patchReq.getMedicineIdx()[i], patchReq.getTimeSlot(), patchReq.getDate());
+
+                logger.info("medicineIdx = " + patchReq.getMedicineIdx());
+                logger.info("recordIdx = " + recordIdx);
+                amount = recordMedicineProvider.getLatestMedicineAmount(patchReq.getMedicineIdx()[i], timeSlot);  // 가장  최근 복용량
+                result = recordMedicineDao.updateAllMedicineRecord(patchReq, i, amount, recordIdx);
+
+            }
+            return new PostAllMedicineRecordRes(patchReq.getDate());
+        } catch (Exception exception) {
+            logger.error("userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
     }
 
     @Transactional
@@ -107,7 +141,6 @@ public class RecordMedicineService {
 
         } catch (Exception exception) {
             logger.error("userIdx = " + userIdx);
-            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

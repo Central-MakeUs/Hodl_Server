@@ -200,6 +200,24 @@ public class RecordMedicineProvider {
         }
     }
 
+    public int checkRecordIdx(int medicineIdx, String timeSlot, String date) throws BaseException{
+        try{
+            return recordMedicineDao.checkRecordIdx(medicineIdx, timeSlot, date);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int getRecordIdx(int medicineIdx, String slot, String date) throws BaseException{
+        try{
+            return recordMedicineDao.getRecordIdx(medicineIdx, slot, date);
+        }catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
     public int getRecordIdx(PatchMedicineRecordReq patchReq, int medicineIdx, String timeSlot) throws BaseException{
         try{
             return recordMedicineDao.getRecordIdx(patchReq, medicineIdx, timeSlot);
