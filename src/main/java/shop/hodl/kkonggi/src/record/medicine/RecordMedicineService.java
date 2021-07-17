@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static shop.hodl.kkonggi.config.BaseResponseStatus.POST_MEDICINE_RECORD_ALREADY;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
 @Service
@@ -104,6 +105,11 @@ public class RecordMedicineService {
             postReq.setDate(currentTimeStr);
         if(!isRegexDate(postReq.getDate()))
             throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
+
+        // 이미 등록된 것인지 확인!
+        if(recordMedicineProvider.checkRecordIdx(medicineIdx, timeSlot, postReq.getDate()) == 1)
+            throw new BaseException(POST_MEDICINE_RECORD_ALREADY);
+
         try {
             result = recordMedicineDao.createMedicineRecord(postReq, medicineIdx, timeSlot);
             if(result == 0) throw

@@ -76,8 +76,8 @@ public class RecordMedicineDao {
     }
 
     public int createMedicineRecord(PostMedicineRecordReq postReq, int medicineIdx, String timeSlot){
-        String createMedicieRecordQuery = "insert into MedicineRecord (medicineIdx, slot, day, time, amount, status) values (?, ?, ?, ?, ?, ?)";
-        Object[] createMedicieRecordParmas = new Object[]{medicineIdx, timeSlot, postReq.getDate(), postReq.getTime(), postReq.getAmount(), postReq.getStatus()};
+        String createMedicieRecordQuery = "insert into MedicineRecord (medicineIdx, slot, day, time, memo, amount, status) values (?, ?, ?, ?, ?, ?, ?)";
+        Object[] createMedicieRecordParmas = new Object[]{medicineIdx, timeSlot, postReq.getDate(), postReq.getTime(), postReq.getMemo(), postReq.getAmount(), postReq.getStatus()};
 
         this.jdbcTemplate.update(createMedicieRecordQuery, createMedicieRecordParmas);
         String lastInserIdQuery = "select last_insert_id()";
@@ -119,8 +119,8 @@ public class RecordMedicineDao {
     }
 
     public int updateMedicineRecord(int recordIdx, PatchMedicineRecordReq patchReq){
-        String updateRecordIdxQuery = "update MedicineRecord set amount = ?, time = ?, memo = ?, status = ? where recordIdx = ?;";
-        Object[] updateRecordIdxQueryRecordIdxParams = new Object[]{patchReq.getAmount(), patchReq.getTime(), patchReq.getMemo(), patchReq.getStatus(), recordIdx};
+        String updateRecordIdxQuery = "update MedicineRecord set amount = ?, time = ?, memo = ?, status = ? , day = ? where recordIdx = ?;";
+        Object[] updateRecordIdxQueryRecordIdxParams = new Object[]{patchReq.getAmount(), patchReq.getTime(), patchReq.getMemo(), patchReq.getStatus(), patchReq.getDate(), recordIdx};
         return this.jdbcTemplate.update(updateRecordIdxQuery, updateRecordIdxQueryRecordIdxParams);
     }
 
