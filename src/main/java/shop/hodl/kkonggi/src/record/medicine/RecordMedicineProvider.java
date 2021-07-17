@@ -330,4 +330,32 @@ public class RecordMedicineProvider {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
+
+    public GetMedChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws  BaseException{
+        try{
+            GetMedChatRes getMedChatRes = recordMedicineDao.getChats(groupId, scenarioIdx);
+            String nickReplace = "%user_nickname%";
+            for(int i = 0; i < getMedChatRes.getChat().size(); i++){
+                if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(nickReplace, getUserNickName(userIdx)));
+            }
+            return getMedChatRes;
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public GetMedChatRes getChatsNoAction(int userIdx, int scenarioIdx, String groupId) throws  BaseException{
+        try{
+            GetMedChatRes getMedChatRes = recordMedicineDao.getChatsNoAction(groupId, scenarioIdx);
+            String nickReplace = "%user_nickname%";
+            for(int i = 0; i < getMedChatRes.getChat().size(); i++){
+                if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(nickReplace, getUserNickName(userIdx)));
+            }
+            return getMedChatRes;
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
 }
