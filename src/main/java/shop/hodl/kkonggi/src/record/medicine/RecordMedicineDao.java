@@ -21,20 +21,27 @@ public class RecordMedicineDao {
     }
 
     public GetMedicineListRes getTodayMedicineList(int userIdx, String timeSlot, String defaultTime, String date) {
-        String getMedicineQuery = "select medicineIdx, medicineRealName,\n" +
+        String getMedicineQuery = "select medicineIdx,medicineRealName,\n" +
+                "    case\n" +
+                "        when taking like('%AM%') then REPLACE(taking,'AM', '오전')\n" +
+                "        when taking like('%PM%') then REPLACE(taking,'PM', '오후')\n" +
+                "        else taking\n" +
+                "    end as taking, status\n" +
+                "from(\n" +
+                "select medicineIdx, medicineRealName,\n" +
                 "       case\n" +
                 "           when MedicineInfo.status is null then concat(MedicineInfo.timeTime, ' 미복용')\n" +
                 "           when MedicineInfo.status = 'N' then '안먹음'\n" +
                 "               else MedicineInfo.recordTime\n" +
                 "       end as taking, status from\n" +
                 "       (select Medicine.medicineIdx, medicineRealName ,case\n" +
-                "           when MedicineTime.time is null then DATE_FORMAT(TIME(?),'%h:%i %p')\n" +
-                "           else (DATE_FORMAT(MedicineTime.time,'%h:%i %p'))\n" +
+                "           when MedicineTime.time is null then DATE_FORMAT(TIME(?),'%p %h:%i')\n" +
+                "           else (DATE_FORMAT(MedicineTime.time,'%p %h:%i'))\n" +
                 "           end  as timeTime,\n" +
-                "               (DATE_FORMAT(MedicineRecord.time,'%h:%i %p')) as recordTime, MedicineRecord.status as status from Medicine\n" +
+                "               (DATE_FORMAT(MedicineRecord.time,'%p %h:%i')) as recordTime, MedicineRecord.status as status from Medicine\n" +
                 "    inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx and slot = ?\n" +
                 "    left join MedicineRecord on MedicineTime.slot = MedicineRecord.slot and MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineRecord.day = ?\n" +
-                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1) MedicineInfo";
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1) MedicineInfo) slotList";
         Object[] getMedicineParams = new Object[]{defaultTime, timeSlot, date, userIdx, date, date};
 
         return new GetMedicineListRes(timeSlot,
