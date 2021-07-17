@@ -34,11 +34,21 @@ public class DocumentProvider {
     }
 
     public GetBoradContentRes getBoardContent(int noticeboardIdx) throws BaseException{
+
+        if(checkBoard(noticeboardIdx) == 0) throw new BaseException(BaseResponseStatus.INVALID_NOTICE_BOARD);
         try {
             return documentDao.getBoradContent(noticeboardIdx);
         }
         catch (Exception exception){
             exception.printStackTrace();
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int checkBoard(int noticeboardIdx) throws BaseException{
+        try{
+            return documentDao.checkBoard(noticeboardIdx);
+        }catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

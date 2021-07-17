@@ -30,6 +30,10 @@ public class DocumentController {
         this.jwtService = jwtService;
     }
 
+    /**
+     * 공지 사항 리스트
+     * @return
+     */
     @ResponseBody
     @GetMapping("/noticeboard")
     public BaseResponse<List<GetBoardRes>> getBoardList(){
@@ -41,6 +45,11 @@ public class DocumentController {
         }
     }
 
+    /**
+     * 특정 공지사항
+     * @param noticeboardIdx
+     * @return
+     */
     @ResponseBody
     @GetMapping("/noticeboard/{noticeboardIdx}")
     public BaseResponse<GetBoradContentRes> getBoardContent(@PathVariable("noticeboardIdx") int noticeboardIdx){
@@ -52,4 +61,13 @@ public class DocumentController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 이용 약관
+     */
+
+
+    /**
+     * 개인 정보
+     */
 }

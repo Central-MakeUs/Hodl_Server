@@ -62,6 +62,8 @@ public enum BaseResponseStatus {
 
     PATCH_MEDICINE_RECORD_INVALID(false, 2050, "상태가 이상한 약물입니다."),
 
+    INVALID_NOTICE_BOARD(false, 2060, "해당 공지 사항이 없습니다."),
+
 
 
     /**

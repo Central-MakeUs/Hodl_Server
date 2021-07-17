@@ -18,10 +18,6 @@ public class DocumentDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    /**
-     * 공지사항 리스트
-     * @return
-     */
     public List<GetBoardRes> getBoardList(){
         String getBoradQuery = "select noticeIdx, title, if(status = 'L', 1, 0) as isNew, date_format(createAt, '%Y.%m.%d') as date from NoticeBoard where status != 'N' order by  isNew desc , createAt desc";
 
@@ -34,11 +30,6 @@ public class DocumentDao {
                 )));
     }
 
-    /**
-     * 특정 공지사항
-     * @param noticeboardIdx
-     * @return
-     */
     public GetBoradContentRes getBoradContent(int noticeboardIdx){
         String getBoradContentQuery = "select title, if(status = 'L', 1, 0) as isNew, date_format(createAt, '%Y.%m.%d') as date, content from NoticeBoard where status != 'N' and noticeIdx = ?";
         return this.jdbcTemplate.queryForObject(getBoradContentQuery,
@@ -50,12 +41,9 @@ public class DocumentDao {
                 ), noticeboardIdx);
     }
 
-    /**
-     * 이용 약관
-     */
+    public int checkBoard(int noticeboardIdx){
+        String checkQuery = "select(exists(select noticeIdx from NoticeBoard where noticeIdx = ?))";
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, noticeboardIdx);
+    }
 
-
-    /**
-     * 개인 정보
-     */
 }
