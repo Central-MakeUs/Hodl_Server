@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
-import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordRes;
-import shop.hodl.kkonggi.src.record.medicine.model.PostMedicineRecordReq;
-import shop.hodl.kkonggi.src.record.medicine.model.PostMedicineRecordRes;
+import shop.hodl.kkonggi.src.record.medicine.model.*;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
@@ -78,6 +75,36 @@ public class RecordMedicineService {
 
             PostMedicineRecordRes postMedicineRecordRes = new PostMedicineRecordRes(result);
             return postMedicineRecordRes;
+
+        } catch (Exception exception) {
+            logger.error("userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    @Transactional
+    public int updateMedicineRecord(int userIdx , PatchMedicineRecordReq patchReq, int medicineIdx, String timeSlot) throws BaseException{
+        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+        Date current = new Date();
+        String currentTimeStr = dtFormat.format(current);
+
+        String status = "Y";
+        if(patchReq.getAmount() == 0) status = "N";
+
+        int result = 0;
+        if (patchReq.getDate() == null || patchReq.getDate().equals(currentTimeStr) || patchReq.getDate().isEmpty())  // 오늘일 경우, Date 설정
+            patchReq.setDate(currentTimeStr);
+        if(!isRegexDate(patchReq.getDate()))
+            throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
+        try{
+            // recordIdx
+            if(recordMedicineProvider.checkRecordIdx(patchReq, medicineIdx, timeSlot) == 0)  // 레코드 된 것이 없는 경우
+                throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+            int recordIdx = recordMedicineProvider.getRecordIdx(patchReq, medicineIdx, timeSlot);
+            result = recordMedicineDao.updateMedicineRecord(recordIdx, patchReq, status);
+            if(result == 0)
+                new BaseException(BaseResponseStatus.CREATE_FAIL_MEDICINE_RECORD);
+            return result;
 
         } catch (Exception exception) {
             logger.error("userIdx = " + userIdx);

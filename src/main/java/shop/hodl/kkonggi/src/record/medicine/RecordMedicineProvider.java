@@ -7,10 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.record.medicine.model.GetMedicine;
-import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
+import shop.hodl.kkonggi.src.record.medicine.model.*;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
-import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineRecordRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.awt.*;
@@ -190,6 +188,25 @@ public class RecordMedicineProvider {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
+
+    public int checkRecordIdx(PatchMedicineRecordReq patchReq, int medicineIdx, String timeSlot) throws BaseException{
+        try{
+            return recordMedicineDao.checkRecordIdx(patchReq, medicineIdx, timeSlot);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int getRecordIdx(PatchMedicineRecordReq patchReq, int medicineIdx, String timeSlot) throws BaseException{
+        try{
+            return recordMedicineDao.getRecordIdx(patchReq, medicineIdx, timeSlot);
+        }catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
 
     public int checkSpecificMedicineRecord(int medicineIdx, String timeSlot, String date) throws BaseException{
         try{

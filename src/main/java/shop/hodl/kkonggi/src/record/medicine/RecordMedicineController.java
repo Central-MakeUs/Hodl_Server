@@ -112,9 +112,7 @@ public class RecordMedicineController {
             if(!(timeSlot.equals("D") || timeSlot.equals("M") || timeSlot.equals("L") || timeSlot.equals("E")
                     || timeSlot.equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
 
-            if(isRegexTime(postReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
-
-            if( postReq.getStatus().equals("Y") && postReq.getAmount() <= 0) ;  // todo : 약 복용했어인데, 0개를 복용함
+            if(!isRegexTime(postReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
 
             if( postReq.getStatus().equals("N") && postReq.getAmount() == 1)
                 postReq.setAmount(0);
@@ -129,6 +127,28 @@ public class RecordMedicineController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+
+    @ResponseBody
+    @PatchMapping("/{medicineIdx}/{timeslot}")
+    public BaseResponse<Integer> updateMedicineRecord(PatchMedicineRecordReq patchReq,
+                                               @PathVariable("medicineIdx") int medicineIdx, @PathVariable("timeslot") String timeSlot){
+        try{
+            if(!(timeSlot.equals("D") || timeSlot.equals("M") || timeSlot.equals("L") || timeSlot.equals("E")
+                    || timeSlot.equals("N"))) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);
+
+            if(!isRegexTime(patchReq.getTime())) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);
+
+            int userIdx = jwtService.getUserIdx();
+            recordMedicineService.updateMedicineRecord(userIdx ,patchReq, medicineIdx, timeSlot);
+
+            return new BaseResponse<>(medicineIdx);
+
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 
     // 오늘 먹을 약이 없는 경우
 }

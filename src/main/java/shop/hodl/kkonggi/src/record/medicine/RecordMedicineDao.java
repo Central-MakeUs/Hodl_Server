@@ -3,12 +3,10 @@ package shop.hodl.kkonggi.src.record.medicine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import shop.hodl.kkonggi.src.record.medicine.model.GetMedicine;
-import shop.hodl.kkonggi.src.record.medicine.model.GetMedicineListRes;
-import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
+import shop.hodl.kkonggi.src.record.medicine.model.*;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
-import shop.hodl.kkonggi.src.record.medicine.model.PostMedicineRecordReq;
 
+import javax.sound.midi.Patch;
 import javax.sql.DataSource;
 import java.util.List;
 
@@ -77,6 +75,24 @@ public class RecordMedicineDao {
     public double getLatestMedicineAmount(int medicineIdx, String timeSlot){
         String getAmountQuery = "select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc limit 1";
         return this.jdbcTemplate.queryForObject(getAmountQuery, double.class, medicineIdx, timeSlot);
+    }
+
+    public int checkRecordIdx(PatchMedicineRecordReq patchReq, int medicineIdx, String timeSlot){
+        String checkQuery = "select (exists(select recordIdx from MedicineRecord where medicineIdx = ? and slot = ? and day = ?))";
+        Object[] checkParams = new Object[]{medicineIdx, timeSlot, patchReq.getDate()};
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
+    }
+
+    public int getRecordIdx(PatchMedicineRecordReq patchReq, int medicineIdx, String timeSlot){
+        String getRecordIdxQuery = "select recordIdx from MedicineRecord where medicineIdx = ? and slot = ? and day = ?";
+        Object[] getRecordIdxParams = new Object[]{medicineIdx, timeSlot, patchReq.getDate()};
+        return this.jdbcTemplate.queryForObject(getRecordIdxQuery, int.class, getRecordIdxParams);
+    }
+
+    public int updateMedicineRecord(int recordIdx, PatchMedicineRecordReq patchReq, String status){
+        String updateRecordIdxQuery = "update MedicineRecord set amount = ?, time = ?, memo = ?, status = ? where recordIdx = ?;";
+        Object[] updateRecordIdxQueryRecordIdxParams = new Object[]{patchReq.getAmount(), patchReq.getTime(), patchReq.getMemo(), status, recordIdx};
+        return this.jdbcTemplate.queryForObject(updateRecordIdxQuery, int.class, updateRecordIdxQueryRecordIdxParams);
     }
 
     public int checkSpecificMedicineRecord(int medicineIdx, String timeSlot, String day){

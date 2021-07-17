@@ -21,7 +21,7 @@ public class ValidationRegex {
 
     // hh:ss
     public static boolean isRegexTime(String target){
-        String regex = "^[0-2][0-3]:[0-5][0-9]$";
+        String regex = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
         Pattern pattern = Pattern.compile(regex, Pattern.CANON_EQ);
         Matcher matcher = pattern.matcher(target);
         return matcher.find();
