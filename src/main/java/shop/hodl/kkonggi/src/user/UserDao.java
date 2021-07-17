@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -45,16 +44,14 @@ public class UserDao {
                 getUsersByEmailParams);
     }
 
-    public GetUserRes getUser(int userIdx){
-        String getUserQuery = "select * from UserInfo where userIdx = ?";
+    public GetUserInfo getUser(int userIdx){
+        String getUserQuery = "select email, ifnull(nickName, '') as nickName, '이메일 회원가입' as signUpType from User where status = 'Y' and userIdx = ?";
         int getUserParams = userIdx;
         return this.jdbcTemplate.queryForObject(getUserQuery,
-                (rs, rowNum) -> new GetUserRes(
-                        rs.getInt("userIdx"),
-                        rs.getString("userName"),
-                        rs.getString("ID"),
-                        rs.getString("Email"),
-                        rs.getString("password")),
+                (rs, rowNum) -> new GetUserInfo(
+                        rs.getString("nickName"),
+                        rs.getString("email"),
+                        rs.getString("signUpType")),
                 getUserParams);
     }
     

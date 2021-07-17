@@ -68,10 +68,13 @@ public class UserController {
     // Path-variable
     @ResponseBody
     @GetMapping("/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
-    public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
+    public BaseResponse<GetUserInfo> getUser(@PathVariable("userIdx") int userIdx) {
         // Get Users
         try{
-            GetUserRes getUserRes = userProvider.getUser(userIdx);
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(userIdxByJwt != userIdx) throw new BaseException(BaseResponseStatus.INVALID_USER_JWT);
+
+            GetUserInfo getUserRes = userProvider.getUser(userIdx);
             return new BaseResponse<>(getUserRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 
 import java.util.List;
+import static shop.hodl.kkonggi.utils.ValidationRegex.getMaskedEmail;
 
 //Provider : Read의 비즈니스 로직 처리
 @Service
@@ -20,7 +21,6 @@ public class UserProvider {
 
     private final UserDao userDao;
     private final JwtService jwtService;
-
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -51,9 +51,12 @@ public class UserProvider {
                     }
 
 
-    public GetUserRes getUser(int userIdx) throws BaseException {
+    public GetUserInfo getUser(int userIdx) throws BaseException {
         try {
-            GetUserRes getUserRes = userDao.getUser(userIdx);
+            GetUserInfo getUserRes = userDao.getUser(userIdx);
+            // 이메일 마스킹
+            getUserRes.setEmail(getMaskedEmail(getUserRes.getEmail()));
+            logger.info("Email masking = " + getUserRes.getEmail());
             return getUserRes;
         } catch (Exception exception) {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
