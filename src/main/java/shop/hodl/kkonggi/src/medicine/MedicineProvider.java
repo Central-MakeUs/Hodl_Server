@@ -8,6 +8,9 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
+import sun.text.resources.CollationData;
+
+import java.util.Collections;
 
 @Service
 public class MedicineProvider {
@@ -84,7 +87,7 @@ public class MedicineProvider {
             for(int i = 0; i < 2; i++){
                 getMedChatRes = medicineDao.getMedAddTime(gorupId, scenarioIdx, stepNumber, getMedChatRes, i);
             }
-
+            Collections.swap(getMedChatRes.getAction().getChoiceList(), 1, 3);
             return getMedChatRes;
         } catch (Exception exception){
             exception.printStackTrace();
