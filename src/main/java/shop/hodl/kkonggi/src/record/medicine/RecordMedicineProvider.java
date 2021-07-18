@@ -299,9 +299,15 @@ public class RecordMedicineProvider {
             else{
                 gorupId = "MED_REC_OK";
             }
-            GetMedChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scenarioIdx);
-            return getMedChatRes;
 
+            GetMedChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scenarioIdx);
+            String nickReplace = "%user_nickname%";
+            for(int i = 0; i < getMedChatRes.getChat().size(); i++){
+                if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(nickReplace, getUserNickName(userIdx)));
+            }
+
+            return getMedChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
