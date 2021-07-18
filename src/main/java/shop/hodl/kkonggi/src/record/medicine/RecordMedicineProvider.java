@@ -72,10 +72,10 @@ public class RecordMedicineProvider {
                     getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(medicineTypeCntReplace,Integer.toString(getMedicineType(userIdx))));
                 }
             }
-
             return getMedChatRes;
         }
         catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

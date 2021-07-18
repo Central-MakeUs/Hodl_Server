@@ -41,7 +41,7 @@ public class RecordMedicineDao {
                 "               (DATE_FORMAT(MedicineRecord.time,'%p %h:%i')) as recordTime, MedicineRecord.status as status from Medicine\n" +
                 "    inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx and slot = ?\n" +
                 "    left join MedicineRecord on MedicineTime.slot = MedicineRecord.slot and MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineRecord.day = ?\n" +
-                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1) MedicineInfo) slotList";
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(?)) > -1)) MedicineInfo) slotList";
         Object[] getMedicineParams = new Object[]{defaultTime, timeSlot, date, userIdx, date, date};
 
         return new GetMedicineListRes(timeSlot,
@@ -136,7 +136,7 @@ public class RecordMedicineDao {
     }
 
     public int checkTodayMedicine(int userIdx){
-        String checkMedicineQuery = "select exists(select medicineIdx from Medicine where userIdx = ? and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and status = 'Y')";
+        String checkMedicineQuery = "select exists(select medicineIdx from Medicine where userIdx = ? and pow(2, weekday(now())) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(now())) > -1) and status = 'Y')";
         return this.jdbcTemplate.queryForObject(checkMedicineQuery, int.class, userIdx);
     }
 
@@ -147,7 +147,7 @@ public class RecordMedicineDao {
 
     public int getTodayRecordCnt(int userIdx, String date){
         String query = "select count(*) from (select Medicine.medicineIdx, medicineRealName, slot, days from MedicineTime inner join Medicine on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
-                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1) Cnt";
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(?)) > -1)) Cnt";
         Object[] params = new Object[]{userIdx, date, date};
         return this.jdbcTemplate.queryForObject(query, int.class, params);
     }
@@ -157,7 +157,7 @@ public class RecordMedicineDao {
                 "(select MedicineRecord.slot from MedicineRecord\n" +
                 "    inner join MedicineTime on MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineTime.slot = MedicineRecord.slot\n" +
                 "    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
-                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1 and MedicineRecord.status = 'Y') yes";
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(?)) > -1) and MedicineRecord.status = 'Y') yes";
         Object[] params = new Object[]{userIdx, date, date};
         return this.jdbcTemplate.queryForObject(query, int.class, params);
     }
@@ -167,7 +167,7 @@ public class RecordMedicineDao {
                 "(select MedicineRecord.slot from MedicineRecord\n" +
                 "    inner join MedicineTime on MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineTime.slot = MedicineRecord.slot\n" +
                 "    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
-                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and datediff(endDay, DATE(?)) > -1 and MedicineRecord.status = 'N') noRecord";
+                "where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(?)) > -1) and MedicineRecord.status = 'N') noRecord";
         Object[] params = new Object[]{userIdx, date, date};
         return this.jdbcTemplate.queryForObject(query, int.class, params);
     }
@@ -248,7 +248,7 @@ public class RecordMedicineDao {
                 "                 from MedicineTime\n" +
                 "    inner join Medicine\n" +
                 "        where Medicine.medicineIdx = MedicineTime.medicineIdx and MedicineTime.status = 'Y' and Medicine.status = 'Y'\n" +
-                "          and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and userIdx = ?";
+                "          and pow(2, weekday(now())) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(now())) > -1) and userIdx = ?";
 
         List<String> slots = this.jdbcTemplate.queryForList(
                 getSlotsQuery,
@@ -270,14 +270,14 @@ public class RecordMedicineDao {
                 "                 from MedicineTime\n" +
                 "    inner join Medicine\n" +
                 "        where Medicine.medicineIdx = MedicineTime.medicineIdx and MedicineTime.status = 'Y' and Medicine.status = 'Y'\n" +
-                "          and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and userIdx = ?) slot";
+                "          and pow(2, weekday(now())) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(now())) > -1) and userIdx = ?) slot";
 
         return this.jdbcTemplate.queryForObject(getSlotCntQuery, int.class, userIdx);
     }
 
     public int getMedicineType(int userIdx){
         String getMedicineTypeQuery = "select count(medicineIdx) from (select medicineIdx from Medicine where Medicine.status = 'Y'\n" +
-                "          and pow(2, weekday(now())) & days != 0 and datediff(endDay, now()) > -1 and userIdx = ?) Medicines";
+                "          and pow(2, weekday(now())) & days != 0 and if(endDay is null, TRUE, datediff(endDay, DATE(now())) > -1) and userIdx = ?) Medicines";
         return this.jdbcTemplate.queryForObject(getMedicineTypeQuery, int.class, userIdx);
     }
 
