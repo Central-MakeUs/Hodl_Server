@@ -54,10 +54,13 @@ public class EmailController {
         if(!isRegexEmail(postAuthReq.getEmail())){
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
         }
-        if(postAuthReq.getCode() == null){
-            return new BaseResponse<>(POST_AUTH_EMPTY_CODE);
-        }
         try{
+            if(postAuthReq.getCode() == null){
+                logger.warn("Resend email = " + postAuthReq.getEmail());
+                emailService.sendEmailMessage(postAuthReq.getEmail());
+                logger.warn("Complete resend email = " + postAuthReq.getEmail());
+                return new BaseResponse<>(POST_AUTH_EMPTY_CODE);
+            }
             emailProvider.checkAuth(postAuthReq);
             return new BaseResponse<>("");
         } catch(BaseException exception){
