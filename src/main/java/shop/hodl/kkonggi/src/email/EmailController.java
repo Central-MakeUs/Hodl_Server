@@ -37,6 +37,8 @@ public class EmailController {
         try{
             logger.info(logger.getName()+ postEmailReq.getEmail());
             emailService.sendEmailMessage(postEmailReq.getEmail());
+
+            logger.info("[Email] send success : " + postEmailReq.getEmail());
             return new BaseResponse<>("");
         }
         catch(BaseException exception){

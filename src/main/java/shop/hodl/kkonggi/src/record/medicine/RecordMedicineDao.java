@@ -125,7 +125,7 @@ public class RecordMedicineDao {
     }
 
     public int checkSpecificMedicineRecord(int medicineIdx, String timeSlot, String day){
-        String getCheckQuery = "select exists(select medicineIdx from MedicineRecord where medicineIdx = ? and slot = ? and day = ? and status = 'Y')";
+        String getCheckQuery = "select exists(select medicineIdx from MedicineRecord where medicineIdx = ? and slot = ? and day = ?)";
         Object[] getCheckParams = new Object[]{medicineIdx, timeSlot, day};
         return this.jdbcTemplate.queryForObject(getCheckQuery, int.class, getCheckParams);
     }
@@ -175,8 +175,8 @@ public class RecordMedicineDao {
 
     public GetMedicine getSpecificMedicineRecordModify(int medicineIdx, String timeSlot, String date){
         String getMedicineQuery = "select MedicineRecord.medicineIdx, medicineRealName, day, DATE_FORMAT(time,'%H:%i') as time, amount, ifnull(memo, \"\") as memo, days  from MedicineRecord\n" +
-                "    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
-                "where Medicine.medicineIdx = ? and slot = ? and day = ? and MedicineRecord.status = 'Y'";
+                "                inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
+                "                where Medicine.medicineIdx = ? and slot = ? and day = ?";
         Object[] getMedicineParams = new Object[]{medicineIdx, timeSlot, date};
         String getSlotQuery = "select\n" +
                 "       case\n" +
