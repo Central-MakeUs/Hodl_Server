@@ -61,6 +61,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public GetChatRes modifyUserName(PatchUserReq patchUserReq, String groupId) throws BaseException {
         if(patchUserReq.getUserNickName().equals(userProvider.getUserNickName(patchUserReq.getUserIdx())))
             throw new BaseException(BaseResponseStatus.PATCH_USERS_ALREADY_NICKNAME);
@@ -101,6 +102,18 @@ public class UserService {
         } catch(Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
+    }
+
+    public PatchNickNameRes modifyUserName(PatchUserReq patchUserReq) throws BaseException{
+        int result = 0;
+        try{
+            result = userDao.modifyUserName(patchUserReq);
+        }catch(Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+        if(result == 0) throw new BaseException(BaseResponseStatus.MODIFY_FAIL_USERNAME);
+        PatchNickNameRes patchNickNameRes = new PatchNickNameRes(patchUserReq.getUserIdx(), patchUserReq.getUserNickName());
+        return patchNickNameRes;
     }
 
 }

@@ -7,5 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor  (access = AccessLevel.PUBLIC)
 public class PatchNickNameRes {
-    private String[] Chat;
+    private int userIdx;
+    private String nickName;
 }

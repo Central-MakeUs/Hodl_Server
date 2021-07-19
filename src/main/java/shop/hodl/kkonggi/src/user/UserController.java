@@ -225,4 +225,26 @@ public class UserController {
         }
     }
 
+    /**
+     * 마이페이지에서 닉네임 수정
+     * @param patchNickNameReq
+     * @return
+     */
+    @ResponseBody
+    @PatchMapping("/nickname")
+    public BaseResponse<PatchNickNameRes> modifyUserNickName(@RequestBody  PatchNickNameReq patchNickNameReq){
+        if(patchNickNameReq.getNickname() == null){
+            return new BaseResponse<>(PATCH_USERS_EMPTY_NICKNAME);
+        }
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            PatchUserReq patchUserReq = new PatchUserReq(userIdxByJwt, patchNickNameReq.getNickname());
+            PatchNickNameRes patchNickNameRes = userService.modifyUserName(patchUserReq);
+            return new BaseResponse<>(patchNickNameRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 }
