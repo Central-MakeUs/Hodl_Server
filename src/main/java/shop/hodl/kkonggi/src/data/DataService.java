@@ -1,4 +1,4 @@
-package shop.hodl.kkonggi.src.document;
+package shop.hodl.kkonggi.src.data;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,17 +7,17 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.utils.JwtService;
 
 @Service
-public class DocumentService {
+public class DataService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final DocumentProvider documentProvider;
-    private final DocumentDao documentDao;
+    private final DataProvider dataProvider;
+    private final DataDao dataDao;
     private final JwtService jwtService;
 
     @Autowired
-    public DocumentService(DocumentProvider documentProvider, DocumentDao documentDao, JwtService jwtService) {
-        this.documentProvider = documentProvider;
-        this.documentDao = documentDao;
+    public DataService(DataProvider dataProvider, DataDao dataDao, JwtService jwtService) {
+        this.dataProvider = dataProvider;
+        this.dataDao = dataDao;
         this.jwtService = jwtService;
     }
 }

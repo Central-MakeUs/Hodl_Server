@@ -1,16 +1,16 @@
-package shop.hodl.kkonggi.src.document;
+package shop.hodl.kkonggi.src.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import shop.hodl.kkonggi.src.document.model.GetBoardRes;
-import shop.hodl.kkonggi.src.document.model.GetBoradContentRes;
+import shop.hodl.kkonggi.src.data.model.GetBoardRes;
+import shop.hodl.kkonggi.src.data.model.GetBoradContentRes;
 
 import javax.sql.DataSource;
 import java.util.List;
 
 @Repository
-public class DocumentDao {
+public class DataDao {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -46,4 +46,8 @@ public class DocumentDao {
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, noticeboardIdx);
     }
 
+    public String getLatestSetting(){
+        String getVersionQuery = "select version from Setting order by createAt desc limit 1";
+        return this.jdbcTemplate.queryForObject(getVersionQuery, String.class);
+    }
 }

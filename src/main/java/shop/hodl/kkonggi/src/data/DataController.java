@@ -1,4 +1,4 @@
-package shop.hodl.kkonggi.src.document;
+package shop.hodl.kkonggi.src.data;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,27 +6,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
-import shop.hodl.kkonggi.src.document.model.GetBoardRes;
-import shop.hodl.kkonggi.src.document.model.GetBoradContentRes;
+import shop.hodl.kkonggi.src.data.model.GetBoardRes;
+import shop.hodl.kkonggi.src.data.model.GetBoradContentRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/app/v1/document")
-public class DocumentController {
+@RequestMapping("/app/v1/data")
+public class DataController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private final DocumentProvider documentProvider;
+    private final DataProvider dataProvider;
     @Autowired
-    private final DocumentService documentService;
+    private final DataService dataService;
     @Autowired
     private final JwtService jwtService;
 
-    public DocumentController(DocumentProvider documentProvider, DocumentService documentService, JwtService jwtService) {
-        this.documentProvider = documentProvider;
-        this.documentService = documentService;
+    public DataController(DataProvider dataProvider, DataService dataService, JwtService jwtService) {
+        this.dataProvider = dataProvider;
+        this.dataService = dataService;
         this.jwtService = jwtService;
     }
 
@@ -38,7 +38,7 @@ public class DocumentController {
     @GetMapping("/noticeboard")
     public BaseResponse<List<GetBoardRes>> getBoardList(){
         try{
-            List<GetBoardRes> getBoardRes = documentProvider.getBoardList();
+            List<GetBoardRes> getBoardRes = dataProvider.getBoardList();
             return new BaseResponse<>(getBoardRes);
         }catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -55,19 +55,20 @@ public class DocumentController {
     public BaseResponse<GetBoradContentRes> getBoardContent(@PathVariable("noticeboardIdx") int noticeboardIdx){
         try{
             if(noticeboardIdx == 0) ;
-            GetBoradContentRes getBoardRes = documentProvider.getBoardContent(noticeboardIdx);
+            GetBoradContentRes getBoardRes = dataProvider.getBoardContent(noticeboardIdx);
             return new BaseResponse<>(getBoardRes);
         }catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
-    /**
-     * 이용 약관
-     */
-
-
-    /**
-     * 개인 정보
-     */
+    @ResponseBody
+    @GetMapping("/version")
+    public BaseResponse<String> getLatestSetting(){
+        try{
+            return new BaseResponse<>(dataProvider.getLatestSetting());
+        }catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 }

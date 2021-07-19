@@ -115,6 +115,16 @@ public class MedicineProvider {
         }
     }
 
+    public GetMedChatRes getMedChatExist(String groupId, int scenarioIdx) throws BaseException{
+        try{
+            // todo : 2차 출시 -> Action있도록 바꿔야함
+            return medicineDao.getChatsNoAction(groupId, scenarioIdx);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+
     public GetMedChatRes getSaveFailedChats(int userIdx) throws BaseException{
         int scenarioIdx = 0;
         String groupId = "SAVE_FAIL";

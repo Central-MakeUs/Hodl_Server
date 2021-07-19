@@ -1,17 +1,17 @@
-package shop.hodl.kkonggi.src.document.model;
+package shop.hodl.kkonggi.src.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetBoradContentRes {
+public class GetBoardRes {
+    private int boradIdx;
     private String title;
-    private int isNew;
     private String date;
-    private String content;
+    private int isNew;
 }

@@ -41,8 +41,21 @@ public class MedicineService {
         if(days == 0) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
         if(timeSlot.isEmpty()) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_TIME);
 
-        if(medicineProvider.checkMedicine(userIdx, medicineDTO.getName()) == 1)
-            throw new BaseException(BaseResponseStatus.POST_MEDICINE_EXISTS);
+        int scenarioIdx;
+        String groupId;
+
+        if(medicineProvider.checkMedicine(userIdx, medicineDTO.getName()) == 1){
+            logger.info(medicineDTO.getName());
+            scenarioIdx = 2;
+            groupId = "MED_ADD_EXITS";
+            String medicineReplace = "%medicine_name%";
+            GetMedChatRes getMedChatRes = medicineProvider.getMedChatExist(groupId, scenarioIdx);
+            for(int i = 0; i < getMedChatRes.getChat().size(); i++){
+                if(getMedChatRes.getChat().get(i).getContent().contains(medicineReplace))
+                    getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(medicineReplace, medicineDTO.getName()));
+            }
+            return getMedChatRes;
+        }
 
         try{
 
@@ -54,9 +67,6 @@ public class MedicineService {
                 medicineTime = medicineDao.createMedicineTime(medicineIdx, time);
                 if(medicineTime == 0) break;
             }
-
-            int scenarioIdx;
-            String groupId;
 
             if(medicineIdx > 0 && medicineTime > 0){
                 scenarioIdx = 2;

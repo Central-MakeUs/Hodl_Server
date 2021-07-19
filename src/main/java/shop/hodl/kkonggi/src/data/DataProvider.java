@@ -1,4 +1,4 @@
-package shop.hodl.kkonggi.src.document;
+package shop.hodl.kkonggi.src.data;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,28 +6,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.document.model.GetBoardRes;
-import shop.hodl.kkonggi.src.document.model.GetBoradContentRes;
+import shop.hodl.kkonggi.src.data.model.GetBoardRes;
+import shop.hodl.kkonggi.src.data.model.GetBoradContentRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.List;
 
 @Service
-public class DocumentProvider {
+public class DataProvider {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final DocumentDao documentDao;
+    private final DataDao dataDao;
     private final JwtService jwtService;
 
     @Autowired
-    public DocumentProvider(DocumentDao documentDao, JwtService jwtService) {
-        this.documentDao = documentDao;
+    public DataProvider(DataDao dataDao, JwtService jwtService) {
+        this.dataDao = dataDao;
         this.jwtService = jwtService;
     }
 
     public List<GetBoardRes> getBoardList() throws BaseException{
         try{
-             return documentDao.getBoardList();
+             return dataDao.getBoardList();
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -37,7 +37,7 @@ public class DocumentProvider {
 
         if(checkBoard(noticeboardIdx) == 0) throw new BaseException(BaseResponseStatus.INVALID_NOTICE_BOARD);
         try {
-            return documentDao.getBoradContent(noticeboardIdx);
+            return dataDao.getBoradContent(noticeboardIdx);
         }
         catch (Exception exception){
             exception.printStackTrace();
@@ -47,11 +47,17 @@ public class DocumentProvider {
 
     public int checkBoard(int noticeboardIdx) throws BaseException{
         try{
-            return documentDao.checkBoard(noticeboardIdx);
+            return dataDao.checkBoard(noticeboardIdx);
         }catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
 
-
+    public String getLatestSetting() throws BaseException{
+        try{
+            return dataDao.getLatestSetting();
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
 }
