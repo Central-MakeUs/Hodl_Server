@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.utils.JwtService;
 import sun.text.resources.CollationData;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class MedicineProvider {
@@ -22,6 +24,15 @@ public class MedicineProvider {
     public MedicineProvider(MedicineDao medicineDao, JwtService jwtService) {
         this.medicineDao = medicineDao;
         this.jwtService = jwtService;
+    }
+
+    public List<GetMedicineRes> getMyMedicines(int userIdx) throws BaseException{
+        try{
+            List<GetMedicineRes> getMedicineRes = medicineDao.getMyMedicines(userIdx);
+            return getMedicineRes;
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
     }
 
     public GetMedChatRes getMedAddInput() throws BaseException{

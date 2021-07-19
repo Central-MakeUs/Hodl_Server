@@ -4,11 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class MedicineDao {
@@ -20,7 +22,6 @@ public class MedicineDao {
     }
 
     public GetMedChatRes getChats(String groupId, int scenarioIdx){
-
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
         String getActionQuery = "select distinct actionType from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
         String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
@@ -57,6 +58,17 @@ public class MedicineDao {
                 ), groupId, scenarioIdx),
                 null
         );
+    }
+
+    public List<GetMedicineRes> getMyMedicines(int userIdx){
+        String getMyMedicineQuery = "select medicineIdx, medicineRealName from Medicine where status = 'Y' and userIdx = ?";
+        Object[] getMyMedicineParams = new Object[]{userIdx};
+
+        return this.jdbcTemplate.query(getMyMedicineQuery,
+                (rs, rowNum) -> new GetMedicineRes(
+                        rs.getInt("medicineIdx"),
+                        rs.getString("medicineRealName")
+                ), getMyMedicineParams);
     }
 
     public int getTotalStepNumber(int scenarioIdx){

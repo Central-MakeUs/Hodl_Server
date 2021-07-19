@@ -8,9 +8,12 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/v1/users/medicine")
@@ -34,7 +37,7 @@ public class MedicineController {
     }
 
     @ResponseBody
-    @GetMapping("")
+    @GetMapping("/input")
     public BaseResponse<GetMedChatRes> getMedAddInput(){
 
         try {
@@ -226,22 +229,21 @@ public class MedicineController {
         }
     }
 
-
+    // todo : 실제 약물 이름 vs 약물 닉네임 둘 중 무엇을 가져올 것인가?
+    // todo : 약물idx, 약물 이름, 그외 필요한 정보가 있나?
     /**
-    // Record 시작
-    // scenarioIdx = 3;
+     * 내 약통
+     */
     @ResponseBody
-    @GetMapping
-    public BaseResponse<GetMedChatRes> getMedRecInput(){
-        try{
+    @GetMapping("")
+    public BaseResponse<List<GetMedicineRes>> getMyMedicines(){
+        try {
             int userIdx = jwtService.getUserIdx();
-            int scenarioIdx = 3;
-
-
-        } catch (BaseException exception){
+            List<GetMedicineRes> getMedicineRes = medicineProvider.getMyMedicines(userIdx);
+            return new BaseResponse<>(getMedicineRes);
+        }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }
-    */
 
 }
