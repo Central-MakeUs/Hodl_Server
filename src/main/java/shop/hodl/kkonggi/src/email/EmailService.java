@@ -24,6 +24,7 @@ public class EmailService {
     private final EmailDao emailDao;
     @Autowired
     private final EmailProvider emailProvider;
+    @Autowired
     private final JavaMailSender emailSender;
     private final SpringTemplateEngine templateEngine;
 
