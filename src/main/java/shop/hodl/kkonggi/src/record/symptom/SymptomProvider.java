@@ -37,7 +37,7 @@ public class SymptomProvider {
         else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
         try{
             // 이미 증상을 기록한 경우
-            if(groupId.equals("SYM_REC_IS") &&checkSymptomOfDay(userIdx, date) == 1) groupId = "SYM_REC_MOD";
+            if(groupId.equals("SYM_REC_IS") && checkSymptomOfDay(userIdx, date) == 1) groupId = "SYM_REC_MOD";
 
             GetChatRes getChatRes = symptomDao.getChats(groupId, scenarioIdx);
             getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
@@ -57,12 +57,11 @@ public class SymptomProvider {
             GetSymptomRes getEmptySymptom =  getEmptySymptom(checkSymptomOfDay(userIdx, date));
             // 이미 기록됨
             if(checkSymptomOfDay(userIdx, date) == 1) {
-                getChecked = getChecked(userIdx);
+                getChecked = getChecked(userIdx, date);
                 getEmptySymptom = getSymptoms(getChecked, getEmptySymptom);
             }
             return getEmptySymptom;
         } catch (Exception exception){
-            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -77,10 +76,11 @@ public class SymptomProvider {
         }
     }
 
-    public int getChecked(int userIdx) throws BaseException{
+    public int getChecked(int userIdx, String date) throws BaseException{
         try {
-            return symptomDao.getChecked(userIdx);
+            return symptomDao.getChecked(userIdx, date);
         } catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

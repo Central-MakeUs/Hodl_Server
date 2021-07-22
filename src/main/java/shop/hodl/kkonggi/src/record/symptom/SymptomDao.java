@@ -19,7 +19,7 @@ public class SymptomDao {
     }
 
     public int checkSymptomOfDay(int userIdx, String date){
-        String checkQuery = "select exists(select recordIdx from SymptomRecord where userIdx = ? and createAt = ? and status = 'Y')";
+        String checkQuery = "select exists(select recordIdx from SymptomRecord where userIdx = ? and date = ? and status = 'Y')";
         Object[] checkParams = new Object[]{userIdx, date};
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
     }
@@ -29,14 +29,14 @@ public class SymptomDao {
         return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
     }
 
-    public int getChecked(int userIdx){
-        String checkQuery = "select checks from SymptomRecord where userIdx = ? and status = 'Y'";
-        Object[] checkParams = new Object[]{userIdx};
+    public int getChecked(int userIdx, String date){
+        String checkQuery = "select checks from SymptomRecord where userIdx = ? and date = ? and status = 'Y'";
+        Object[] checkParams = new Object[]{userIdx, date};
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
     }
 
     public int createSymptomRecord(int userIdx, String date, int symptom){
-        String craeteQuery = "insert into SymptomRecord (userIdx, createAt, checks) values (?,?, ?)";
+        String craeteQuery = "insert into SymptomRecord (userIdx, date, checks) values (?,?,?)";
         Object[] craeteParams = new Object[]{userIdx, date, symptom};
         this.jdbcTemplate.update(craeteQuery, craeteParams);
 
@@ -68,7 +68,7 @@ public class SymptomDao {
     }
 
     public int getSymptomOfDay(int userIdx, String date){
-        String getQuery = "select recordIdx from SymptomRecord where userIdx = ? and createAt = ? and status = 'Y'";
+        String getQuery = "select recordIdx from SymptomRecord where userIdx = ? and date = ? and status = 'Y'";
         Object[] getParams = new Object[]{userIdx, date};
         return this.jdbcTemplate.queryForObject(getQuery, int.class, getParams);
     }
