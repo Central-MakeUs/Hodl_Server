@@ -247,4 +247,24 @@ public class UserController {
         }
     }
 
+    /**
+     * 마이페이지 화면
+     */
+    @ResponseBody
+    @GetMapping("/my")
+    public BaseResponse<GetMyRes> getMyPage(){
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            GetMyRes getMyRes = userProvider.getMyPage(userIdxByJwt);
+
+
+
+            return new BaseResponse<>(getMyRes);
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
 }

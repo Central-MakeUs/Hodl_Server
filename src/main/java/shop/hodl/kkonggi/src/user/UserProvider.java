@@ -94,6 +94,26 @@ public class UserProvider {
 
     }
 
+    public GetMyRes getMyPage(int userIdx) throws BaseException{
+        try{
+            // 사용자가 있는 사용자인지 체크
+            if(checkUser(userIdx) == 0) throw new BaseException(BaseResponseStatus.INVALID_USER_MYPAGE);
+            GetMyRes getMyRes = userDao.getMyPage(userIdx);
+            getMyRes.setEmail(getMaskedEmail(getMyRes.getEmail()));
+            return getMyRes;
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int checkUser(int userIdx) throws BaseException{
+        try{
+            return userDao.checkUser(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
     public String getUserNickName(int userIdx){
         return userDao.getUserNickName(userIdx);
     }

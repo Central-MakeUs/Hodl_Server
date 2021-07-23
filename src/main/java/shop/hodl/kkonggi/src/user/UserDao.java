@@ -54,7 +54,24 @@ public class UserDao {
                         rs.getString("signUpType")),
                 getUserParams);
     }
-    
+
+    public int checkUser(int userIdx){
+        String checkQuery = "select exists(select userIdx from User where status = 'Y' and userIdx = ?)";
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, userIdx);
+    }
+
+    public GetMyRes getMyPage(int userIdx){
+        String getQuery = "select nickName, email, count(medicineIdx) as medicineCnt, datediff(now(), createAt) as startCnt\n" +
+                "from (select User.useridx,nickName, email, ifnull(medicineIdx, 0) as medicineIdx, User.createAt from User\n" +
+                "    left join Medicine on User.userIdx = Medicine.userIdx and User.status = 'Y' and Medicine.status = 'Y'where User.useridx = ? ) medicineCnt";
+        return this.jdbcTemplate.queryForObject(getQuery,
+                (rs, rowNum) -> new GetMyRes(
+                        rs.getString("nickName"),
+                        rs.getString("email"),
+                        rs.getInt("medicineCnt"),
+                        rs.getInt("startCnt")
+                        ), userIdx);
+    }
 
     public int createUser(PostUserReq postUserReq, String userInfo){
         String createUserQuery = "insert into User (email, password, userInfoStatus) values (?, ?, ?)";
@@ -71,7 +88,6 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(checkEmailQuery,
                 int.class,
                 checkEmailParams);
-
     }
 
     public int modifyUserName(PatchUserReq patchUserReq){
