@@ -81,13 +81,29 @@ public class SymptomController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+    /**
+     * 증상 기록 전, 할래? 말래?
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/ask")
+    public BaseResponse<GetChatRes> getRecordSymptomAsk(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SYM_REC_ASK";
+            GetChatRes getChatRes = symptomProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
     /**
      * [증상 기록할래]  -> [응 부작용이 있었어] -> [좋아, 알려줄게]
      *
      */
     @ResponseBody
-    @GetMapping("/ask")
+    @GetMapping("/ask/check")
     public BaseResponse<GetSymptomRes> getSymptomList(@RequestParam(required = false) String date){
         try{
             int userIdx = jwtService.getUserIdx();
