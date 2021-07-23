@@ -9,10 +9,8 @@ import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.utils.JwtService;
-import sun.text.resources.CollationData;
 
 import java.util.Collections;
-import java.util.List;
 
 @Service
 public class MedicineProvider {
@@ -26,11 +24,12 @@ public class MedicineProvider {
         this.jwtService = jwtService;
     }
 
-    public List<GetMedicineRes> getMyMedicines(int userIdx) throws BaseException{
+    public GetMedicineRes getMyMedicines(int userIdx) throws BaseException{
         try{
-            List<GetMedicineRes> getMedicineRes = medicineDao.getMyMedicines(userIdx);
+            GetMedicineRes getMedicineRes = medicineDao.getMyMedicines(userIdx);
             return getMedicineRes;
         } catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -159,6 +158,14 @@ public class MedicineProvider {
     public int checkMedicine(int userIdx, String medicineRealName) throws BaseException{
         try{
             return medicineDao.checkMedicine(userIdx, medicineRealName);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int checkMedicine(int userIdx, int medicineIdx) throws BaseException{
+        try{
+            return medicineDao.checkMedicine(userIdx, medicineIdx);
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }

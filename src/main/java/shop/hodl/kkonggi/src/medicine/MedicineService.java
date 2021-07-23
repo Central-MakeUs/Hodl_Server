@@ -9,6 +9,7 @@ import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
+import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
 import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
 import shop.hodl.kkonggi.utils.JwtService;
 
@@ -106,5 +107,21 @@ public class MedicineService {
             }
         }
         return timeSlot;
+    }
+
+    // 특정 약물 삭제
+    @Transactional
+    public Integer deleteMedicine(int userIdx, int medicineIdx ,PatchDeleteReq patchDeleteReq) throws BaseException{
+        // 해당 약물이 있는 지 or 삭제된 것인지
+        if(medicineProvider.checkMedicine(userIdx, medicineIdx) == 0)
+            throw new BaseException(BaseResponseStatus.PATCH_MEDICINE_EXISTS);
+        try{
+            // 해당 약물이
+            int result = medicineDao.deleteMedicine(patchDeleteReq);
+            return patchDeleteReq.getMedicineIdx();
+        } catch (Exception exception) {
+            logger.error( "약물 삭제 실패 DB, " + "userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
     }
 }

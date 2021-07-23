@@ -10,6 +10,7 @@ import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
+import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
@@ -229,21 +230,37 @@ public class MedicineController {
         }
     }
 
-    // todo : 실제 약물 이름 vs 약물 닉네임 둘 중 무엇을 가져올 것인가?
-    // todo : 약물idx, 약물 이름, 그외 필요한 정보가 있나?
     /**
      * 내 약통
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<List<GetMedicineRes>> getMyMedicines(){
+    public BaseResponse<GetMedicineRes> getMyMedicines(){
         try {
             int userIdx = jwtService.getUserIdx();
-            List<GetMedicineRes> getMedicineRes = medicineProvider.getMyMedicines(userIdx);
+            GetMedicineRes getMedicineRes = medicineProvider.getMyMedicines(userIdx);
             return new BaseResponse<>(getMedicineRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
+    /**
+     * 특정 e약 삭제
+     *      * @param patchDleteReq
+     * @return
+     */
+    @ResponseBody
+    @PatchMapping("/{medicineIdx}")
+    public BaseResponse<Integer> deleteMedicine(@RequestBody PatchDeleteReq patchDeleteReq, @PathVariable("medicineIdx") int medicineIdx){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            if(patchDeleteReq.getMedicineIdx() < 0 || medicineIdx != patchDeleteReq.getMedicineIdx())
+                throw new BaseException(BaseResponseStatus.PATCH_MEDICINE_EXISTS);
+            Integer result = medicineService.deleteMedicine(userIdx, medicineIdx, patchDeleteReq);
+            return new BaseResponse<>(result);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

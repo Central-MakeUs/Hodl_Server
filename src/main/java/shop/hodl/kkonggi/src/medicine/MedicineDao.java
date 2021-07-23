@@ -1,16 +1,18 @@
 package shop.hodl.kkonggi.src.medicine;
 
+import com.sun.tools.javac.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
+import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
 import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
-import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Collectors;
+
+import static shop.hodl.kkonggi.utils.days.getDays;
 
 @Repository
 public class MedicineDao {
@@ -60,15 +62,22 @@ public class MedicineDao {
         );
     }
 
-    public List<GetMedicineRes> getMyMedicines(int userIdx){
-        String getMyMedicineQuery = "select medicineIdx, medicineRealName from Medicine where status = 'Y' and userIdx = ?";
+    public GetMedicineRes getMyMedicines(int userIdx){
+        String getCntQuery = "select count(medicineidx) as count from Medicine where userIdx = ?";
+        String getMyMedicineQuery = "select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount from Medicine left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx where userIdx = ? and Medicine.status = 'Y'";
         Object[] getMyMedicineParams = new Object[]{userIdx};
 
-        return this.jdbcTemplate.query(getMyMedicineQuery,
+        return this.jdbcTemplate.queryForObject(getCntQuery,
                 (rs, rowNum) -> new GetMedicineRes(
-                        rs.getInt("medicineIdx"),
-                        rs.getString("medicineRealName")
-                ), getMyMedicineParams);
+                        rs.getInt("count"),
+                        this.jdbcTemplate.query(getMyMedicineQuery,
+                                (rk, rkNum) -> new GetMedicineRes.Medicine (
+                                        rk.getInt("medicineIdx"),
+                                        rk.getString("medicineRealName"),
+                                        (String.join(",", getDays(rk.getInt("days")))),
+                                        rk.getString("amount")
+                        ), getMyMedicineParams))
+        , getMyMedicineParams);
     }
 
     public int getTotalStepNumber(int scenarioIdx){
@@ -154,7 +163,12 @@ public class MedicineDao {
     public int checkMedicine(int userIdx, String medicineRealName){
         String checkMedicineQuery = "select exists(select medicineRealName from Medicine where userIdx= ? and medicineRealName = ? and status = 'Y')";
         Object[] checkMedicineParams = new Object[]{userIdx, medicineRealName};
+        return this.jdbcTemplate.queryForObject(checkMedicineQuery, int.class, checkMedicineParams);
+    }
 
+    public int checkMedicine(int userIdx, int medicineIdx){
+        String checkMedicineQuery = "select exists(select medicineIdx from Medicine where userIdx= ? and medicineIdx = ? and status = 'Y')";
+        Object[] checkMedicineParams = new Object[]{userIdx, medicineIdx};
         return this.jdbcTemplate.queryForObject(checkMedicineQuery, int.class, checkMedicineParams);
     }
 
@@ -166,6 +180,12 @@ public class MedicineDao {
 
         String lastInserIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    }
+
+    public int deleteMedicine(PatchDeleteReq patchDeleteReq){
+        String deleteQuery = "update Medicine set status = 'N' where medicineIdx = ?";
+        Object[] deleteParams = new Object[]{patchDeleteReq.getMedicineIdx()};
+        return this.jdbcTemplate.update(deleteQuery, deleteParams);
     }
 
     public int createMedicineTime(int medicineIdx, String timeSlot){
