@@ -59,7 +59,6 @@ public class MedicineService {
         }
 
         try{
-
             PostMedicineReq postMedicineReq = new PostMedicineReq(userIdx, medicineDTO.getName(), days, medicineDTO.getStart(), medicineDTO.getEnd());
 
             int medicineIdx = medicineDao.createMedicine(postMedicineReq);

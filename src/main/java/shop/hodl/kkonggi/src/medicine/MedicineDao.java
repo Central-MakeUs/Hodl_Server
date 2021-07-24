@@ -3,12 +3,11 @@ package shop.hodl.kkonggi.src.medicine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
-import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
-import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
-import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
+import shop.hodl.kkonggi.src.medicine.model.*;
 
 import javax.sql.DataSource;
+
+import java.util.List;
 
 import static shop.hodl.kkonggi.utils.Time.getDays;
 
@@ -60,22 +59,48 @@ public class MedicineDao {
         );
     }
 
-    public GetMedicineRes getMyMedicines(int userIdx){
+    public GetMedicine getMyMedicines(int userIdx){
         String getCntQuery = "select count(medicineidx) as count from Medicine where userIdx = ?";
-        String getMyMedicineQuery = "select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount from Medicine left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx where userIdx = ? and Medicine.status = 'Y'";
+        String getMyMedicineQuery = "select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount, endDay from Medicine left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx where userIdx = ? and Medicine.status = 'Y'";
         Object[] getMyMedicineParams = new Object[]{userIdx};
 
         return this.jdbcTemplate.queryForObject(getCntQuery,
-                (rs, rowNum) -> new GetMedicineRes(
+                (rs, rowNum) -> new GetMedicine(
                         rs.getInt("count"),
                         this.jdbcTemplate.query(getMyMedicineQuery,
-                                (rk, rkNum) -> new GetMedicineRes.Medicine (
+                                (rk, rkNum) -> new GetMedicine.Medicine (
                                         rk.getInt("medicineIdx"),
                                         rk.getString("medicineRealName"),
                                         (String.join(",", getDays(rk.getInt("days")))),
-                                        rk.getString("amount")
+                                        rk.getString("amount"),
+                                        rk.getString("endDay")
                         ), getMyMedicineParams))
         , getMyMedicineParams);
+    }
+
+    public GetMedicine getMyMedicinesHasSlot(int userIdx, String[] arr, int count){
+        String getCntQuery = "select count(medicineidx) as count from Medicine where userIdx = ?";
+        String getMyMedicineQuery = "SELECT * FROM\n" +
+                "(select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount, endDay, count(Medicine.medicineIdx) as count\n" +
+                "from Medicine\n" +
+                "         inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
+                "                                        and slot in (substring_index(?, ',', 1), substring_index(?, ',', 2), substring_index(?, ',', 3), substring_index(?, ',', 4), substring_index(?, ',', 5))\n" +
+                "         left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx\n" +
+                "where userIdx = ? and Medicine.status = 'Y' group by medicineidx) info where count = ?";
+        Object[] getMyMedicineParams = new Object[]{arr[0], arr[1], arr[2], arr[3], arr[4], userIdx, count};
+
+        return this.jdbcTemplate.queryForObject(getCntQuery,
+                (rs, rowNum) -> new GetMedicine(
+                        rs.getInt("count"),
+                        this.jdbcTemplate.query(getMyMedicineQuery,
+                                (rk, rkNum) -> new GetMedicine.Medicine (
+                                        rk.getInt("medicineIdx"),
+                                        rk.getString("medicineRealName"),
+                                        (String.join(",", getDays(rk.getInt("days")))),
+                                        rk.getString("amount"),
+                                        rk.getString("endDay")
+                                ), getMyMedicineParams))
+                , userIdx);
     }
 
     public int getTotalStepNumber(int scenarioIdx){

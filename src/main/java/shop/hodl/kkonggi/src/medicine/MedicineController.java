@@ -234,8 +234,8 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<GetMedicineRes> getMyMedicines(@RequestParam(required = false) List<String> cycle,
-                                                       @RequestParam(required = false) List<String> time,
+    public BaseResponse<GetMedicineRes> getMyMedicines(@RequestParam(required = false) String cycle,
+                                                       @RequestParam(required = false) String time,
                                                        @RequestParam(required = false) Integer endDay){
         try {
             int userIdx = jwtService.getUserIdx();

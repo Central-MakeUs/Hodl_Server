@@ -1,6 +1,7 @@
 package shop.hodl.kkonggi.utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cycle {
     public static int intArrayToInt(int[] arr){
@@ -26,4 +27,5 @@ public class Cycle {
         }
         return timeSlot;
     }
+
 }

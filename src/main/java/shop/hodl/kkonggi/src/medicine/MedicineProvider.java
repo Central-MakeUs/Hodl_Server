@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.medicine.model.GetMedicine;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MedicineProvider {
@@ -25,21 +28,54 @@ public class MedicineProvider {
         this.jwtService = jwtService;
     }
 
-    // todo : 주기가 여러개 선택 가능한가?
-    public GetMedicineRes getMyMedicines(int userIdx, List<String> cycle, List<String> time, Integer endDay) throws BaseException{
-        if (cycle != null) {
+    public GetMedicineRes getMedicineRes(GetMedicine getMedicine){
+        GetMedicineRes getMedicineRes = new GetMedicineRes();
+        getMedicineRes.setMedicineList(new ArrayList<>());
 
+        getMedicineRes.setTotalCnt(getMedicine.getMedicineList().size());
+        for(int i = 0; i < getMedicine.getMedicineList().size(); i++){
+            getMedicineRes.getMedicineList().add(
+                    new GetMedicineRes.Medicine(
+                            getMedicine.getMedicineList().get(i).getMedicineIdx(),
+                            getMedicine.getMedicineList().get(i).getMedicineName(),
+                            getMedicine.getMedicineList().get(i).getAmount(),
+                            getMedicine.getMedicineList().get(i).getCycle()
+                    ));
         }
-        if(time == null){
 
-        }
-        if(endDay == null){
+        return getMedicineRes;
+    }
 
-        }
-
+    public GetMedicineRes getMyMedicines(int userIdx, String cycle, String time, Integer endDay) throws BaseException{
+        GetMedicine getMedicineRes;
         try{
-            GetMedicineRes getMedicineRes = medicineDao.getMyMedicines(userIdx);
-            return getMedicineRes;
+            if (cycle != null) {
+                // D : 새벽, M : 아침, L : 점심, E : 저녁, N : 자기전
+                String[] arr = new String[5];
+                String[] cycleArr = cycle.split(",");
+                for(int i = 0; i < arr.length; i++){
+                    if(cycleArr.length > i) arr[i] = cycleArr[i];
+                    else arr[i] = "";
+                }
+                getMedicineRes = medicineDao.getMyMedicinesHasSlot(userIdx, arr, cycleArr.length);
+            } else{
+                getMedicineRes = medicineDao.getMyMedicines(userIdx);
+            }
+            if(time != null){
+                if(time.equals("매일")){
+                    getMedicineRes.setMedicineList(getMedicineRes.getMedicineList().stream().filter(t -> t.getCycle().equals("매일")).collect(Collectors.toList()));
+                } else if (time.equals("요일")){
+                    getMedicineRes.setMedicineList(getMedicineRes.getMedicineList().stream().filter(t -> !(t.getCycle().equals("매일"))).collect(Collectors.toList()));
+                }
+            }
+            if(endDay != null){
+                if(endDay == 1){
+                    getMedicineRes.setMedicineList(getMedicineRes.getMedicineList().stream().filter(t -> (t.getEndDay() != null)).collect(Collectors.toList()));
+                } else if(endDay == 0){
+                    getMedicineRes.setMedicineList(getMedicineRes.getMedicineList().stream().filter(t -> (t.getEndDay() == null)).collect(Collectors.toList()));
+                }
+            }
+            return getMedicineRes(getMedicineRes);
         } catch (Exception exception){
             exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

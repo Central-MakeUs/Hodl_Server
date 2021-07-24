@@ -42,7 +42,7 @@ public class SleepService {
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8)
             throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
 
-        if(sleepProvider.checkSleepRecord(userIdx, postReq.getDate()) == 0){
+        if(sleepProvider.checkSleepRecord(userIdx, postReq.getDate()) == 1){
             throw new BaseException(BaseResponseStatus.POST_SLEEP_RECORD_ALREADY);
         }
         try{

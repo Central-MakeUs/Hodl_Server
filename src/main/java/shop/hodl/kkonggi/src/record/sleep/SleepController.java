@@ -252,7 +252,7 @@ public class SleepController {
     public BaseResponse<GetChatRes> getSleepBreathNo(){
         try{
             int userIdx = jwtService.getUserIdx();
-            String groupId = "SLEEP_REC_LESS_BREATH";
+            String groupId = "SLEEP_REC_LESS_THANK";
             GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
             return new BaseResponse<>(getChatRes);
         } catch (BaseException exception) {
@@ -331,6 +331,19 @@ public class SleepController {
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "SLEEP_REC_ANY_OK";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/mod/no")
+    public BaseResponse<GetChatRes> getSleepModifyNo(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_NO";
             GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
             return new BaseResponse<>(getChatRes);
         } catch (BaseException exception) {
