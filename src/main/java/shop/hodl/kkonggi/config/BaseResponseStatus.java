@@ -68,6 +68,8 @@ public enum BaseResponseStatus {
     INVALID_NOTICE_BOARD(false, 2060, "해당 공지 사항이 없습니다."),
 
     POST_MEDICINE_RECORD_STATUS(false, 2070, "기록 체크 형식을 확인해주세요."),
+    POST_SLEEP_RECORD_ALREADY(false, 2071, "이미 수면 기록을 완료했습니다."),
+    PATCH_SLEEP_RECORD_EMPTY(false, 2072, "수면 기록이 없습니다."),
 
 
 

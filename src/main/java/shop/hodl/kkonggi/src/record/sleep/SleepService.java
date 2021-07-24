@@ -41,6 +41,10 @@ public class SleepService {
         if(postReq.getDate() == null || getCurrentDateStr().equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(getCurrentDateStr());
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8)
             throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+
+        if(sleepProvider.checkSleepRecord(userIdx, postReq.getDate()) == 0){
+            throw new BaseException(BaseResponseStatus.POST_SLEEP_RECORD_ALREADY);
+        }
         try{
             String groupId = "";
             int scenarioIdx = 5;
@@ -74,6 +78,36 @@ public class SleepService {
             return getChatRes;
         } catch (Exception exception){
             logger.error("userIdx = " + userIdx + "post sleep fail");
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    @Transactional
+    public GetChatRes updateSleepRecord(int userIdx, PostSleepReq postReq) throws BaseException{
+        if(postReq.getDate() == null || getCurrentDateStr().equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(getCurrentDateStr());
+        else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8)
+            throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+
+        if(sleepProvider.checkSleepRecord(userIdx, postReq.getDate()) == 0){
+            throw new BaseException(BaseResponseStatus.PATCH_SLEEP_RECORD_EMPTY);
+        }
+        try{
+            int recordIdx = sleepProvider.getSleepRecord(userIdx, postReq.getDate());
+            String groupId = "";
+            int scenarioIdx = 5;
+            GetChatRes getChatRes;
+            int result = sleepDao.updateSleepRecord(postReq, recordIdx);
+            if(result > 0){
+                groupId = "SLEEP_REC_OK";
+                getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            }else{
+                groupId = "SAVE_FAIL";
+                scenarioIdx = 0;
+                getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            }
+            return getChatRes;
+        } catch (Exception exception){
+            logger.error("userIdx = " + userIdx + "patch sleep fail");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

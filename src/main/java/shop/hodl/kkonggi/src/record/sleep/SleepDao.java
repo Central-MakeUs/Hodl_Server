@@ -24,6 +24,12 @@ public class SleepDao {
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
     }
 
+    public int getSleepRecord(int userIdx, String date){
+        String checkQuery = "select recordIdx from Sleep where userIdx = ? and date = ? and status != 'N'";
+        Object [] checkParams = new Object[]{userIdx, date};
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
+    }
+
     public String getUserNickName(int userIdx){
         String getNickNameQuery = "select ifnull(nickName, \"\") as nickName from User where userIdx = ? and status = 'Y'";
         return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
@@ -52,6 +58,12 @@ public class SleepDao {
 
         String lastInserIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    }
+
+    public int updateSleepRecord(PostSleepReq postSleepReq, int recordIdx){
+        String updateQuery = "update Sleep set sleepTime= ?, wakeUpTime = ?, memo = ?, status = if( ? = 1, 'Y', 'P'), date = ? where recordIdx = ?";
+        Object [] updateParams = new Object[]{postSleepReq.getSleepTime(), postSleepReq.getWakeUpTime(), postSleepReq.getMemo(), postSleepReq.getIsSleep(), postSleepReq.getDate(), recordIdx};
+        return this.jdbcTemplate.update(updateQuery, updateParams);
     }
 
     public GetChatRes getChats(String groupId, int scenarioIdx){

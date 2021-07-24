@@ -71,6 +71,14 @@ public class SleepProvider {
         }
     }
 
+    public int getSleepRecord(int userIdx, String date) throws BaseException{
+        try{
+            return sleepDao.getSleepRecord(userIdx, date);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
     public GetChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws BaseException {
         try{
             GetChatRes getChatRes = sleepDao.getChats(groupId, scenarioIdx);

@@ -81,7 +81,7 @@ public class SleepController {
 
             int userIdx = jwtService.getUserIdx();
             GetChatRes getChatRes = sleepService.createSleepRecord(userIdx, postSleepReq);
-            if(getChatRes.getAction().getActionType().equals("USER_INPUT_CHIP_GROUP")){
+            if(getChatRes.getAction() != null && getChatRes.getAction().getActionType().equals("USER_INPUT_CHIP_GROUP")){
                 getChatRes = makeSaveFailChat(getChatRes,"SLEEP_CHIP_GROUP", "SAVE_FAIL_RETRY_SLEEP", "SAVE_FAIL_DISCARD_SLEEP");
                 return new BaseResponse<>(getChatRes, BaseResponseStatus.CHAT_ERROR);
             }
@@ -105,8 +105,8 @@ public class SleepController {
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);    // 시간 형식 확인
 
             int userIdx = jwtService.getUserIdx();
-            GetChatRes getChatRes = sleepService.createSleepRecord(userIdx, postSleepReq);
-            if(getChatRes.getAction().getActionType().equals("USER_INPUT_CHIP_GROUP")){
+            GetChatRes getChatRes = sleepService.updateSleepRecord(userIdx, postSleepReq);
+            if(getChatRes.getAction() != null && getChatRes.getAction().getActionType().equals("USER_INPUT_CHIP_GROUP")){
                 getChatRes = makeSaveFailChat(getChatRes,"SLEEP_CHIP_GROUP", "SAVE_FAIL_RETRY_SLEEP", "SAVE_FAIL_DISCARD_SLEEP");
                 return new BaseResponse<>(getChatRes, BaseResponseStatus.CHAT_ERROR);
             }
