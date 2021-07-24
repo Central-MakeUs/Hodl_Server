@@ -74,7 +74,6 @@ public class SymptomDao {
     }
 
     public GetChatRes getChats(String groupId, int scenarioIdx){
-
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
         String getActionQuery = "select distinct actionType from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
         String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
@@ -101,7 +100,6 @@ public class SymptomDao {
 
     public GetChatRes getChatsNoAction(String groupId, int scenarioIdx){
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
-
         return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
                 (rs, rowNum)-> new GetChatRes.Chat(
                         rs.getString("chatType"),

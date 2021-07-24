@@ -1,2 +1,91 @@
-package shop.hodl.kkonggi.src.record.sleep;public class SleepDao {
+package shop.hodl.kkonggi.src.record.sleep;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+import shop.hodl.kkonggi.src.record.sleep.model.GetSleepRes;
+import shop.hodl.kkonggi.src.user.model.GetChatRes;
+
+import javax.sql.DataSource;
+
+@Repository
+public class SleepDao {
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource){
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    public int checkSleepRecord(int userIdx, String date){
+        String checkQuery = "select exists(select recordIdx from Sleep where userIdx = ? and date = ?)";
+        Object [] checkParams = new Object[]{userIdx, date};
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParams);
+    }
+
+    public String getUserNickName(int userIdx){
+        String getNickNameQuery = "select ifnull(nickName, \"\") as nickName from User where userIdx = ? and status = 'Y'";
+        return this.jdbcTemplate.queryForObject(getNickNameQuery, String.class, userIdx);
+    }
+
+    public GetSleepRes getSleep(int userIdx, String date, int status){
+        String getQuery = "select DATE_FORMAT(date, '%Y.%m.%d') as date, case\n" +
+                "           when DATE_FORMAT(sleepTime,'%p %h:%i') like('%AM%') then REPLACE(DATE_FORMAT(sleepTime,'%p %h:%i'),'AM', '오전')\n" +
+                "           when DATE_FORMAT(sleepTime,'%p %h:%i') like('%PM%') then REPLACE(DATE_FORMAT(sleepTime,'%p %h:%i'),'PM', '오후')\n" +
+                "           end as sleepTime,\n" +
+                "       case\n" +
+                "           when DATE_FORMAT(wakeUpTime,'%p %h:%i') like('%AM%') then REPLACE(DATE_FORMAT(wakeUpTime,'%p %h:%i'),'AM', '오전')\n" +
+                "           when DATE_FORMAT(wakeUpTime,'%p %h:%i') like('%PM%') then REPLACE(DATE_FORMAT(wakeUpTime,'%p %h:%i'),'PM', '오후')\n" +
+                "           end as wakeUpTime, memo\n" +
+                "from (select ifnull(date, STR_TO_DATE(?, '%Y%m%d')) as date, ifnull(sleepTime, STR_TO_DATE('220000', '%H%i')) as sleepTime,\n" +
+                "             ifnull(wakeUpTime, STR_TO_DATE('060000', '%H%i')) as wakeUpTime, ifnull(memo, \"\") as memo from Sleep right join User on User.userIdx =  Sleep.userIdx and Sleep.status != 'N'\n" +
+                "where User.userIdx = ? and User.status = 'Y') Info";
+        Object [] getParams = new Object[]{date, userIdx};
+        return this.jdbcTemplate.queryForObject(getQuery,
+                (rs, rowNum) -> new GetSleepRes(
+                        status,
+                        rs.getString("date"),
+                        rs.getString("sleepTime"),
+                        rs.getString("wakeUpTime"),
+                        rs.getString("memo")
+                ), getParams);
+    }
+
+    public GetChatRes getChats(String groupId, int scenarioIdx){
+        String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
+        String getActionQuery = "select distinct actionType from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
+        String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
+
+        return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum)-> new GetChatRes.Chat(
+                        rs.getString("chatType"),
+                        rs.getString("date"),
+                        rs.getString("time"),
+                        rs.getString("content")
+                ), groupId, scenarioIdx),
+
+                this.jdbcTemplate.queryForObject(getActionQuery,
+                        (rs, rowNum)-> new GetChatRes.Action(
+                                rs.getString("actionType"),
+                                this.jdbcTemplate.query(getActionContentQuery,
+                                        (rk, rkNum)-> new GetChatRes.Action.Choice(
+                                                rk.getString("actionId"),
+                                                rk.getString("content")
+                                        ), groupId, scenarioIdx)
+                        ), groupId, scenarioIdx)
+        );
+    }
+
+    public GetChatRes getChatsNoAction(String groupId, int scenarioIdx){
+        String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
+        return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum)-> new GetChatRes.Chat(
+                        rs.getString("chatType"),
+                        rs.getString("date"),
+                        rs.getString("time"),
+                        rs.getString("content")
+                ), groupId, scenarioIdx),
+                null
+        );
+    }
 }
