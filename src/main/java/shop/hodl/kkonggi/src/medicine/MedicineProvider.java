@@ -11,6 +11,8 @@ import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.Collections;
+import java.util.List;
+import static shop.hodl.kkonggi.utils.cycle.*;
 
 @Service
 public class MedicineProvider {
@@ -24,7 +26,18 @@ public class MedicineProvider {
         this.jwtService = jwtService;
     }
 
-    public GetMedicineRes getMyMedicines(int userIdx) throws BaseException{
+    // todo : 주기가 여러개 선택 가능한가?
+    public GetMedicineRes getMyMedicines(int userIdx, List<String> cycle, List<String> time, Integer endDay) throws BaseException{
+        if (cycle != null) {
+
+        }
+        if(time == null){
+
+        }
+        if(endDay == null){
+
+        }
+
         try{
             GetMedicineRes getMedicineRes = medicineDao.getMyMedicines(userIdx);
             return getMedicineRes;

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
-import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
@@ -15,6 +14,7 @@ import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import static shop.hodl.kkonggi.utils.cycle.*;
 
 @Service
 public class MedicineService {
@@ -83,30 +83,6 @@ public class MedicineService {
             logger.error( "약물 저장 실패 DB, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
-    }
-
-    public int intArrayToInt(int[] arr){
-        int sum = 0;
-        for(int i = 0; i < arr.length; i++){
-            if(arr[i] == 1){
-                sum += Math.pow(2, i);
-            }
-        }
-        return sum;
-    }
-
-    public ArrayList<String> toTimeSlot(int[] arr){
-        ArrayList<String> timeSlot = new ArrayList<>();
-        for(int i = 0; i < arr.length; i++){
-            if(arr[i] == 1){
-                if(i == 0) timeSlot.add("D");   // Dawn
-                if(i == 1) timeSlot.add("M");   // Morning
-                if(i == 2) timeSlot.add("L");   // Launch
-                if(i == 3) timeSlot.add("E");   // Evening
-                if(i == 4) timeSlot.add("N");   // Night
-            }
-        }
-        return timeSlot;
     }
 
     // 특정 약물 삭제

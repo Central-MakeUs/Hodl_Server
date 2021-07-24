@@ -235,10 +235,12 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<GetMedicineRes> getMyMedicines(){
+    public BaseResponse<GetMedicineRes> getMyMedicines(@RequestParam(required = false) List<String> cycle,
+                                                       @RequestParam(required = false) List<String> time,
+                                                       @RequestParam(required = false) Integer endDay){
         try {
             int userIdx = jwtService.getUserIdx();
-            GetMedicineRes getMedicineRes = medicineProvider.getMyMedicines(userIdx);
+            GetMedicineRes getMedicineRes = medicineProvider.getMyMedicines(userIdx, cycle, time, endDay);
             return new BaseResponse<>(getMedicineRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
