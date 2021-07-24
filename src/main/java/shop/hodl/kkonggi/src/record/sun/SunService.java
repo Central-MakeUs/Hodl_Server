@@ -49,22 +49,25 @@ public class SunService {
             GetChatRes getChatRes;
             int result = sunDao.createSunRecord(userIdx, postReq);
             if(result > 0){
-                SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-                Date ten = format.parse("00:10");
-                Date thirty = format.parse("00:30");
-                Date totalTime = format.parse(postReq.getTotalTime());
+                if(postReq.getIsSun() == 0) groupId = "SUN_REC_NOT";
+                else{
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    Date ten = format.parse("00:10");
+                    Date thirty = format.parse("00:30");
+                    Date totalTime = format.parse(postReq.getTotalTime());
 
-                if(totalTime.before(ten)) {
-                    logger.info("[Before 10]" + ten.getTime() + " " + totalTime.getTime());
-                    groupId = "SUN_REC_LESS_TEN";
-                }
-                else if(totalTime.after(thirty)) {
-                    logger.info("[After 30]" + ten.getTime() + " " + totalTime.getTime());
-                    groupId = "SUN_REC_MORE_THIRTY";
-                }
-                else {
-                    logger.info("[10 ~ 30]" + ten.getTime() + " " + totalTime.getTime());
-                    groupId = "SUN_REC_MORE_TEN";
+                    if(totalTime.before(ten)) {
+                        logger.info("[Before 10]" + ten.getTime() + " " + totalTime.getTime());
+                        groupId = "SUN_REC_LESS_TEN";
+                    }
+                    else if(totalTime.after(thirty)) {
+                        logger.info("[After 30]" + ten.getTime() + " " + totalTime.getTime());
+                        groupId = "SUN_REC_MORE_THIRTY";
+                    }
+                    else {
+                        logger.info("[10 ~ 30]" + ten.getTime() + " " + totalTime.getTime());
+                        groupId = "SUN_REC_MORE_TEN";
+                    }
                 }
             } else{
                 groupId = "SAVE_FAIL";
