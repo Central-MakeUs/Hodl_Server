@@ -85,6 +85,7 @@ public class SleepProvider {
             getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
             return getChatRes;
         } catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

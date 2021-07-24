@@ -87,7 +87,6 @@ public class SleepService {
         if(postReq.getDate() == null || getCurrentDateStr().equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(getCurrentDateStr());
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8)
             throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
-
         if(sleepProvider.checkSleepRecord(userIdx, postReq.getDate()) == 0){
             throw new BaseException(BaseResponseStatus.PATCH_SLEEP_RECORD_EMPTY);
         }
@@ -107,6 +106,7 @@ public class SleepService {
             }
             return getChatRes;
         } catch (Exception exception){
+            exception.printStackTrace();
             logger.error("userIdx = " + userIdx + "patch sleep fail");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }

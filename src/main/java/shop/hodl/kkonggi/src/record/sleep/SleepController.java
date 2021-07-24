@@ -116,4 +116,225 @@ public class SleepController {
         }
     }
 
+    @ResponseBody
+    @GetMapping("/less/just")
+    public BaseResponse<GetChatRes> getSleepLessJust(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_JUST";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/breath")
+    public BaseResponse<GetChatRes> getSleepBreath(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_BREATH";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/insomnia")
+    public BaseResponse<GetChatRes> getSleepInsomnia(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_INSOMNIA";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/cry")
+    public BaseResponse<GetChatRes> getSleepCry(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_CRY";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/sad")
+    public BaseResponse<GetChatRes> getSleepSad(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_SAD";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/what")
+    public BaseResponse<GetChatRes> getSleepWhat(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_WHAT";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/how")
+    public BaseResponse<GetChatRes> getSleepHow(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_HOW";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/work")
+    public BaseResponse<GetChatRes> getSleepWork(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_WORK";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/stress")
+    public BaseResponse<GetChatRes> getSleepStress(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_STRESS";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/anything")
+    public BaseResponse<GetChatRes> getSleepAny(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_ANY";
+            GetChatRes getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    // NoAction
+    @ResponseBody
+    @GetMapping("/breath/no")
+    public BaseResponse<GetChatRes> getSleepBreathNo(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_BREATH";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/next")
+    public BaseResponse<GetChatRes> getSleepNext(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_NEXT";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/sad/no")
+    public BaseResponse<GetChatRes> getSleepSadNo(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_LESS_SAD_NO";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/exercise")
+    public BaseResponse<GetChatRes> getSleepExcersieNo(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_EXE_NO";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/exercise/ok")
+    public BaseResponse<GetChatRes> getSleepExerciseOk(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_EXE_YES";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/stress/ok")
+    public BaseResponse<GetChatRes> getSleepStressOk(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_STRESS_OK";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/anything/ok")
+    public BaseResponse<GetChatRes> getSleepAnythingOk(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            String groupId = "SLEEP_REC_ANY_OK";
+            GetChatRes getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
