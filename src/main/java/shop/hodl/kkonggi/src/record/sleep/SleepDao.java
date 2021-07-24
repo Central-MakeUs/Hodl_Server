@@ -32,9 +32,9 @@ public class SleepDao {
     public GetSleepRes getSleep(int userIdx, String date, int status){
         String getQuery = "select DATE_FORMAT(date, '%Y%m%d') as date, DATE_FORMAT(sleepTime, '%H:%i') as sleepTime, DATE_FORMAT(wakeUpTime, '%H:%i') as wakeUpTime, memo\n" +
                 "from (select ifnull(date, STR_TO_DATE(?, '%Y%m%d')) as date, ifnull(sleepTime, STR_TO_DATE('2200', '%H%i')) as sleepTime,\n" +
-                "             ifnull(wakeUpTime, STR_TO_DATE('0600', '%H%i')) as wakeUpTime, ifnull(memo, \"\") as memo from Sleep right join User on User.userIdx =  Sleep.userIdx and Sleep.status != 'N'\n" +
+                "             ifnull(wakeUpTime, STR_TO_DATE('0600', '%H%i')) as wakeUpTime, ifnull(memo, \"\") as memo from Sleep right join User on User.userIdx =  Sleep.userIdx and Sleep.status != 'N' and date = ?\n" +
                 "where User.userIdx = ? and User.status = 'Y') Info";
-        Object [] getParams = new Object[]{date, userIdx};
+        Object [] getParams = new Object[]{date, date, userIdx};
         return this.jdbcTemplate.queryForObject(getQuery,
                 (rs, rowNum) -> new GetSleepRes(
                         status,

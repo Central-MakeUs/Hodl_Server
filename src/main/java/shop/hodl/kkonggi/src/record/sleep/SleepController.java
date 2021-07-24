@@ -91,4 +91,29 @@ public class SleepController {
         }
     }
 
+    /**
+     * 수면 기록 수정
+     */
+    @ResponseBody
+    @PatchMapping("")
+    public BaseResponse<GetChatRes> updateSleepRecord(@RequestBody PostSleepReq postSleepReq){
+        try{
+            if(postSleepReq.getIsSleep() != 1 && postSleepReq.getIsSleep() != 0)
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_STATUS);
+
+            if(!isRegexTime(postSleepReq.getSleepTime()) || !isRegexTime(postSleepReq.getWakeUpTime()))
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);    // 시간 형식 확인
+
+            int userIdx = jwtService.getUserIdx();
+            GetChatRes getChatRes = sleepService.createSleepRecord(userIdx, postSleepReq);
+            if(getChatRes.getAction().getActionType().equals("USER_INPUT_CHIP_GROUP")){
+                getChatRes = makeSaveFailChat(getChatRes,"SLEEP_CHIP_GROUP", "SAVE_FAIL_RETRY_SLEEP", "SAVE_FAIL_DISCARD_SLEEP");
+                return new BaseResponse<>(getChatRes, BaseResponseStatus.CHAT_ERROR);
+            }
+            return new BaseResponse<>(getChatRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 }

@@ -166,7 +166,7 @@ public class RecordMedicineProvider {
                 for(int i = 0; i < Constant.TIMES.get(0).size(); i++){
                     if(Constant.TIMES.get(0).get(i).equals(timeSlot)) defulatTime = Constant.TIMES.get(1).get(i);
                 }
-                getMedicine = recordMedicineDao.getSpecificMedicineRecord(date,defulatTime, medicineIdx, timeSlot);
+                getMedicine = recordMedicineDao.getSpecificMedicineRecord(date, defulatTime, medicineIdx, timeSlot);
             }
             getMedicine.setSlotCnt(getMedicine.getSlot().size());
             toReturn.setMedicineIdx(getMedicine.getMedicineIdx());
