@@ -3,11 +3,12 @@ package shop.hodl.kkonggi.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class SleepTime {
     private static final Logger logger = LoggerFactory.getLogger("SleepTime");
-    public static long subTime(Date sleepTime, Date wakeUpTime, Date mid){
+    public static long subTimeSleep(Date sleepTime, Date wakeUpTime, Date mid){
         int hour = 3600000;
         long diff = 0;
         // 잠든 시각이 일어난 시각보다 늦음

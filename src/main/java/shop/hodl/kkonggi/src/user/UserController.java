@@ -1,9 +1,7 @@
 package shop.hodl.kkonggi.src.user;
 
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.repository.query.Param;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 import static shop.hodl.kkonggi.config.BaseResponseStatus.*;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexEmail;

@@ -71,7 +71,8 @@ public enum BaseResponseStatus {
     POST_SLEEP_RECORD_ALREADY(false, 2071, "이미 수면 기록을 완료했습니다."),
     PATCH_SLEEP_RECORD_EMPTY(false, 2072, "수면 기록이 없습니다."),
 
-
+    POST_SUN_RECORD_ALREADY(false, 2081, "이미 햇빛 기록을 완료했습니다."),
+    PATCH_SUN_RECORD_EMPTY(false, 2082, "햇빛 기록이 없습니다."),
 
     /**
      * 3000 : Response 오류

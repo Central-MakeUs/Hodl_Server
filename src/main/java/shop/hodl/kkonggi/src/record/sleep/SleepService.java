@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
-import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.record.sleep.model.PostSleepReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
@@ -17,8 +16,7 @@ import java.util.Date;
 
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
-import static shop.hodl.kkonggi.utils.SleepTime.subTime;
-import static shop.hodl.kkonggi.utils.Chat.makeSaveFailChat;
+import static shop.hodl.kkonggi.utils.SleepTime.subTimeSleep;
 
 @Service
 public class SleepService {
@@ -59,7 +57,7 @@ public class SleepService {
                     Date wakeUpTime = format.parse(postReq.getWakeUpTime());
                     logger.info("sleepTime = " + sleepTime);
                     logger.info("wakeUpTime = " + wakeUpTime);
-                    long diff = subTime(sleepTime, wakeUpTime, mid);
+                    long diff = subTimeSleep(sleepTime, wakeUpTime, mid);
 
                     logger.info("timeDiff = " + diff);
                     if(diff < 5) groupId = "SLEEP_REC_LESS";
@@ -106,7 +104,6 @@ public class SleepService {
             }
             return getChatRes;
         } catch (Exception exception){
-            exception.printStackTrace();
             logger.error("userIdx = " + userIdx + "patch sleep fail");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
