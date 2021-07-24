@@ -37,10 +37,10 @@ public class Chat {
     public static GetChatRes makeSaveFailChat(GetChatRes getChatRes, String actionType, String retry, String discard){
         getChatRes.getAction().setActionType(actionType);
         for(int i = 0; i < getChatRes.getAction().getChoiceList().size(); i++){
-            if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("SAVE_FAIL_RETRY"))
-                getChatRes.getAction().getChoiceList().get(i).setContent(retry);
-            if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("SAVE_FAIL_DISCARD"))
-                getChatRes.getAction().getChoiceList().get(i).setContent(discard);
+            if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("취소"))
+                getChatRes.getAction().getChoiceList().get(i).setActionId(retry);
+            if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("재전송"))
+                getChatRes.getAction().getChoiceList().get(i).setActionId(discard);
         }
         return getChatRes;
     }

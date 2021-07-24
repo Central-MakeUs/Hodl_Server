@@ -12,6 +12,7 @@ import shop.hodl.kkonggi.src.record.sleep.model.PostSleepReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
+import static shop.hodl.kkonggi.utils.Chat.makeSaveFailChat;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexTime;
 
 @RestController
@@ -80,6 +81,10 @@ public class SleepController {
 
             int userIdx = jwtService.getUserIdx();
             GetChatRes getChatRes = sleepService.createSleepRecord(userIdx, postSleepReq);
+            if(getChatRes.getAction().getActionType().equals("USER_INPUT_CHIP_GROUP")){
+                getChatRes = makeSaveFailChat(getChatRes,"SLEEP_CHIP_GROUP", "SAVE_FAIL_RETRY_SLEEP", "SAVE_FAIL_DISCARD_SLEEP");
+                return new BaseResponse<>(getChatRes, BaseResponseStatus.CHAT_ERROR);
+            }
             return new BaseResponse<>(getChatRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

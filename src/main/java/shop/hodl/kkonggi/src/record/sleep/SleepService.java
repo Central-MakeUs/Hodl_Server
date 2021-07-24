@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
+import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.record.sleep.model.PostSleepReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
@@ -65,17 +66,14 @@ public class SleepService {
                         return getChatRes;
                     }
                 }
-                getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
-                return getChatRes;
             }else{
                 groupId = "SAVE_FAIL";
                 scenarioIdx = 0;
-                getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
-                getChatRes = makeSaveFailChat(getChatRes,"SLEEP_CHIP_GROUP", "SAVE_FAIL_RETRY_SLEEP", "SAVE_FAIL_DISCARD_SLEEP");
-                return getChatRes;
             }
+            getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
+            return getChatRes;
         } catch (Exception exception){
-            exception.printStackTrace();
+            logger.error("userIdx = " + userIdx + "post sleep fail");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

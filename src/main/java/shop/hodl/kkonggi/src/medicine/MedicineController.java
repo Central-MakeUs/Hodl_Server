@@ -11,10 +11,10 @@ import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
 import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
-import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.List;
+import static shop.hodl.kkonggi.utils.Chat.makeSaveFailChat;
 
 @RestController
 @RequestMapping("/app/v1/users/medicine")
@@ -183,7 +183,6 @@ public class MedicineController {
                 String actionType = "MEDICINE_ADD_FAIL";
                 String actionIdRe = "MED_ADD_FAIL_RETRY";
                 String actionIdFail = "MED_ADD_FAIL_DISCARD";
-
                 getChatRes.getAction().setActionType(actionType);
                 for(int i= 0; i < getChatRes.getAction().getChoiceList().size(); i++){
                     if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("취소")){
