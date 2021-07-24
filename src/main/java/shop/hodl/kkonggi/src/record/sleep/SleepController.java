@@ -75,7 +75,7 @@ public class SleepController {
             if(postSleepReq.getIsSleep() != 1 && postSleepReq.getIsSleep() != 0)
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_STATUS);
 
-            if(!isRegexTime(postSleepReq.getSleepTime()) || isRegexTime(postSleepReq.getWakeUpTime()))
+            if(!isRegexTime(postSleepReq.getSleepTime()) || !isRegexTime(postSleepReq.getWakeUpTime()))
                 return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);    // 시간 형식 확인
 
             int userIdx = jwtService.getUserIdx();

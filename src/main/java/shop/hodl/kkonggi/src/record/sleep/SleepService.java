@@ -49,25 +49,33 @@ public class SleepService {
                 if(postReq.getIsSleep() == 0) groupId = "SLEEP_REC_LESS";
                 else{
                     SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    Date mid = format.parse("24:00");
                     Date sleepTime = format.parse(postReq.getSleepTime());
                     Date wakeUpTime = format.parse(postReq.getWakeUpTime());
-                    long diff = subTime(sleepTime, wakeUpTime);
+                    logger.info("sleepTime = " + sleepTime);
+                    logger.info("wakeUpTime = " + wakeUpTime);
+                    long diff = subTime(sleepTime, wakeUpTime, mid);
 
+                    logger.info("timeDiff = " + diff);
                     if(diff < 5) groupId = "SLEEP_REC_LESS";
                     else if(12 < diff) groupId = "SLEEP_REC_MORE";
-                    else groupId = "SLEEP_REC_MID";
-
+                    else {
+                        groupId = "SLEEP_REC_MID";
+                        getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+                        return getChatRes;
+                    }
                 }
-                getChatRes = sleepDao.getChats(groupId, scenarioIdx);
+                getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
                 return getChatRes;
             }else{
                 groupId = "SAVE_FAIL";
                 scenarioIdx = 0;
-                getChatRes = sleepDao.getChats(groupId, scenarioIdx);
+                getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
                 getChatRes = makeSaveFailChat(getChatRes,"SLEEP_CHIP_GROUP", "SAVE_FAIL_RETRY_SLEEP", "SAVE_FAIL_DISCARD_SLEEP");
                 return getChatRes;
             }
         } catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
