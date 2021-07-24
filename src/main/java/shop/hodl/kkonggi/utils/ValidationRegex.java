@@ -20,7 +20,7 @@ public class ValidationRegex {
         return matcher.find();
     }
 
-    // hh:ss
+    // HH:mm
     public static boolean isRegexTime(String target){
         String regex = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
         Pattern pattern = Pattern.compile(regex, Pattern.CANON_EQ);

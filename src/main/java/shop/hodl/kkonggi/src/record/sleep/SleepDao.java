@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import shop.hodl.kkonggi.src.record.sleep.model.GetSleepRes;
+import shop.hodl.kkonggi.src.record.sleep.model.PostSleepReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
 import javax.sql.DataSource;
@@ -29,16 +30,9 @@ public class SleepDao {
     }
 
     public GetSleepRes getSleep(int userIdx, String date, int status){
-        String getQuery = "select DATE_FORMAT(date, '%Y.%m.%d') as date, case\n" +
-                "           when DATE_FORMAT(sleepTime,'%p %h:%i') like('%AM%') then REPLACE(DATE_FORMAT(sleepTime,'%p %h:%i'),'AM', '오전')\n" +
-                "           when DATE_FORMAT(sleepTime,'%p %h:%i') like('%PM%') then REPLACE(DATE_FORMAT(sleepTime,'%p %h:%i'),'PM', '오후')\n" +
-                "           end as sleepTime,\n" +
-                "       case\n" +
-                "           when DATE_FORMAT(wakeUpTime,'%p %h:%i') like('%AM%') then REPLACE(DATE_FORMAT(wakeUpTime,'%p %h:%i'),'AM', '오전')\n" +
-                "           when DATE_FORMAT(wakeUpTime,'%p %h:%i') like('%PM%') then REPLACE(DATE_FORMAT(wakeUpTime,'%p %h:%i'),'PM', '오후')\n" +
-                "           end as wakeUpTime, memo\n" +
-                "from (select ifnull(date, STR_TO_DATE(?, '%Y%m%d')) as date, ifnull(sleepTime, STR_TO_DATE('220000', '%H%i')) as sleepTime,\n" +
-                "             ifnull(wakeUpTime, STR_TO_DATE('060000', '%H%i')) as wakeUpTime, ifnull(memo, \"\") as memo from Sleep right join User on User.userIdx =  Sleep.userIdx and Sleep.status != 'N'\n" +
+        String getQuery = "select DATE_FORMAT(date, '%Y%m%d') as date, DATE_FORMAT(sleepTime, '%H:%i') as sleepTime, DATE_FORMAT(wakeUpTime, '%H:%i') as wakeUpTime, memo\n" +
+                "from (select ifnull(date, STR_TO_DATE(?, '%Y%m%d')) as date, ifnull(sleepTime, STR_TO_DATE('2200', '%H%i')) as sleepTime,\n" +
+                "             ifnull(wakeUpTime, STR_TO_DATE('0600', '%H%i')) as wakeUpTime, ifnull(memo, \"\") as memo from Sleep right join User on User.userIdx =  Sleep.userIdx and Sleep.status != 'N'\n" +
                 "where User.userIdx = ? and User.status = 'Y') Info";
         Object [] getParams = new Object[]{date, userIdx};
         return this.jdbcTemplate.queryForObject(getQuery,
@@ -49,6 +43,15 @@ public class SleepDao {
                         rs.getString("wakeUpTime"),
                         rs.getString("memo")
                 ), getParams);
+    }
+
+    public int createSleepRecord(int userIdx, PostSleepReq postSleepReq){
+        String createQuery = "insert into Sleep (userIdx, date, sleepTime, wakeUpTime, memo, status) values (?, ?, ?, ?, ?, if(? = 1, 'Y', 'P'))";
+        Object [] createParams = new Object[]{userIdx, postSleepReq.getDate(), postSleepReq.getSleepTime(), postSleepReq.getWakeUpTime(), postSleepReq.getMemo(), postSleepReq.getIsSleep()};
+        this.jdbcTemplate.update(createQuery, createParams);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
     }
 
     public GetChatRes getChats(String groupId, int scenarioIdx){

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class days {
+public class Time {
     public static List<String> getDays(int day){
         List<String> days = new ArrayList<>();
         for(int i = 0; i < 7; i++){
@@ -27,8 +27,15 @@ public class days {
         return days;
     }
 
-    public static String getCurrentTimeStr(){
+    public static String getCurrentDateStr(){
         SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+        Date current = new Date();
+        String currentTimeStr = dtFormat.format(current);
+        return currentTimeStr;
+    }
+
+    public static String getCurrentTimeStr(){
+        SimpleDateFormat dtFormat = new SimpleDateFormat("HH:mm a");
         Date current = new Date();
         String currentTimeStr = dtFormat.format(current);
         return currentTimeStr;

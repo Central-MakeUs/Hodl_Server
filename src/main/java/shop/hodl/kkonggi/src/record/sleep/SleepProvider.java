@@ -12,7 +12,7 @@ import shop.hodl.kkonggi.utils.JwtService;
 
 import static shop.hodl.kkonggi.utils.Chat.replaceNickName;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
-import static shop.hodl.kkonggi.utils.days.getCurrentTimeStr;
+import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 
 @Service
 public class SleepProvider {
@@ -30,7 +30,7 @@ public class SleepProvider {
     // 디폴트 일어나는 시간 : 오전 6시
     // 디폴트 잠 든 시간 : 오후 9시
     public GetSleepRes getSleep(int userIdx, String date) throws BaseException{
-        String currentTimeStr =  getCurrentTimeStr();
+        String currentTimeStr =  getCurrentDateStr();
         if(date == null || currentTimeStr.equals(date) || date.isEmpty()) date = currentTimeStr;
         else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
         int status = 0;
@@ -55,7 +55,7 @@ public class SleepProvider {
     public GetChatRes getSleepInput(int userIdx, int scenarioIdx, String groupId) throws BaseException{
         try{
             // 오늘 잠 기록 했는 지,
-            String currentTimeStr =  getCurrentTimeStr();
+            String currentTimeStr =  getCurrentDateStr();
             if(checkSleepRecord(userIdx,currentTimeStr) == 1) groupId = "SLEEP_REC_MOD";
             return getChats(userIdx, scenarioIdx, groupId);
         } catch (Exception exception){

@@ -1,6 +1,5 @@
 package shop.hodl.kkonggi.src.medicine;
 
-import com.sun.tools.javac.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -10,9 +9,8 @@ import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
 import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
 
 import javax.sql.DataSource;
-import java.util.stream.Collectors;
 
-import static shop.hodl.kkonggi.utils.days.getDays;
+import static shop.hodl.kkonggi.utils.Time.getDays;
 
 @Repository
 public class MedicineDao {

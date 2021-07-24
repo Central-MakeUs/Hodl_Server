@@ -8,8 +8,11 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.record.sleep.model.GetSleepRes;
+import shop.hodl.kkonggi.src.record.sleep.model.PostSleepReq;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
+
+import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexTime;
 
 @RestController
 @RequestMapping("/app/v1/users/record/sleep")
@@ -57,6 +60,27 @@ public class SleepController {
             int userIdx = jwtService.getUserIdx();
             GetSleepRes getSleepRes = sleepProvider.getSleep(userIdx, date);
             return new BaseResponse<>(getSleepRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 수면 기록 등록
+     */
+    @ResponseBody
+    @PostMapping("")
+    public BaseResponse<GetChatRes> createSleepRecord(@RequestBody PostSleepReq postSleepReq){
+        try{
+            if(postSleepReq.getIsSleep() != 1 && postSleepReq.getIsSleep() != 0)
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_STATUS);
+
+            if(!isRegexTime(postSleepReq.getSleepTime()) || isRegexTime(postSleepReq.getWakeUpTime()))
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);    // 시간 형식 확인
+
+            int userIdx = jwtService.getUserIdx();
+            GetChatRes getChatRes = sleepService.createSleepRecord(userIdx, postSleepReq);
+            return new BaseResponse<>(getChatRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

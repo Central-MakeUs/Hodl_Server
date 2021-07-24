@@ -3,6 +3,7 @@ package shop.hodl.kkonggi.src.user.model;
 import lombok.*;
 
 import java.util.List;
+import static shop.hodl.kkonggi.utils.Time.*;
 
 @Getter
 @Setter
@@ -41,5 +42,11 @@ public class GetChatRes {
             private String actionId;    // 버튼 id
             private String content; // 내용
         }
+    }
+
+    public GetChatRes createExceptionChat(String content){
+        GetChatRes getChatRes =
+                new GetChatRes((List<Chat>) new Chat("BOT_NORMAL", getCurrentDateStr(), getCurrentTimeStr(), content), null);
+        return getChatRes;
     }
 }

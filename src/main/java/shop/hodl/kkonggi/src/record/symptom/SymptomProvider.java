@@ -10,10 +10,8 @@ import shop.hodl.kkonggi.src.record.symptom.model.GetSymptomRes;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
-import java.util.List;
-
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
-import static shop.hodl.kkonggi.utils.days.getCurrentTimeStr;
+import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.Chat.replaceNickName;
 import static shop.hodl.kkonggi.utils.Chat.getSymptoms;
 
@@ -32,7 +30,7 @@ public class SymptomProvider {
 
     public GetChatRes getRecordSymptom(int userIdx, String date, int scenarioIdx, String groupId) throws BaseException {
 
-        String currentTimeStr =  getCurrentTimeStr();
+        String currentTimeStr =  getCurrentDateStr();
         if(date == null || currentTimeStr.equals(date) || date.isEmpty()) date = currentTimeStr;
         else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
         try{
@@ -49,7 +47,7 @@ public class SymptomProvider {
     }
 
     public GetSymptomRes getSymptomList(int userIdx, String date) throws BaseException{
-        String currentTimeStr =  getCurrentTimeStr();
+        String currentTimeStr =  getCurrentDateStr();
         if(date == null || currentTimeStr.equals(date) || date.isEmpty()) date = currentTimeStr;
         else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
         int getChecked = 0;

@@ -2,7 +2,7 @@ package shop.hodl.kkonggi.utils;
 
 import java.util.ArrayList;
 
-public class cycle {
+public class Cycle {
     public static int intArrayToInt(int[] arr){
         int sum = 0;
         for(int i = 0; i < arr.length; i++){

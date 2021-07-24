@@ -12,7 +12,6 @@ import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.Collections;
 import java.util.List;
-import static shop.hodl.kkonggi.utils.cycle.*;
 
 @Service
 public class MedicineProvider {

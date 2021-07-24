@@ -14,7 +14,7 @@ import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import static shop.hodl.kkonggi.utils.cycle.*;
+import static shop.hodl.kkonggi.utils.Cycle.*;
 
 @Service
 public class MedicineService {

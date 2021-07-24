@@ -13,7 +13,7 @@ import shop.hodl.kkonggi.utils.JwtService;
 import javax.transaction.Transactional;
 
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
-import static shop.hodl.kkonggi.utils.days.getCurrentTimeStr;
+import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.Chat.makeSymptoms;
 
 @Service
@@ -34,7 +34,7 @@ public class SymptomService {
 
     @Transactional
     public GetChatRes createSymptomRecord(int userIdx, PostSymptomReq postReq) throws BaseException {
-        String currentTimeStr =  getCurrentTimeStr();
+        String currentTimeStr =  getCurrentDateStr();
         if(postReq.getDate() == null || currentTimeStr.equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(currentTimeStr);
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
         try{
@@ -74,7 +74,7 @@ public class SymptomService {
 
     @Transactional
     public GetChatRes updateSymptomRecord(int userIdx, PostSymptomReq postReq) throws BaseException {
-        String currentTimeStr =  getCurrentTimeStr();
+        String currentTimeStr =  getCurrentDateStr();
         if(postReq.getDate() == null || currentTimeStr.equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(currentTimeStr);
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
 

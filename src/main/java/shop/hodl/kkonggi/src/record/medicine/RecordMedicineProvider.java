@@ -1,7 +1,5 @@
 package shop.hodl.kkonggi.src.record.medicine;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
-import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,15 +9,13 @@ import shop.hodl.kkonggi.src.record.medicine.model.*;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
-import java.awt.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
 
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
-import static shop.hodl.kkonggi.utils.days.getDays;
+import static shop.hodl.kkonggi.utils.Time.getDays;
 import shop.hodl.kkonggi.config.Constant;
 
 @Service

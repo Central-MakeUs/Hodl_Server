@@ -2,7 +2,6 @@ package shop.hodl.kkonggi.utils;
 
 import shop.hodl.kkonggi.src.record.symptom.model.GetSymptomRes;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
-import java.util.List;
 
 public class Chat {
     // 닉네임 변경
@@ -33,5 +32,16 @@ public class Chat {
             sum += Math.pow(2, symptoms[i]);
         }
         return sum;
+    }
+
+    public static GetChatRes makeSaveFailChat(GetChatRes getChatRes, String actionType, String retry, String discard){
+        getChatRes.getAction().setActionType(actionType);
+        for(int i = 0; i < getChatRes.getAction().getChoiceList().size(); i++){
+            if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("SAVE_FAIL_RETRY"))
+                getChatRes.getAction().getChoiceList().get(i).setContent(retry);
+            if(getChatRes.getAction().getChoiceList().get(i).getContent().contains("SAVE_FAIL_DISCARD"))
+                getChatRes.getAction().getChoiceList().get(i).setContent(discard);
+        }
+        return getChatRes;
     }
 }
