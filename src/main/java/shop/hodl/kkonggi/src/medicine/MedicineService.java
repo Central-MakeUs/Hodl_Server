@@ -106,7 +106,8 @@ public class MedicineService {
             // 해당 약물이
             int result = medicineDao.deleteMedicine(patchDeleteReq);
             deleteMedicineTime(userIdx, medicineIdx,patchDeleteReq);
-            return patchDeleteReq.getMedicineIdx();
+            patchDeleteReq.getMedicineIdx();
+            return medicineProvider.getMedicineCnt(userIdx);
         } catch (Exception exception) {
             logger.error( "약물 삭제 실패 DB, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

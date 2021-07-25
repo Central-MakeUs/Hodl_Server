@@ -253,11 +253,7 @@ public class UserController {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
             GetMyRes getMyRes = userProvider.getMyPage(userIdxByJwt);
-
-
-
             return new BaseResponse<>(getMyRes);
-
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

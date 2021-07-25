@@ -103,6 +103,11 @@ public class MedicineDao {
                 , userIdx);
     }
 
+    public int getMedicineCnt(int userIdx){
+        String getQuery = "select count(medicineIdx) as count from Medicine where userIdx = ? and status ='Y'";
+        return this.jdbcTemplate.queryForObject(getQuery, int.class, userIdx);
+    }
+
     public int getTotalStepNumber(int scenarioIdx){
         String getQuery = "select count(chatType) from (select chatType from Chat where Chat.chatType='BOT_STEPPER' and status = 'Y' and scenarioIdx = ?) Stepper";
         return this.jdbcTemplate.queryForObject(getQuery, int.class, scenarioIdx);

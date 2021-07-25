@@ -39,8 +39,8 @@ public class MedicineProvider {
                     new GetMedicineRes.Medicine(
                             getMedicine.getMedicineList().get(i).getMedicineIdx(),
                             getMedicine.getMedicineList().get(i).getMedicineName(),
-                            getMedicine.getMedicineList().get(i).getAmount(),
-                            getMedicine.getMedicineList().get(i).getCycle()
+                            getMedicine.getMedicineList().get(i).getCycle(),
+                            getMedicine.getMedicineList().get(i).getAmount()
                     ));
         }
 
@@ -91,15 +91,6 @@ public class MedicineProvider {
             GetMedChatRes getChatRes = medicineDao.getChats(gorupId, scenarioIdx);
 
             return getChatRes;
-        } catch (Exception exception){
-            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
-        }
-    }
-
-    public int getTotalStepNumber() throws BaseException{
-        try{
-            int scenarioIdx = 2;
-            return medicineDao.getTotalStepNumber(scenarioIdx);
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -248,6 +239,12 @@ public class MedicineProvider {
         }
     }
 
-
+    public int getMedicineCnt(int userIdx) throws BaseException{
+        try{
+            return medicineDao.getMedicineCnt(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
 
 }

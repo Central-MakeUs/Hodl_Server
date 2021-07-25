@@ -61,9 +61,8 @@ public class UserDao {
     }
 
     public GetMyRes getMyPage(int userIdx){
-        String getQuery = "select nickName, email, count(medicineIdx) as medicineCnt, datediff(now(), createAt) as startCnt\n" +
-                "from (select User.useridx,nickName, email, ifnull(medicineIdx, 0) as medicineIdx, User.createAt from User\n" +
-                "    left join Medicine on User.userIdx = Medicine.userIdx and User.status = 'Y' and Medicine.status = 'Y'where User.useridx = ? ) medicineCnt";
+        String getQuery = "select nickName, email, count(medicineIdx) as medicineCnt ,datediff(now(), User.createAt) as startCnt  from User\n" +
+                "                    left join Medicine on User.userIdx = Medicine.userIdx and User.status = 'Y' and Medicine.status = 'Y' where User.useridx = ?";
         return this.jdbcTemplate.queryForObject(getQuery,
                 (rs, rowNum) -> new GetMyRes(
                         rs.getString("nickName"),
