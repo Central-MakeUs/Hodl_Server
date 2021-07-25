@@ -219,6 +219,14 @@ public class MedicineProvider {
         }
     }
 
+    public int checkMedicineTime(int medicineIdx) throws BaseException{
+        try{
+            return medicineDao.checkMedicineTime(medicineIdx);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
 
 
 }

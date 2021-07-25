@@ -195,6 +195,12 @@ public class MedicineDao {
         return this.jdbcTemplate.queryForObject(checkMedicineQuery, int.class, checkMedicineParams);
     }
 
+    public int checkMedicineTime(int medicineIdx){
+        String checkMedicineQuery = "select exists(select medicineIdx from MedicineTime where medicineIdx = ? and status = 'Y')";
+        Object[] checkMedicineParams = new Object[]{medicineIdx};
+        return this.jdbcTemplate.queryForObject(checkMedicineQuery, int.class, checkMedicineParams);
+    }
+
     public int createMedicine(PostMedicineReq postMedicineReq){
         String createMedicineQuery = "INSERT INTO  Medicine (userIdx, medicineRealName, days, startDay, endDay) values (?, ?, ?, ?, ?)";
         Object[] createMedicineParams = new Object[]{postMedicineReq.getUserIdx(), postMedicineReq.getMedicineRealName(), postMedicineReq.getDays(), postMedicineReq.getStartDay(), postMedicineReq.getEndDay()};
@@ -207,6 +213,12 @@ public class MedicineDao {
 
     public int deleteMedicine(PatchDeleteReq patchDeleteReq){
         String deleteQuery = "update Medicine set status = 'N' where medicineIdx = ?";
+        Object[] deleteParams = new Object[]{patchDeleteReq.getMedicineIdx()};
+        return this.jdbcTemplate.update(deleteQuery, deleteParams);
+    }
+
+    public int deleteMedicineTime(PatchDeleteReq patchDeleteReq){
+        String deleteQuery = "update MedicineTime set status = 'N' where medicineIdx = ?";
         Object[] deleteParams = new Object[]{patchDeleteReq.getMedicineIdx()};
         return this.jdbcTemplate.update(deleteQuery, deleteParams);
     }

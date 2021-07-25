@@ -93,9 +93,26 @@ public class MedicineService {
         try{
             // 해당 약물이
             int result = medicineDao.deleteMedicine(patchDeleteReq);
+            deleteMedicineTime(userIdx, medicineIdx,patchDeleteReq);
             return patchDeleteReq.getMedicineIdx();
         } catch (Exception exception) {
             logger.error( "약물 삭제 실패 DB, " + "userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    // 특정 약물 삭제
+    @Transactional
+    public Integer deleteMedicineTime(int userIdx, int medicineIdx ,PatchDeleteReq patchDeleteReq) throws BaseException{
+        // 해당 약물이 있는 지 or 삭제된 것인지
+        if(medicineProvider.checkMedicineTime(medicineIdx) == 0)
+            throw new BaseException(BaseResponseStatus.PATCH_MEDICINE_EXISTS);
+        try{
+            // 해당 약물이
+            int result = medicineDao.deleteMedicineTime(patchDeleteReq);
+            return patchDeleteReq.getMedicineIdx();
+        } catch (Exception exception) {
+            logger.error( "MedicineTime 삭제 실패 DB, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
