@@ -47,6 +47,7 @@ public class SunService {
             String groupId = "";
             int scenarioIdx = 6;
             GetChatRes getChatRes;
+            if (postReq.getIsSun() == 0) postReq.setTotalTime("00:00");
             int result = sunDao.createSunRecord(userIdx, postReq);
             if(result > 0){
                 if(postReq.getIsSun() == 0) groupId = "SUN_REC_NOT";
@@ -94,15 +95,34 @@ public class SunService {
             String groupId = "";
             int scenarioIdx = 6;
             GetChatRes getChatRes;
+            if (postReq.getIsSun() == 0) postReq.setTotalTime("00:00");
             int result = sunDao.updateSunRecord(postReq, recordIdx);
             if(result > 0){
-                groupId = "SUN_REC_OK";
-                getChatRes = sunProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
-            }else{
+                if(postReq.getIsSun() == 0) groupId = "SUN_REC_NOT";
+                else{
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    Date ten = format.parse("00:10");
+                    Date thirty = format.parse("00:30");
+                    Date totalTime = format.parse(postReq.getTotalTime());
+
+                    if(totalTime.before(ten)) {
+                        logger.info("[Before 10]" + ten.getTime() + " " + totalTime.getTime());
+                        groupId = "SUN_REC_LESS_TEN";
+                    }
+                    else if(totalTime.after(thirty)) {
+                        logger.info("[After 30]" + ten.getTime() + " " + totalTime.getTime());
+                        groupId = "SUN_REC_MORE_THIRTY";
+                    }
+                    else {
+                        logger.info("[10 ~ 30]" + ten.getTime() + " " + totalTime.getTime());
+                        groupId = "SUN_REC_MORE_TEN";
+                    }
+                }
+            } else{
                 groupId = "SAVE_FAIL";
                 scenarioIdx = 0;
-                getChatRes = sunProvider.getChats(userIdx, scenarioIdx, groupId);
             }
+            getChatRes = sunProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
             logger.error("userIdx = " + userIdx + "patch sun fail");

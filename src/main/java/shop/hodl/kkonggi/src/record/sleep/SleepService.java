@@ -55,8 +55,6 @@ public class SleepService {
                     Date mid = format.parse("24:00");
                     Date sleepTime = format.parse(postReq.getSleepTime());
                     Date wakeUpTime = format.parse(postReq.getWakeUpTime());
-                    logger.info("sleepTime = " + sleepTime);
-                    logger.info("wakeUpTime = " + wakeUpTime);
                     long diff = subTimeSleep(sleepTime, wakeUpTime, mid);
 
                     logger.info("timeDiff = " + diff);
@@ -95,13 +93,28 @@ public class SleepService {
             GetChatRes getChatRes;
             int result = sleepDao.updateSleepRecord(postReq, recordIdx);
             if(result > 0){
-                groupId = "SLEEP_REC_OK";
-                getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+                if(postReq.getIsSleep() == 0) groupId = "SLEEP_REC_LESS";
+                else{
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    Date mid = format.parse("24:00");
+                    Date sleepTime = format.parse(postReq.getSleepTime());
+                    Date wakeUpTime = format.parse(postReq.getWakeUpTime());
+                    long diff = subTimeSleep(sleepTime, wakeUpTime, mid);
+
+                    logger.info("timeDiff = " + diff);
+                    if(diff < 5) groupId = "SLEEP_REC_LESS";
+                    else if(12 < diff) groupId = "SLEEP_REC_MORE";
+                    else {
+                        groupId = "SLEEP_REC_MID";
+                        getChatRes = sleepProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+                        return getChatRes;
+                    }
+                }
             }else{
                 groupId = "SAVE_FAIL";
                 scenarioIdx = 0;
-                getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
             }
+            getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
             logger.error("userIdx = " + userIdx + "patch sleep fail");
