@@ -10,10 +10,13 @@ import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
 import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
 import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
+import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import static shop.hodl.kkonggi.utils.Cycle.*;
 
 @Service
@@ -76,8 +79,17 @@ public class MedicineService {
                 scenarioIdx = 0;
                 groupId = "SAVE_FAIL";
             }
-            return medicineProvider.getMedChats(postMedicineReq.getUserIdx(), groupId, scenarioIdx);
-
+            GetMedChatRes getMedChatRes = medicineProvider.getMedChats(postMedicineReq.getUserIdx(), groupId, scenarioIdx);
+            int toBeFirst = getMedChatRes.getAction().getChoiceList()
+                    .indexOf(getMedChatRes.getAction().getChoiceList().stream().filter(e -> e.getContent().equals("약 복용 기록할래")).findFirst().get());
+            int lastIndex = getMedChatRes.getAction().getChoiceList().size() - 1;
+            // Action 순서 변경
+            Collections.swap(getMedChatRes.getAction().getChoiceList(), 0, toBeFirst);
+            int toBeLast = getMedChatRes.getAction().getChoiceList()
+                    .indexOf(getMedChatRes.getAction().getChoiceList().stream().filter(e -> e.getContent().equals("아니, 괜찮아")).findFirst().get());
+            // Action 순서 변경
+            Collections.swap(getMedChatRes.getAction().getChoiceList(), toBeLast, lastIndex);
+            return getMedChatRes;
         } catch (Exception exception) {
             logger.error( "약물 저장 실패 DB, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

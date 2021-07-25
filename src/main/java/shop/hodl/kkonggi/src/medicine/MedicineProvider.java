@@ -14,6 +14,7 @@ import shop.hodl.kkonggi.utils.JwtService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,16 +120,18 @@ public class MedicineProvider {
         try{
 
             GetMedChatRes getMedChatRes = medicineDao.getMedChatRes(groupId, scenarioIdx, stepNumber);
-
             // 약 이름 바꿈
             String replaceMedicine = "%MED_ADD_002_01_답변%";
-
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
                 if(getMedChatRes.getChat().get(i).getContent().contains(replaceMedicine)){
                     getMedChatRes.getChat().get(0).setContent(getMedChatRes.getChat().get(0).getContent().replace(replaceMedicine, medName));
                 }
             }
-
+            int index = getMedChatRes.getAction().getChoiceList()
+                    .indexOf(getMedChatRes.getAction().getChoiceList().stream().filter(e -> e.getContent().equals("이전 단계로")).findFirst().get());
+            int lastIndex = getMedChatRes.getAction().getChoiceList().size() - 1;
+            // Action 순서 변경
+            Collections.swap(getMedChatRes.getAction().getChoiceList(), index, lastIndex);
             return getMedChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
@@ -145,6 +148,7 @@ public class MedicineProvider {
             for(int i = 0; i < 2; i++){
                 getMedChatRes = medicineDao.getMedAddTime(gorupId, scenarioIdx, stepNumber, getMedChatRes, i);
             }
+
             Collections.swap(getMedChatRes.getAction().getChoiceList(), 1, 3);
             return getMedChatRes;
         } catch (Exception exception){
@@ -169,6 +173,7 @@ public class MedicineProvider {
 
             return getChatRes;
         } catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
