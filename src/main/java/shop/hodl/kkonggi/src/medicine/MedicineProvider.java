@@ -171,6 +171,22 @@ public class MedicineProvider {
                 }
             }
 
+            if(groupId.equals("MED_ADD_MODIFY")){
+                int lastIndex = getChatRes.getAction().getChoiceList().size() - 1;
+                int toBeFirst = getChatRes.getAction().getChoiceList()
+                        .indexOf(getChatRes.getAction().getChoiceList().stream().filter(e -> e.getActionId().contains("NAME")).findFirst().get());
+                Collections.swap(getChatRes.getAction().getChoiceList(), 0, toBeFirst);
+                int toBeSec = getChatRes.getAction().getChoiceList()
+                        .indexOf(getChatRes.getAction().getChoiceList().stream().filter(e -> e.getActionId().contains("CYCLE")).findFirst().get());
+                Collections.swap(getChatRes.getAction().getChoiceList(), 1, toBeSec);
+                int toBeThird = getChatRes.getAction().getChoiceList()
+                        .indexOf(getChatRes.getAction().getChoiceList().stream().filter(e -> e.getActionId().contains("START")).findFirst().get());
+                Collections.swap(getChatRes.getAction().getChoiceList(), 2, toBeThird);
+                int toBeLast = getChatRes.getAction().getChoiceList()
+                        .indexOf(getChatRes.getAction().getChoiceList().stream().filter(e -> e.getActionId().contains("TIME")).findFirst().get());
+                Collections.swap(getChatRes.getAction().getChoiceList(), lastIndex, toBeLast);
+            }
+
             return getChatRes;
         } catch (Exception exception){
             exception.printStackTrace();
