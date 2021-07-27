@@ -10,7 +10,6 @@ public class Time {
         List<String> days = new ArrayList<>();
         for(int i = 0; i < 7; i++){
             if((day & (int) Math.pow(2, i)) == (int) Math.pow(2, i)){
-                System.out.println(i + " day = " + day);
                 if(i == 0) days.add("월");
                 if(i == 1) days.add("화");
                 if(i == 2) days.add("수");

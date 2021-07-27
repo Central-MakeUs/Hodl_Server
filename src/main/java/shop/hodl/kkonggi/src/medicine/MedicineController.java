@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
-import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
-import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
-import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
+import shop.hodl.kkonggi.src.medicine.model.*;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.List;
@@ -241,6 +238,46 @@ public class MedicineController {
             int userIdx = jwtService.getUserIdx();
             GetMedicineRes getMedicineRes = medicineProvider.getMyMedicines(userIdx, cycle, time, endDay);
             return new BaseResponse<>(getMedicineRes);
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 특정 약 상세
+     */
+    @ResponseBody
+    @GetMapping("/{medicineIdx}")
+    public BaseResponse<GetMedicineDetailRes> getMedicineDetail(@PathVariable("medicineIdx") int medicineIdx){
+        try {
+            int userIdx = jwtService.getUserIdx();
+            GetMedicineDetailRes getMedicineDetailRes = medicineProvider.getMedicineDetail(userIdx, medicineIdx);
+            return new BaseResponse<>(getMedicineDetailRes);
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 특정 약 변경
+     */
+    @ResponseBody
+    @PutMapping("/{medicineIdx}")
+    public BaseResponse<Integer> updateMedicineDetail(@PathVariable("medicineIdx") int medicineIdx, @RequestBody MedicineDTO medicineDTO){
+        try {
+            if(medicineDTO.getName().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_NAME);
+            if(medicineDTO.getStart().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_START);
+            if(medicineDTO.getDays() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_DAYS);
+            if(medicineDTO.getTimes() == null) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_TIME);
+
+            if(medicineDTO.getDays().length != 7)
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+            if(medicineDTO.getTimes().length != 5)
+                return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_INVALID_TIME);
+
+            int userIdx = jwtService.getUserIdx();
+            Integer result = medicineService.updateMedicineDetail(userIdx, medicineIdx, medicineDTO);
+            return new BaseResponse<>(result);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }

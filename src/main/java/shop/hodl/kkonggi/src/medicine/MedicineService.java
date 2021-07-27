@@ -6,18 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
-import shop.hodl.kkonggi.src.medicine.model.MedicineDTO;
-import shop.hodl.kkonggi.src.medicine.model.PatchDeleteReq;
-import shop.hodl.kkonggi.src.medicine.model.PostMedicineReq;
+import shop.hodl.kkonggi.src.medicine.model.*;
 import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static shop.hodl.kkonggi.utils.Cycle.*;
+import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
 @Service
 public class MedicineService {
@@ -92,6 +92,54 @@ public class MedicineService {
             return getMedChatRes;
         } catch (Exception exception) {
             logger.error( "약물 저장 실패 DB, " + "userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    // 특정 약물 변경
+    @Transactional
+    public Integer updateMedicineDetail(int userIdx, int medicineIdx, MedicineDTO medicineDTO) throws BaseException{
+        if(!isRegexDate(medicineDTO.getStart()))
+            throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
+
+        int days = intArrayToInt(medicineDTO.getDays());
+        ArrayList<String> toBeModifiedTimeSlot = toTimeSlot(medicineDTO.getTimes());
+
+        if(days == 0) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+
+        if(toBeModifiedTimeSlot.isEmpty()) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_TIME);
+
+        if(medicineProvider.checkMedicine(userIdx, medicineIdx) == 0)
+            throw new BaseException(BaseResponseStatus.PUT_MEDICINE_NO);
+        try{
+            PutMedicineReq putMedicineReq = new PutMedicineReq(userIdx, medicineIdx, medicineDTO.getName(), medicineDTO.getMedicineDetail(), medicineDTO.getStart(), medicineDTO.getEnd(), days);
+
+            // Medicine 업데이트
+            int updateResult = medicineDao.updateMedicineDetail(putMedicineReq);
+            if(updateResult == 0) throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+
+            List<String> getTimeSlotInDB = medicineProvider.getTimeSlot(medicineIdx);   // 현재 TimeSlot
+            List<String> toBeletedTimeSlot = getTimeSlotInDB.stream().filter(x -> !toBeModifiedTimeSlot.contains(x)).collect(Collectors.toList());    // status -> N
+            List<String> toBeAddTimeSlot = toBeModifiedTimeSlot.stream().filter(x -> !getTimeSlotInDB.contains(x)).collect(Collectors.toList());    // create of status -> Y
+
+            int medicineTime = 0;
+            // 시간대 삭제
+            for(String beDeletedTimeSlot : toBeletedTimeSlot){
+                if(medicineProvider.checkMedicineTime(medicineIdx, beDeletedTimeSlot, "Y") == 0)
+                    throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+                medicineTime = medicineDao.updateMedicineTime(medicineIdx, beDeletedTimeSlot, "N");
+                if(medicineTime == 0) throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+            }
+            // 시간대 추가
+            for(String beAddedTimeSlot : toBeAddTimeSlot){
+                if(medicineProvider.checkMedicineTime(medicineIdx, beAddedTimeSlot, "N") == 0) medicineTime = medicineDao.createMedicineTime(medicineIdx, beAddedTimeSlot);
+                else medicineTime = medicineDao.updateMedicineTime(medicineIdx, beAddedTimeSlot, "Y");
+                if(medicineTime == 0) throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+            }
+            return medicineIdx;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            logger.error( "약물 상세 업데이트 실패" + "userIdx = " + userIdx + ", medicineIdx = " + medicineIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

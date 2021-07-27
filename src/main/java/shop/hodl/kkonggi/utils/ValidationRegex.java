@@ -14,7 +14,7 @@ public class ValidationRegex {
 
     // yyyyMMdd
     public static boolean isRegexDate(String target){
-        String regex = "(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
+        String regex = "(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$";
         Pattern pattern = Pattern.compile(regex, Pattern.CANON_EQ);
         Matcher matcher = pattern.matcher(target);
         return matcher.find();

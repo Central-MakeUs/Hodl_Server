@@ -8,6 +8,7 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicine;
+import shop.hodl.kkonggi.src.medicine.model.GetMedicineDetailRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
@@ -58,7 +59,7 @@ public class MedicineProvider {
                     if(cycleArr.length > i) arr[i] = cycleArr[i];
                     else arr[i] = "";
                 }
-                getMedicineRes = medicineDao.getMyMedicinesHasSlot(userIdx, arr, cycleArr.length);
+                getMedicineRes = medicineDao.getMyMedicinesHasSlot(userIdx, arr);
             } else{
                 getMedicineRes = medicineDao.getMyMedicines(userIdx);
             }
@@ -125,6 +126,27 @@ public class MedicineProvider {
             Collections.swap(getMedChatRes.getAction().getChoiceList(), index, lastIndex);
             return getMedChatRes;
         } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public GetMedicineDetailRes getMedicineDetail(int userIdx, int medicineIdx) throws BaseException{
+        if(checkMedicine(userIdx, medicineIdx) == 0)
+            throw new BaseException(BaseResponseStatus.PATCH_MEDICINE_EXISTS);
+        try{
+            GetMedicineDetailRes getMedicineDetailRes = medicineDao.getMedicineDetail(userIdx, medicineIdx);
+            return getMedicineDetailRes;
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public List<String> getTimeSlot(int medicineIdx) throws BaseException{
+        try{
+            return medicineDao.getTimeSlot(medicineIdx);
+        } catch (Exception exception){
+            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -234,6 +256,14 @@ public class MedicineProvider {
     public int checkMedicineTime(int medicineIdx) throws BaseException{
         try{
             return medicineDao.checkMedicineTime(medicineIdx);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int checkMedicineTime(int medicineIdx, String timeSlot, String status) throws BaseException{
+        try{
+            return medicineDao.checkMedicineTime(medicineIdx, timeSlot, status);
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }

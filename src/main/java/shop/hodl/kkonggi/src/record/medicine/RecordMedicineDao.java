@@ -69,10 +69,7 @@ public class RecordMedicineDao {
         String createMedicieRecordQuery = "update MedicineRecord set medicineIdx =?, slot = ?, day =?, time = ?, amount =?, status = 'Y' where recordIdx = ?";
         Object[] createMedicieRecordParmas = new Object[]{postReq.getMedicineIdx()[index], postReq.getTimeSlot(), postReq.getDate(), postReq.getTime(), amount, recordIdx};
 
-        this.jdbcTemplate.update(createMedicieRecordQuery, createMedicieRecordParmas);
-
-        String lastInserIdQuery = "select last_insert_id()";
-        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+        return this.jdbcTemplate.update(createMedicieRecordQuery, createMedicieRecordParmas);
     }
 
     public int createMedicineRecord(PostMedicineRecordReq postReq, int medicineIdx, String timeSlot){
@@ -90,7 +87,7 @@ public class RecordMedicineDao {
     }
 
     public double getLatestMedicineAmount(int medicineIdx, String timeSlot){
-        String getAmountQuery = "select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc limit 1";
+        String getAmountQuery = "select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by day desc limit 1";
         return this.jdbcTemplate.queryForObject(getAmountQuery, double.class, medicineIdx, timeSlot);
     }
 
@@ -206,13 +203,13 @@ public class RecordMedicineDao {
 
     public GetMedicine getSpecificMedicineRecord(String date,String defaultTime ,int medicineIdx, String timeSlot){
         String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, DATE_FORMAT(?, '%Y-%m-%d') as day,\n" +
-                "       ifnull(DATE_FORMAT(time,'%H:%i'), ?) as time,ifnull((select lastAmount from (select distinct medicineIdx ,case\n" +
-                "        when (select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')) = 1\n" +
-                "            then (select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc limit 1)\n" +
-                "        else 1\n" +
-                "    end as lastAmount from MedicineRecord  where medicineIdx = ? and slot = ? and status = 'Y' order by createAt desc) last), 1) as amount, \"\" as memo, days\n" +
-                "from Medicine inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
-                "where Medicine.medicineIdx = ? and slot = ? and MedicineTime.status = 'Y'";
+                "                       ifnull(DATE_FORMAT(time,'%H:%i'), ?) as time,ifnull((select lastAmount from (select distinct medicineIdx ,case\n" +
+                "                        when (select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')) = 1\n" +
+                "                            then (select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by days desc limit 1)\n" +
+                "                        else 1\n" +
+                "                    end as lastAmount from MedicineRecord  where medicineIdx = ? and slot = ? and status = 'Y' order by days desc) last), 1) as amount, \"\" as memo, days\n" +
+                "                from Medicine inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
+                "                where Medicine.medicineIdx = ? and slot = ? and MedicineTime.status = 'Y'";
         Object[] getMedicineParams = new Object[]{date ,defaultTime, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot};
         String getSlotQuery = "select\n" +
                 "       case\n" +

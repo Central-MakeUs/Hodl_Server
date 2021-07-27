@@ -52,7 +52,9 @@ public enum BaseResponseStatus {
     POST_MEDICINE_EXISTS(false, 2036, "중복된 약물입니다."),
 
     PATCH_MEDICINE_EXISTS(false, 2037, "유효하지 않는 약물입니다."),
+    PUT_MEDICINE_NO(false, 2038, "존재하지 않는 약물입니다."),
 
+    POST_MEDICINE_RECORD_ALL_ALREADY(false, 2039, "이미 투약한 약물이 있습니다."),
     POST_MEDICINE_RECORD_ALL_EMPTY_SLOT(false, 2040, "시간대를 입력해주세요."),
     POST_MEDICINE_RECORD_ALL_EMPTY_MEDICINES(false, 2041, "약물 식별자를 입력해주세요."),
     POST_MEDICINE_RECORD_ALL_EMPTY_DATE(false, 2042, "날짜를 입력해주세요."),

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @Setter
@@ -11,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MedicineDTO {
     private String name;
+    @Nullable private String medicineDetail;
     private int[] days;    // 순서 : 월,화,수,목,금,토,일
                             // 매일 : {1,1,1,1,1,1,1}, 월,수,금,토{1,0,1,0,1,1,0}
                             // 이틀에 한 번 {2,0,0,0,0,0,0}

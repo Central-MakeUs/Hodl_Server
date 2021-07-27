@@ -1,6 +1,8 @@
 package shop.hodl.kkonggi.utils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Cycle {
@@ -26,6 +28,25 @@ public class Cycle {
             }
         }
         return timeSlot;
+    }
+
+    public static List<String> getTimeSlotOfMedicineTime(List<String> getTimeSlot){
+        if(getTimeSlot.stream().anyMatch(e -> e.equals("M")) && getTimeSlot.stream().anyMatch(e -> e.equals("E"))){
+            int morning = getTimeSlot.indexOf(getTimeSlot.stream().filter(e -> e.equals("M")).findFirst().get());
+            int evening = getTimeSlot.indexOf(getTimeSlot.stream().filter(e -> e.equals("E")).findFirst().get());
+
+            Collections.swap(getTimeSlot, morning, evening);    // 시간순 정렬1
+        }
+
+        List<String> timeSlotRes = new ArrayList<>();
+        for(int i = 0; i < getTimeSlot.size(); i++){
+            if(getTimeSlot.get(i).equals("D")) timeSlotRes.add("새벽");
+            if(getTimeSlot.get(i).equals("M")) timeSlotRes.add("아침");
+            if(getTimeSlot.get(i).equals("L")) timeSlotRes.add("점심");
+            if(getTimeSlot.get(i).equals("E")) timeSlotRes.add("저녁");
+            if(getTimeSlot.get(i).equals("N")) timeSlotRes.add("자기 전");
+        }
+        return timeSlotRes;
     }
 
 }

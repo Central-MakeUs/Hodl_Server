@@ -44,6 +44,13 @@ public class RecordMedicineService {
         if(!isRegexDate(postReq.getDate()))
             throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
 
+        // 들어온 모든 약물들이 새로 등록되어야 할 약물들인 지 확인
+        for(int i = 0; i <postReq.getMedicineIdx().length; i++){
+            int isRec = recordMedicineProvider.checkRecordIdx(postReq.getMedicineIdx()[i], postReq.getTimeSlot(), postReq.getDate());
+            logger.info(postReq.getMedicineIdx()[i] + "가 이미 투약한 약물입니다.");
+            if(isRec == 1) throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_ALREADY);
+        }
+
         try{
             for(int i = 0; i < postReq.getMedicineIdx().length; i++) {
                 amount = recordMedicineProvider.getLatestMedicineAmount(postReq.getMedicineIdx()[i], timeSlot);  // 가장  최근 복용량
@@ -52,7 +59,7 @@ public class RecordMedicineService {
             }
             return new PostAllMedicineRecordRes(postReq.getDate());
         } catch (Exception exception) {
-            logger.error("userIdx = " + userIdx);
+            logger.error(currentTimeStr + "userIdx = " + userIdx + " fail to createAllMedicineRecord");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -72,22 +79,23 @@ public class RecordMedicineService {
         if(!isRegexDate(patchReq.getDate()))
             throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
 
+        // 들어온 모든 약물들이 수정되어야 할 약물들인 지 확인
+        for(int i = 0; i <patchReq.getMedicineIdx().length; i++){
+            int isRec = recordMedicineProvider.checkRecordIdx(patchReq.getMedicineIdx()[i], patchReq.getTimeSlot(), patchReq.getDate());
+            if(isRec == 0) throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_ALREADY);
+        }
         try{
             for(int i = 0; i < patchReq.getMedicineIdx().length; i++) {
                 if(recordMedicineProvider.checkRecordIdx(patchReq.getMedicineIdx()[i], patchReq.getTimeSlot(), patchReq.getDate()) == 0)  // 레코드 된 것이 없는 경우
                     throw new BaseException(BaseResponseStatus.PATCH_MEDICINE_RECORD_INVALID);
 
                 recordIdx = recordMedicineProvider.getRecordIdx(patchReq.getMedicineIdx()[i], patchReq.getTimeSlot(), patchReq.getDate());
-
-                logger.info("medicineIdx = " + patchReq.getMedicineIdx());
-                logger.info("recordIdx = " + recordIdx);
                 amount = recordMedicineProvider.getLatestMedicineAmount(patchReq.getMedicineIdx()[i], timeSlot);  // 가장  최근 복용량
                 result = recordMedicineDao.updateAllMedicineRecord(patchReq, i, amount, recordIdx);
-
             }
             return new PostAllMedicineRecordRes(patchReq.getDate());
         } catch (Exception exception) {
-            logger.error("userIdx = " + userIdx);
+            logger.error(currentTimeStr + "userIdx = " + userIdx + " fail to updateAllMedicineRecord");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
