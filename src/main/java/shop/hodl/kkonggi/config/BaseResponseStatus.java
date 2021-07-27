@@ -76,6 +76,9 @@ public enum BaseResponseStatus {
     POST_SUN_RECORD_ALREADY(false, 2081, "이미 햇빛 기록을 완료했습니다."),
     PATCH_SUN_RECORD_EMPTY(false, 2082, "햇빛 기록이 없습니다."),
 
+    POST_EXERCISE_RECORD_ALREADY(false, 2091, "이미 운동 기록을 완료했습니다."),
+    POST_EXERCISE_RECORD_EMPTY(false, 2092, "운동 기록이 없습니다."),
+
     /**
      * 3000 : Response 오류
      */
