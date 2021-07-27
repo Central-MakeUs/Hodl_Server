@@ -165,7 +165,7 @@ public class RecordMedicineDao {
                 "                (select MedicineRecord.slot from MedicineRecord\n" +
                 "                    inner join MedicineTime on MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineTime.slot = MedicineRecord.slot\n" +
                 "                    inner join Medicine on Medicine.medicineIdx = MedicineRecord.medicineIdx\n" +
-                "                where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and DATE(MedicineRecord.createAt) = DATE(?)\n" +
+                "                where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and DATE(MedicineRecord.day) = DATE(?)\n" +
                 "                  and pow(2, weekday(DATE(?))) & days != 0 and datediff(DATE(?), startDay) > -1 and if(endDay is null, TRUE, datediff(endDay, DATE(?)) > -1) and MedicineRecord.status = 'N') yes";
         Object[] params = new Object[]{userIdx, date, date, date, date};
         return this.jdbcTemplate.queryForObject(query, int.class, params);

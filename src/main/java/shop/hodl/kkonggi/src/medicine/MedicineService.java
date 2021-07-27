@@ -100,7 +100,7 @@ public class MedicineService {
     @Transactional
     public Integer updateMedicineDetail(int userIdx, int medicineIdx, MedicineDTO medicineDTO) throws BaseException{
         if(!isRegexDate(medicineDTO.getStart()))
-            throw  new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
+            throw  new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
 
         int days = intArrayToInt(medicineDTO.getDays());
         ArrayList<String> toBeModifiedTimeSlot = toTimeSlot(medicineDTO.getTimes());
