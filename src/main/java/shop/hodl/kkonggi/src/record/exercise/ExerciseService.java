@@ -34,27 +34,28 @@ public class ExerciseService {
     public GetChatRes createExerciseRecord(int userIdx, PostExerciseReq postReq) throws BaseException {
         if(postReq.getDate() == null || getCurrentDateStr().equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(getCurrentDateStr());
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8)
-            throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+            throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
         if(exerciseProvider.checkExerciseRecord(userIdx, postReq.getDate()) == 1){
             throw new BaseException(BaseResponseStatus.POST_EXERCISE_RECORD_ALREADY);
         }
 
         try{
-            String groupId = "";
+            String groupId = "EXE_REC_COM";
             int scenarioIdx = 7;
             GetChatRes getChatRes;
-            if (postReq.getIsExercise() == 0) postReq.setTotalTime("00:00");
+            if (postReq.getIsExercise() == 0) {
+                postReq.setTotalTime("00:00");
+                groupId = "EXE_REC_NO";
+            }
             int result = exerciseDao.createExerciseRecord(userIdx, postReq);
-            if(result > 0){
-                groupId = "EXE_REC_COM";
-            } else{
+            if(result < 0){
                 groupId = "SAVE_FAIL";
                 scenarioIdx = 0;
             }
             getChatRes = exerciseProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error("userIdx = " + userIdx + "post exercise fail");
+            logger.error(getCurrentDateStr() + " userIdx = " + userIdx + "post exercise fail");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -63,28 +64,29 @@ public class ExerciseService {
     public GetChatRes updateExerciseRecord(int userIdx, PostExerciseReq postReq) throws BaseException {
         if(postReq.getDate() == null || getCurrentDateStr().equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(getCurrentDateStr());
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8)
-            throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+            throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
         if(exerciseProvider.checkExerciseRecord(userIdx, postReq.getDate()) == 0){
             throw new BaseException(BaseResponseStatus.POST_EXERCISE_RECORD_EMPTY);
         }
 
         try{
             int recordIdx = exerciseProvider.getExerciseRecord(userIdx, postReq.getDate());
-            String groupId = "";
+            String groupId = "EXE_REC_COM";
             int scenarioIdx = 7;
             GetChatRes getChatRes;
-            if (postReq.getIsExercise() == 0) postReq.setTotalTime("00:00");
+            if (postReq.getIsExercise() == 0) {
+                postReq.setTotalTime("00:00");
+                groupId = "EXE_REC_NO";
+            }
             int result = exerciseDao.updateExerciseRecord(recordIdx, postReq);
-            if(result > 0){
-                groupId = "EXE_REC_COM";
-            } else{
+            if(result < 0){
                 groupId = "SAVE_FAIL";
                 scenarioIdx = 0;
             }
             getChatRes = exerciseProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error("userIdx = " + userIdx + "patch exercise fail");
+            logger.error( getCurrentDateStr() + " userIdx = " + userIdx + "patch exercise fail");
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

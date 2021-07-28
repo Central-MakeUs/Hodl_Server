@@ -30,7 +30,7 @@ public class ExerciseProvider {
     public GetSunRes getExercise(int userIdx, String date) throws BaseException{
         String currentTimeStr =  getCurrentDateStr();
         if(date == null || currentTimeStr.equals(date) || date.isEmpty()) date = currentTimeStr;
-        else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
+        else if(!isRegexDate(date) || date.length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);
         int status = 0;
         try{
             if(checkExerciseRecord(userIdx,date) > 0) status = 1;
