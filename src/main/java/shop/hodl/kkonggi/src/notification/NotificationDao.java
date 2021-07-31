@@ -38,31 +38,30 @@ public class NotificationDao {
 
     public Integer updateMedicineNotification(int userIdx, List<PatchMedicineNotificationReq> patchReq){
         String updateQuery = "update MedicineNotification\n" +
-                "set notificationTime = case when timeslot = 'D' and ? is not null then ? else notificationTime end,\n" +
-                "    notificationTime = case when timeslot = 'M' and ? is not null then ? else notificationTime end,\n" +
-                "    notificationTime = case when timeslot = 'L' and ? is not null then ? else notificationTime end,\n" +
-                "    notificationTime = case when timeslot = 'N' and ? is not null then ? else notificationTime end,\n" +
-                "    notificationTime = case when timeslot = 'E' and ? is not null then ? else notificationTime end,\n" +
-                "    status = case when timeslot = 'D' and ? is not null then ? else status end,\n" +
-                "    status = case when timeslot = 'M' and ? is not null then ? else status end,\n" +
-                "    status = case when timeslot = 'L' and ? is not null then ? else status end,\n" +
-                "    status = case when timeslot = 'N' and ? is not null then ? else status end,\n" +
-                "    status = case when timeslot = 'E' and ? is not null then ? else status end\n" +
+                "set notificationTime = case when timeSlot = 'D' and ? is not null then ? else notificationTime end,\n" +
+                "    notificationTime = case when timeSlot = 'M' and ? is not null then ? else notificationTime end,\n" +
+                "    notificationTime = case when timeSlot = 'L' and ? is not null then ? else notificationTime end,\n" +
+                "    notificationTime = case when timeSlot = 'N' and ? is not null then ? else notificationTime end,\n" +
+                "    notificationTime = case when timeSlot = 'E' and ? is not null then ? else notificationTime end,\n" +
+                "    status = case when timeSlot = 'D' and ? is not null then ? else status end,\n" +
+                "    status = case when timeSlot = 'M' and ? is not null then ? else status end,\n" +
+                "    status = case when timeSlot = 'L' and ? is not null then ? else status end,\n" +
+                "    status = case when timeSlot = 'N' and ? is not null then ? else status end,\n" +
+                "    status = case when timeSlot = 'E' and ? is not null then ? else status end\n" +
                 "where userIdx = ? and status != 'N'";
-        Object[] updateParams =
+        Object[] updateParamsTimeSlot =
                 new Object[]{
-                        patchReq.get(0).getTimeSlot(), patchReq.get(0).getNotificationTime(),patchReq.get(0).getNotificationTime(),
-                        patchReq.get(1).getTimeSlot(), patchReq.get(1).getNotificationTime(),patchReq.get(1).getNotificationTime(),
-                        patchReq.get(2).getTimeSlot(), patchReq.get(2).getNotificationTime(),patchReq.get(2).getNotificationTime(),
-                        patchReq.get(3).getTimeSlot(), patchReq.get(3).getNotificationTime(),patchReq.get(3).getNotificationTime(),
-                        patchReq.get(4).getTimeSlot(), patchReq.get(4).getNotificationTime(),patchReq.get(4).getNotificationTime(),
-                        patchReq.get(0).getTimeSlot(), patchReq.get(0).getStatus(),patchReq.get(0).getStatus(),
-                        patchReq.get(1).getTimeSlot(), patchReq.get(1).getStatus(),patchReq.get(1).getStatus(),
-                        patchReq.get(2).getTimeSlot(), patchReq.get(2).getStatus(),patchReq.get(2).getStatus(),
-                        patchReq.get(3).getTimeSlot(), patchReq.get(3).getStatus(),patchReq.get(3).getStatus(),
-                        patchReq.get(4).getTimeSlot(), patchReq.get(4).getStatus(),patchReq.get(4).getStatus(),
-                };
-        return this.jdbcTemplate.update(updateQuery, updateParams);
+                        patchReq.get(0).getNotificationTime(), patchReq.get(0).getNotificationTime(),
+                        patchReq.get(1).getNotificationTime(), patchReq.get(1).getNotificationTime(),
+                        patchReq.get(2).getNotificationTime(), patchReq.get(2).getNotificationTime(),
+                        patchReq.get(3).getNotificationTime(), patchReq.get(3).getNotificationTime(),
+                        patchReq.get(4).getNotificationTime(), patchReq.get(4).getNotificationTime(),
+                        patchReq.get(0).getStatus(), patchReq.get(0).getStatus(),
+                        patchReq.get(1).getStatus(), patchReq.get(1).getStatus(),
+                        patchReq.get(2).getStatus(), patchReq.get(2).getStatus(),
+                        patchReq.get(3).getStatus(), patchReq.get(3).getStatus(),
+                        patchReq.get(4).getStatus(), patchReq.get(4).getStatus(), userIdx };
+        return this.jdbcTemplate.update(updateQuery, updateParamsTimeSlot);
     }
 
     public int checkNotification(int userIdx){

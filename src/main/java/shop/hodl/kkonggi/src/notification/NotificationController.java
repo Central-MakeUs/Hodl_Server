@@ -88,11 +88,11 @@ public class NotificationController {
         try{
             int userIdx = jwtService.getUserIdx();
             for(int i = 0; i < patchReq.size(); i++) {
-                if( !patchReq.get(i).getTimeSlot().equals("D") || !patchReq.get(i).getTimeSlot().equals("M") ||!patchReq.get(i).getTimeSlot().equals("L") ||!patchReq.get(i).getTimeSlot().equals("E") ||!patchReq.get(i).getTimeSlot().equals("N"))
+                if( !patchReq.get(i).getTimeSlot().equals("D") && !patchReq.get(i).getTimeSlot().equals("M") && !patchReq.get(i).getTimeSlot().equals("L") && !patchReq.get(i).getTimeSlot().equals("E") && !patchReq.get(i).getTimeSlot().equals("N"))
                     throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);  // 시간대 형식 확인
-                if( !patchReq.get(i).getStatus().equals("A") || !patchReq.get(i).getStatus().equals("I"))
+                else if( !patchReq.get(i).getStatus().equals("A") && !patchReq.get(i).getStatus().equals("I"))
                     throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_STATUS);    // 상태 형식 확인
-                if( !isRegexTime(patchReq.get(i).getNotificationTime()))
+                else if( !isRegexTime(patchReq.get(i).getNotificationTime()))
                     throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);  // 시간 형식 확인
             }
             Integer result = notificationService.updateMedicineNotification(userIdx, patchReq);

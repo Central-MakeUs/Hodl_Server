@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class PatchMedicineNotificationReq {
     private String timeSlot;    // D, M, L, E, N
     private String notificationTime;    // 알림 시간 HH:mm

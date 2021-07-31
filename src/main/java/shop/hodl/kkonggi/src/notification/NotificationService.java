@@ -12,10 +12,14 @@ import shop.hodl.kkonggi.src.notification.model.PatchMedicineNotificationReq;
 import shop.hodl.kkonggi.src.notification.model.PatchNotificationReq;
 import shop.hodl.kkonggi.utils.JwtService;
 
+import javax.sound.midi.Patch;
 import javax.transaction.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 
@@ -56,10 +60,18 @@ public class NotificationService {
     @Transactional
     public Integer updateMedicineNotification(int userIdx, List<PatchMedicineNotificationReq> patchReq) throws BaseException{
         try{
+            // D, M, L, E, N 순서!
+            patchReq = patchReq.stream().sorted(Comparator.comparing(PatchMedicineNotificationReq::getTimeSlot)).collect(Collectors.toList());
+
+            int mIndex = patchReq.indexOf(patchReq.stream().filter(e -> e.getTimeSlot().equals("M")).findFirst().get());
+            int eIndex = patchReq.indexOf(patchReq.stream().filter(e -> e.getTimeSlot().equals("E")).findFirst().get());
+            Collections.swap(patchReq, mIndex, eIndex);
+
             int result = notificationDao.updateMedicineNotification(userIdx, patchReq);
             if(result > 0) result = userIdx;
             return result;
         } catch (Exception exception){
+            exception.printStackTrace();
             logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY MedicineNotification, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
