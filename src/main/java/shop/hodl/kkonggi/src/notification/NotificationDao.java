@@ -41,13 +41,13 @@ public class NotificationDao {
                 "set notificationTime = case when timeSlot = 'D' and ? is not null then ? else notificationTime end,\n" +
                 "    notificationTime = case when timeSlot = 'M' and ? is not null then ? else notificationTime end,\n" +
                 "    notificationTime = case when timeSlot = 'L' and ? is not null then ? else notificationTime end,\n" +
-                "    notificationTime = case when timeSlot = 'N' and ? is not null then ? else notificationTime end,\n" +
                 "    notificationTime = case when timeSlot = 'E' and ? is not null then ? else notificationTime end,\n" +
+                "    notificationTime = case when timeSlot = 'N' and ? is not null then ? else notificationTime end,\n" +
                 "    status = case when timeSlot = 'D' and ? is not null then ? else status end,\n" +
                 "    status = case when timeSlot = 'M' and ? is not null then ? else status end,\n" +
                 "    status = case when timeSlot = 'L' and ? is not null then ? else status end,\n" +
-                "    status = case when timeSlot = 'N' and ? is not null then ? else status end,\n" +
-                "    status = case when timeSlot = 'E' and ? is not null then ? else status end\n" +
+                "    status = case when timeSlot = 'E' and ? is not null then ? else status end,\n" +
+                "    status = case when timeSlot = 'N' and ? is not null then ? else status end\n" +
                 "where userIdx = ? and status != 'N'";
         Object[] updateParamsTimeSlot =
                 new Object[]{
@@ -97,7 +97,7 @@ public class NotificationDao {
                 "    when notificationTime like('%AM%') then REPLACE(notificationTime,'AM', '오전')\n" +
                 "    when notificationTime like('%PM%') then REPLACE(notificationTime,'PM', '오후')\n" +
                 "end as notificationTime, status from\n" +
-                "(select timeSlot, date_format(notificationTime, '%p %h:%m') as notificationTime, if(status = 'A', 1, 0) as status\n" +
+                "(select timeSlot, date_format(notificationTime, '%p %h:%i') as notificationTime, if(status = 'A', 1, 0) as status\n" +
                 "from MedicineNotification where userIdx = ? and status != 'N') medicineNoti";
         return new GetMedicineNotificationRes(
                 this.jdbcTemplate.query(getQuery,

@@ -60,6 +60,7 @@ public class NotificationService {
     @Transactional
     public Integer updateMedicineNotification(int userIdx, List<PatchMedicineNotificationReq> patchReq) throws BaseException{
         try{
+            // D, E, L, M, N
             // D, M, L, E, N 순서!
             patchReq = patchReq.stream().sorted(Comparator.comparing(PatchMedicineNotificationReq::getTimeSlot)).collect(Collectors.toList());
 
