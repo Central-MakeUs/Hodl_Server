@@ -14,6 +14,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.utils.Email.*;
 
 @RequiredArgsConstructor
@@ -54,10 +55,11 @@ public class EmailService {
             else emailDao.createAuth(email, ePw);
         }
         catch (MessagingException e){
-            logger.error("Fail email send = " + email);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail email send email = " + email);
             throw new BaseException(BaseResponseStatus.SEND_MAIL_ERROR);
         }
         catch (Exception exception){
+            LogDateFormat.format(System.currentTimeMillis() + "Fail to Store email = " + email);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

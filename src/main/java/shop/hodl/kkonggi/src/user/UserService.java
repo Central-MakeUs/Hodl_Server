@@ -122,7 +122,8 @@ public class UserService {
 
     @Transactional
     public Integer updateUserInfo(int userIdx, PatchUserInfoReq pathReq) throws BaseException {
-        pathReq.setBirthYear(pathReq.getBirthYear() + "0000");
+        if(pathReq.getBirthYear() != null)
+            pathReq.setBirthYear(pathReq.getBirthYear() + "0000");
         try{
             if(userProvider.checkUserInfo(userIdx) == 0) {
                 userDao.createUserInfo(userIdx, pathReq);   // UserInfo
@@ -133,6 +134,7 @@ public class UserService {
             }
             return userIdx;
         } catch(Exception exception){
+            exception.printStackTrace();
             logger.error(getCurrentDateStr() + " Fail to update My Profile, userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }

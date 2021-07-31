@@ -10,6 +10,8 @@ import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.email.model.PostAuthReq;
 import shop.hodl.kkonggi.src.user.UserDao;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
+
 @RequiredArgsConstructor
 @Service
 public class EmailProvider {
@@ -30,12 +32,12 @@ public class EmailProvider {
     public void checkAuth(PostAuthReq postAuthReq) throws BaseException {
         // 이메일 자체가 없음
         if(emailDao.checkAuthEmail(postAuthReq.getEmail()) == 0) {
-            logger.error("No Authentic email = " + postAuthReq.getEmail());
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "No Authentic email = " + postAuthReq.getEmail());
             throw new BaseException(BaseResponseStatus.POST_AUTH_EMPTY_EMAIL);
         }
         // 인증 코드가 다름
         if(emailDao.checkAuthCode(postAuthReq) == 0) {
-            logger.warn("Invalid Authentic email = " + postAuthReq.getEmail());
+            logger.warn(LogDateFormat.format(System.currentTimeMillis()) + "Invalid Authentic email = " + postAuthReq.getEmail());
             throw new BaseException(BaseResponseStatus.INVALID_AUTH_EMAIL_CODE);
         }
     }

@@ -36,12 +36,10 @@ public class MedicineController {
     @ResponseBody
     @GetMapping("/input")
     public BaseResponse<GetChatRes> getMedAddInput(){
-
         try {
             int userIdx = jwtService.getUserIdx();
             GetChatRes getChatRes = medicineProvider.getMedAddInput();
             return new BaseResponse<>(getChatRes);
-
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }

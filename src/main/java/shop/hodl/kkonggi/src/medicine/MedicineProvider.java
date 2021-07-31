@@ -79,7 +79,6 @@ public class MedicineProvider {
             }
             return getMedicineRes(getMedicineRes);
         } catch (Exception exception){
-            exception.printStackTrace();
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

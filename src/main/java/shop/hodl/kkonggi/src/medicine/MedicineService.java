@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.utils.Cycle.*;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
@@ -91,7 +92,7 @@ public class MedicineService {
             Collections.swap(getMedChatRes.getAction().getChoiceList(), toBeLast, lastIndex);
             return getMedChatRes;
         } catch (Exception exception) {
-            logger.error( "약물 저장 실패 DB, " + "userIdx = " + userIdx);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to STORE Medicine in DB, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -138,8 +139,7 @@ public class MedicineService {
             }
             return medicineIdx;
         } catch (Exception exception) {
-            exception.printStackTrace();
-            logger.error( "약물 상세 업데이트 실패" + "userIdx = " + userIdx + ", medicineIdx = " + medicineIdx);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY Medicine, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -157,7 +157,7 @@ public class MedicineService {
             patchDeleteReq.getMedicineIdx();
             return medicineProvider.getMedicineCnt(userIdx);
         } catch (Exception exception) {
-            logger.error( "약물 삭제 실패 DB, " + "userIdx = " + userIdx);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to DELETE Medicine, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -173,7 +173,7 @@ public class MedicineService {
             int result = medicineDao.deleteMedicineTime(patchDeleteReq);
             return patchDeleteReq.getMedicineIdx();
         } catch (Exception exception) {
-            logger.error( "MedicineTime 삭제 실패 DB, " + "userIdx = " + userIdx);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to DELETE MedicineTIME, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
