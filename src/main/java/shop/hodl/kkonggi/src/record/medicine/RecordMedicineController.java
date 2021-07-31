@@ -8,10 +8,9 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.record.medicine.model.*;
-import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
-import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexTime;
 
 import java.util.List;
@@ -40,10 +39,10 @@ public class RecordMedicineController {
 
     @ResponseBody
     @GetMapping("/scenario")
-    public BaseResponse<GetMedChatRes> getRecordMedicineInput(){
+    public BaseResponse<GetChatRes> getRecordMedicineInput(){
         try{
             int userIdx = jwtService.getUserIdx();
-            GetMedChatRes getMedChatRes = recordMedicineProvider.getRecordMedicineInput(userIdx, scenarioIdx);
+            GetChatRes getMedChatRes = recordMedicineProvider.getRecordMedicineInput(userIdx, scenarioIdx);
             return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -176,10 +175,10 @@ public class RecordMedicineController {
 
     @ResponseBody
     @GetMapping("list/ok")
-    public BaseResponse<GetMedChatRes> getTodayMedicineStatus(@RequestParam(required = false) String date){
+    public BaseResponse<GetChatRes> getTodayMedicineStatus(@RequestParam(required = false) String date){
         try{
             int userIdx = jwtService.getUserIdx();
-            GetMedChatRes getMedChatRes = recordMedicineProvider.getTodayMedicineStatus(userIdx, date, scenarioIdx);
+            GetChatRes getMedChatRes = recordMedicineProvider.getTodayMedicineStatus(userIdx, date, scenarioIdx);
             return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -188,11 +187,11 @@ public class RecordMedicineController {
 
     @ResponseBody
     @GetMapping("/scenario/notadd")
-    public BaseResponse<GetMedChatRes> getNotAddChats(@RequestParam(required = false) String date){
+    public BaseResponse<GetChatRes> getNotAddChats(@RequestParam(required = false) String date){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_REC_NO";
-            GetMedChatRes getMedChatRes = recordMedicineProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            GetChatRes getMedChatRes = recordMedicineProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
             return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -201,11 +200,11 @@ public class RecordMedicineController {
 
     @ResponseBody
     @GetMapping("/scenario/forget")
-    public BaseResponse<GetMedChatRes> getForgetChats(@RequestParam(required = false) String date){
+    public BaseResponse<GetChatRes> getForgetChats(@RequestParam(required = false) String date){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_REC_FORGET";
-            GetMedChatRes getMedChatRes = recordMedicineProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            GetChatRes getMedChatRes = recordMedicineProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
             return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -214,11 +213,11 @@ public class RecordMedicineController {
 
     @ResponseBody
     @GetMapping("/scenario/just")
-    public BaseResponse<GetMedChatRes> getJustChats(@RequestParam(required = false) String date){
+    public BaseResponse<GetChatRes> getJustChats(@RequestParam(required = false) String date){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_REC_DONT_WANT";
-            GetMedChatRes getMedChatRes = recordMedicineProvider.getChats(userIdx, scenarioIdx, groupId);
+            GetChatRes getMedChatRes = recordMedicineProvider.getChats(userIdx, scenarioIdx, groupId);
             return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -227,11 +226,11 @@ public class RecordMedicineController {
 
     @ResponseBody
     @GetMapping("/scenario/thank")
-    public BaseResponse<GetMedChatRes> getThankChats(@RequestParam(required = false) String date){
+    public BaseResponse<GetChatRes> getThankChats(@RequestParam(required = false) String date){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_REC_DONT_WANT_OK";
-            GetMedChatRes getMedChatRes = recordMedicineProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
+            GetChatRes getMedChatRes = recordMedicineProvider.getChatsNoAction(userIdx, scenarioIdx, groupId);
             return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());

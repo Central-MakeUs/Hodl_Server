@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.record.medicine.model.*;
-import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.text.SimpleDateFormat;
@@ -30,7 +30,7 @@ public class RecordMedicineProvider {
         this.recordMedicineDao = recordMedicineDao;
     }
 
-    public GetMedChatRes getRecordMedicineInput(int userIdx, int scscenarioIdx) throws BaseException {
+    public GetChatRes getRecordMedicineInput(int userIdx, int scscenarioIdx) throws BaseException {
         try{
             String gorupId = "";
 
@@ -48,7 +48,9 @@ public class RecordMedicineProvider {
             // 유저가 오늘 먹을 약물이 없는 경우
             else gorupId = "MED_REC_INPUT_NONE";
 
-            GetMedChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scscenarioIdx);
+            GetChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scscenarioIdx);
+            if(gorupId.equals("MED_REC_INPUT_EXIST"))
+                getMedChatRes.getChat().add(recordMedicineDao.getImage("LAGOM_MEDICINE"));
 
             String nickNameReplace = "%user_nickname%";
             String timeSlotReplace = "%time_slot%";
@@ -269,7 +271,7 @@ public class RecordMedicineProvider {
         }
     }
 
-    public GetMedChatRes getTodayMedicineStatus(int userIdx, String date, int scenarioIdx) throws BaseException{
+    public GetChatRes getTodayMedicineStatus(int userIdx, String date, int scenarioIdx) throws BaseException{
         SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
         Date current = new Date();
         String currentTimeStr = dtFormat.format(current);
@@ -284,19 +286,23 @@ public class RecordMedicineProvider {
             int noCnt = getTodayNoCnt(userIdx, date);
 
             String gorupId;
-            // 오늘 약 다 먹음
-            if(totalCnt == yesCnt){
-                gorupId = "MED_REC_ALL_TAKE";
+            // 오늘 먹을 약물 없음
+            if(totalCnt == 0)
+                gorupId = "MED_REC_INPUT_ADD";
+            else {
+                // 오늘 약 다 먹음
+                if(totalCnt == yesCnt){
+                    gorupId = "MED_REC_ALL_TAKE";
+                }
+                // 오늘 약 다 안먹음
+                else if (totalCnt == noCnt) {
+                    gorupId = "MED_REC_NO_TAKE";
+                }
+                else{
+                    gorupId = "MED_REC_OK";
+                }
             }
-            // 오늘 약 다 안먹음
-            else if (totalCnt == noCnt) {
-                gorupId = "MED_REC_NO_TAKE";
-            }
-            else{
-                gorupId = "MED_REC_OK";
-            }
-
-            GetMedChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scenarioIdx);
+            GetChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scenarioIdx);
             String nickReplace = "%user_nickname%";
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
                 if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))
@@ -333,9 +339,9 @@ public class RecordMedicineProvider {
         }
     }
 
-    public GetMedChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws  BaseException{
+    public GetChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws  BaseException{
         try{
-            GetMedChatRes getMedChatRes = recordMedicineDao.getChats(groupId, scenarioIdx);
+            GetChatRes getMedChatRes = recordMedicineDao.getChats(groupId, scenarioIdx);
             String nickReplace = "%user_nickname%";
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
                 if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))
@@ -347,9 +353,9 @@ public class RecordMedicineProvider {
         }
     }
 
-    public GetMedChatRes getChatsNoAction(int userIdx, int scenarioIdx, String groupId) throws  BaseException{
+    public GetChatRes getChatsNoAction(int userIdx, int scenarioIdx, String groupId) throws  BaseException{
         try{
-            GetMedChatRes getMedChatRes = recordMedicineDao.getChatsNoAction(groupId, scenarioIdx);
+            GetChatRes getMedChatRes = recordMedicineDao.getChatsNoAction(groupId, scenarioIdx);
             String nickReplace = "%user_nickname%";
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
                 if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))

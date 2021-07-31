@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import shop.hodl.kkonggi.src.record.medicine.model.*;
-import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
+import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
-import javax.sound.midi.Patch;
 import javax.sql.DataSource;
 import java.util.List;
 
@@ -20,28 +19,41 @@ public class RecordMedicineDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    public GetChatRes.Chat getImage(String imageName){
+        String getImageQuery = "select 'BOT_IMAGE' as chatType, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time, imageUrl as content from LagomImage where imageName = ? and status = 'Y'";
+        return this.jdbcTemplate.queryForObject(getImageQuery,
+                (rs, rowNum) -> new GetChatRes.Chat(
+                        rs.getString("chatType"),
+                        rs.getString("date"),
+                        rs.getString("time"),
+                        rs.getString("content")
+                ) , imageName);
+    }
+
     public GetMedicineListRes getTodayMedicineList(int userIdx, String timeSlot, String defaultTime, String date) {
         String getMedicineQuery = "select medicineIdx,medicineRealName,\n" +
-                "                    case\n" +
-                "                        when taking like('%AM%') then REPLACE(taking,'AM', '오전')\n" +
-                "                        when taking like('%PM%') then REPLACE(taking,'PM', '오후')\n" +
-                "                        else taking\n" +
-                "                    end as taking, status\n" +
-                "                from(\n" +
-                "                select medicineIdx, medicineRealName,\n" +
-                "                       case\n" +
-                "                           when MedicineInfo.status is null then concat(MedicineInfo.timeTime, ' 미복용')\n" +
-                "                           when MedicineInfo.status = 'N' then '안먹음'\n" +
-                "                               else MedicineInfo.recordTime\n" +
-                "                       end as taking, status from\n" +
-                "                       (select Medicine.medicineIdx, medicineRealName ,case\n" +
-                "                           when MedicineTime.time is null then DATE_FORMAT(TIME(?),'%p %h:%i')\n" +
-                "                           else (DATE_FORMAT(MedicineTime.time,'%p %h:%i'))\n" +
-                "                           end  as timeTime,\n" +
-                "                               (DATE_FORMAT(MedicineRecord.time,'%p %h:%i')) as recordTime, MedicineRecord.status as status from Medicine\n" +
-                "                    inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx and slot = ?\n" +
-                "                    left join MedicineRecord on MedicineTime.slot = MedicineRecord.slot and MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineRecord.day = ?\n" +
-                "                where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and (datediff(DATE(?), startDay) > -1) and if(endDay is null, TRUE, datediff(endDay, DATE(?)) > -1)) MedicineInfo) slotList";
+                "                                    case\n" +
+                "                                        when taking like('%AM%') then REPLACE(taking,'AM', '오전')\n" +
+                "                                        when taking like('%PM%') then REPLACE(taking,'PM', '오후')\n" +
+                "                                        else taking\n" +
+                "                                    end as taking, status\n" +
+                "                                from(\n" +
+                "                                select medicineIdx, medicineRealName,\n" +
+                "                                       case\n" +
+                "                                           when MedicineInfo.status is null then concat('미복용 ', MedicineInfo.timeTime)\n" +
+                "                                           when MedicineInfo.status = 'N' then '안먹음'\n" +
+                "                                               else concat(amount , ' 알', ' ', MedicineInfo.recordTime)\n" +
+                "                                       end as taking, status from\n" +
+                "                                       (select Medicine.medicineIdx, medicineRealName ,\n" +
+                "                                               case\n" +
+                "                                                    when MedicineTime.time is null then DATE_FORMAT(TIME(?),'%p %h:%i')\n" +
+                "                                                    else (DATE_FORMAT(MedicineTime.time,'%p %h:%i'))\n" +
+                "                                                    end  as timeTime,\n" +
+                "                                            (DATE_FORMAT(MedicineRecord.time,'%p %h:%i')) as recordTime, MedicineRecord.status as status, amount\n" +
+                "                                       from Medicine\n" +
+                "                                    inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx and slot = ?\n" +
+                "                                    left join MedicineRecord on MedicineTime.slot = MedicineRecord.slot and MedicineTime.medicineIdx = MedicineRecord.medicineIdx and MedicineRecord.day = ?\n" +
+                "                                where userIdx = ? and Medicine.status = 'Y' and MedicineTime.status = 'Y' and pow(2, weekday(DATE(?))) & days != 0 and (datediff(DATE(?), startDay) > -1) and if(endDay is null, TRUE, datediff(endDay, DATE(?)) > -1)) MedicineInfo) slotList";
         Object[] getMedicineParams = new Object[]{defaultTime, timeSlot, date, userIdx, date, date, date};
 
         return new GetMedicineListRes(timeSlot,
@@ -203,14 +215,14 @@ public class RecordMedicineDao {
 
     public GetMedicine getSpecificMedicineRecord(String date,String defaultTime ,int medicineIdx, String timeSlot){
         String getMedicineQuery = "select Medicine.medicineIdx, medicineRealName, DATE_FORMAT(?, '%Y-%m-%d') as day,\n" +
-                "                       ifnull(DATE_FORMAT(time,'%H:%i'), ?) as time,ifnull((select lastAmount from (select distinct medicineIdx ,case\n" +
-                "                        when (select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')) = 1\n" +
-                "                            then (select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by days desc limit 1)\n" +
-                "                        else 1\n" +
-                "                    end as lastAmount from MedicineRecord  where medicineIdx = ? and slot = ? and status = 'Y' order by days desc) last), 1) as amount, \"\" as memo, days\n" +
-                "                from Medicine inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
-                "                where Medicine.medicineIdx = ? and slot = ? and MedicineTime.status = 'Y'";
-        Object[] getMedicineParams = new Object[]{date ,defaultTime, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot};
+                "                                       DATE_FORMAT(ifnull(time, now()), '%H:%i') as time,ifnull((select lastAmount from (select distinct medicineIdx ,case\n" +
+                "                                        when (select exists(select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y')) = 1\n" +
+                "                                            then (select amount from MedicineRecord where medicineIdx = ? and slot = ? and status = 'Y' order by days desc limit 1)\n" +
+                "                                        else 1\n" +
+                "                                    end as lastAmount from MedicineRecord  where medicineIdx = ? and slot = ? and status = 'Y' order by days desc) last), 1) as amount, \"\" as memo, days\n" +
+                "                                from Medicine inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
+                "                                where Medicine.medicineIdx = ? and slot = ? and MedicineTime.status = 'Y'";
+        Object[] getMedicineParams = new Object[]{date, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot, medicineIdx, timeSlot};
         String getSlotQuery = "select\n" +
                 "       case\n" +
                 "       when slot = 'D' then '새벽'\n" +
@@ -281,14 +293,14 @@ public class RecordMedicineDao {
     }
 
 
-    public GetMedChatRes getChats(String groupId, int scenarioIdx){
+    public GetChatRes getChats(String groupId, int scenarioIdx){
 
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
         String getActionQuery = "select distinct actionType from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
         String getActionContentQuery = "select content, actionId from Action where groupId = ? and status = 'Y' and scenarioIdx =?";
 
-        return new GetMedChatRes(this.jdbcTemplate.query(getChatQuery,
-                (rs, rowNum)-> new GetMedChatRes.Chat(
+        return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum)-> new GetChatRes.Chat(
                         rs.getString("chatType"),
                         rs.getString("date"),
                         rs.getString("time"),
@@ -296,10 +308,10 @@ public class RecordMedicineDao {
                 ), groupId, scenarioIdx),
 
                 this.jdbcTemplate.queryForObject(getActionQuery,
-                        (rs, rowNum)-> new GetMedChatRes.Action(
+                        (rs, rowNum)-> new GetChatRes.Action(
                                 rs.getString("actionType"),
                                 this.jdbcTemplate.query(getActionContentQuery,
-                                        (rk, rkNum)-> new GetMedChatRes.Action.Choice(
+                                        (rk, rkNum)-> new GetChatRes.Action.Choice(
                                                 rk.getString("actionId"),
                                                 rk.getString("content")
                                         ), groupId, scenarioIdx)
@@ -307,11 +319,11 @@ public class RecordMedicineDao {
         );
     }
 
-    public GetMedChatRes getChatsNoAction(String groupId, int scenarioIdx){
+    public GetChatRes getChatsNoAction(String groupId, int scenarioIdx){
         String getChatQuery = "select chatType, content, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time from Chat where groupId = ? and status = 'Y' and scenarioIdx = ?";
 
-        return new GetMedChatRes(this.jdbcTemplate.query(getChatQuery,
-                (rs, rowNum)-> new GetMedChatRes.Chat(
+        return new GetChatRes(this.jdbcTemplate.query(getChatQuery,
+                (rs, rowNum)-> new GetChatRes.Chat(
                         rs.getString("chatType"),
                         rs.getString("date"),
                         rs.getString("time"),

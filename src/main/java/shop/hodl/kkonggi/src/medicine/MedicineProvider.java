@@ -6,17 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.medicine.model.GetMedChatRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicine;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineDetailRes;
 import shop.hodl.kkonggi.src.medicine.model.GetMedicineRes;
 import shop.hodl.kkonggi.utils.JwtService;
+import shop.hodl.kkonggi.src.user.model.GetChatRes;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Service
 public class MedicineProvider {
@@ -84,12 +84,12 @@ public class MedicineProvider {
         }
     }
 
-    public GetMedChatRes getMedAddInput() throws BaseException{
+    public GetChatRes getMedAddInput() throws BaseException{
         try{
             String gorupId = "";
             int scenarioIdx = 2;
 
-            GetMedChatRes getChatRes = medicineDao.getChats(gorupId, scenarioIdx);
+            GetChatRes getChatRes = medicineDao.getChats(gorupId, scenarioIdx);
 
             return getChatRes;
         } catch (Exception exception){
@@ -97,10 +97,10 @@ public class MedicineProvider {
         }
     }
 
-    public GetMedChatRes getMedAdd(String groupId, int scenarioIdx, int stepNumber) throws BaseException{
+    public GetChatRes getMedAdd(String groupId, int scenarioIdx, int stepNumber) throws BaseException{
         try{
 
-            GetMedChatRes getMedChatRes = medicineDao.getMedChatRes(groupId, scenarioIdx, stepNumber);
+            GetChatRes getMedChatRes = medicineDao.getMedChatRes(groupId, scenarioIdx, stepNumber);
 
             return getMedChatRes;
         } catch (Exception exception){
@@ -108,10 +108,10 @@ public class MedicineProvider {
         }
     }
 
-    public GetMedChatRes getMedAddChats(int userIdx,String medName, String groupId, int scenarioIdx, int stepNumber) throws BaseException{
+    public GetChatRes getMedAddChats(int userIdx,String medName, String groupId, int scenarioIdx, int stepNumber) throws BaseException{
         try{
 
-            GetMedChatRes getMedChatRes = medicineDao.getMedChatRes(groupId, scenarioIdx, stepNumber);
+            GetChatRes getMedChatRes = medicineDao.getMedChatRes(groupId, scenarioIdx, stepNumber);
             // 약 이름 바꿈
             String replaceMedicine = "%MED_ADD_002_01_답변%";
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
@@ -151,12 +151,12 @@ public class MedicineProvider {
         }
     }
 
-    public GetMedChatRes getMedAddTime() throws BaseException{
+    public GetChatRes getMedAddTime() throws BaseException{
         try{
             String gorupId = "MED_ADD_TIME";
             int scenarioIdx = 2;
             int stepNumber = 5;
-            GetMedChatRes getMedChatRes = new GetMedChatRes();
+            GetChatRes getMedChatRes = new GetChatRes();
 
             for(int i = 0; i < 2; i++){
                 getMedChatRes = medicineDao.getMedAddTime(gorupId, scenarioIdx, stepNumber, getMedChatRes, i);
@@ -170,9 +170,9 @@ public class MedicineProvider {
         }
     }
 
-    public GetMedChatRes getMedChats(int userIdx, String groupId, int scenarioIdx) throws BaseException {
+    public GetChatRes getMedChats(int userIdx, String groupId, int scenarioIdx) throws BaseException {
         try{
-            GetMedChatRes getChatRes;
+            GetChatRes getChatRes;
             if(groupId.equals("COM_OK")) getChatRes = medicineDao.getChatsNoAction(groupId, scenarioIdx);
             else getChatRes = medicineDao.getChats(groupId, scenarioIdx);
 
@@ -207,7 +207,7 @@ public class MedicineProvider {
         }
     }
 
-    public GetMedChatRes getMedChatExist(String groupId, int scenarioIdx) throws BaseException{
+    public GetChatRes getMedChatExist(String groupId, int scenarioIdx) throws BaseException{
         try{
             // todo : 2차 출시 -> Action있도록 바꿔야함
             return medicineDao.getChatsNoAction(groupId, scenarioIdx);
@@ -217,12 +217,12 @@ public class MedicineProvider {
     }
 
 
-    public GetMedChatRes getSaveFailedChats(int userIdx) throws BaseException{
+    public GetChatRes getSaveFailedChats(int userIdx) throws BaseException{
         int scenarioIdx = 0;
         String groupId = "SAVE_FAIL";
 
         try{
-            GetMedChatRes getMedChatRes = medicineDao.getChats(groupId, scenarioIdx);
+            GetChatRes getMedChatRes = medicineDao.getChats(groupId, scenarioIdx);
             return getMedChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

@@ -8,10 +8,9 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.medicine.model.*;
+import shop.hodl.kkonggi.src.user.model.GetChatRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
-import java.util.List;
-import static shop.hodl.kkonggi.utils.Chat.makeSaveFailChat;
 
 @RestController
 @RequestMapping("/app/v1/users/medicine")
@@ -36,11 +35,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("/input")
-    public BaseResponse<GetMedChatRes> getMedAddInput(){
+    public BaseResponse<GetChatRes> getMedAddInput(){
 
         try {
             int userIdx = jwtService.getUserIdx();
-            GetMedChatRes getChatRes = medicineProvider.getMedAddInput();
+            GetChatRes getChatRes = medicineProvider.getMedAddInput();
             return new BaseResponse<>(getChatRes);
 
         } catch (BaseException exception){
@@ -54,13 +53,13 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/name")
-    public BaseResponse<GetMedChatRes> getMedAddName(){
+    public BaseResponse<GetChatRes> getMedAddName(){
         try {
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_NAME";
             int stepNumber = 1;
 
-            GetMedChatRes getMedChatRes = medicineProvider.getMedAdd(groupId, scenarioIdx, stepNumber);
+            GetChatRes getMedChatRes = medicineProvider.getMedAdd(groupId, scenarioIdx, stepNumber);
             return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
@@ -74,7 +73,7 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/cycle")
-    public BaseResponse<GetMedChatRes> getMedAddCycle(@RequestParam("name") String name){
+    public BaseResponse<GetChatRes> getMedAddCycle(@RequestParam("name") String name){
         if(name.isEmpty()){
             return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_NAME);
         }
@@ -83,7 +82,7 @@ public class MedicineController {
             String groupId = "MED_ADD_CYCLE";
             int scenarioIdx = 2;
             int stepNumber = 2;
-            GetMedChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx,name, groupId, scenarioIdx, stepNumber);
+            GetChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx,name, groupId, scenarioIdx, stepNumber);
             return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
@@ -97,12 +96,12 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/start")
-    public BaseResponse<GetMedChatRes> getMedAddStart(){
+    public BaseResponse<GetChatRes> getMedAddStart(){
         try {
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_START";
             int stepNumber = 3;
-            GetMedChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx, "", groupId, scenarioIdx, stepNumber);
+            GetChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx, "", groupId, scenarioIdx, stepNumber);
             return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
@@ -116,12 +115,12 @@ public class MedicineController {
      */
     @ResponseBody
     @GetMapping("/end")
-    public BaseResponse<GetMedChatRes> getMedAddEnd(){
+    public BaseResponse<GetChatRes> getMedAddEnd(){
         try {
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_END";
             int stepNumber = 4;
-            GetMedChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx, "", groupId, scenarioIdx, stepNumber);
+            GetChatRes getMedChatRes = medicineProvider.getMedAddChats(userIdx, "", groupId, scenarioIdx, stepNumber);
             return new BaseResponse<>(getMedChatRes);
 
         } catch (BaseException exception){
@@ -131,10 +130,10 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("/time")
-    public BaseResponse<GetMedChatRes> getMedAddTime(){
+    public BaseResponse<GetChatRes> getMedAddTime(){
         try{
             int userIdx = jwtService.getUserIdx();
-            GetMedChatRes getMedChatRes = medicineProvider.getMedAddTime();
+            GetChatRes getMedChatRes = medicineProvider.getMedAddTime();
             return new BaseResponse<>(getMedChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -143,11 +142,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("check")
-    public BaseResponse<GetMedChatRes> getMedAddCheck(){
+    public BaseResponse<GetChatRes> getMedAddCheck(){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_IS_OK";
-            GetMedChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
+            GetChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
             return new BaseResponse<>(getChatRes);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -157,7 +156,7 @@ public class MedicineController {
 
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<GetMedChatRes> createMedicine(@RequestBody MedicineDTO medicineDTO){
+    public BaseResponse<GetChatRes> createMedicine(@RequestBody MedicineDTO medicineDTO){
         try {
             if(medicineDTO.getName().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_NAME);
             if(medicineDTO.getStart().isEmpty()) return new BaseResponse<>(BaseResponseStatus.POST_MEDICINE_EMPTY_START);
@@ -172,9 +171,9 @@ public class MedicineController {
 
             int userIdx = jwtService.getUserIdx();
             logger.info("userIdx = " + userIdx);
-            GetMedChatRes getChatRes = medicineService.createMedicine(userIdx, medicineDTO);
+            GetChatRes getChatRes = medicineService.createMedicine(userIdx, medicineDTO);
             // 채팅 실패
-            GetMedChatRes getSaveFailedChats = medicineProvider.getSaveFailedChats(userIdx);
+            GetChatRes getSaveFailedChats = medicineProvider.getSaveFailedChats(userIdx);
 
             if(getChatRes.equals(getSaveFailedChats)) {
                 String actionType = "MEDICINE_ADD_FAIL";
@@ -202,11 +201,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("modify")
-    public BaseResponse<GetMedChatRes> getMedAddModify(){
+    public BaseResponse<GetChatRes> getMedAddModify(){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "MED_ADD_MODIFY";
-            GetMedChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
+            GetChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, scenarioIdx);
             return new BaseResponse<>(getChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
@@ -215,11 +214,11 @@ public class MedicineController {
 
     @ResponseBody
     @GetMapping("no")
-    public BaseResponse<GetMedChatRes> getMedAddNo(){
+    public BaseResponse<GetChatRes> getMedAddNo(){
         try{
             int userIdx = jwtService.getUserIdx();
             String groupId = "COM_OK";
-            GetMedChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, 0);
+            GetChatRes getChatRes = medicineProvider.getMedChats(userIdx, groupId, 0);
             return new BaseResponse<>(getChatRes);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());

@@ -37,7 +37,7 @@ public class MedicineService {
 
 
     @Transactional
-    public GetMedChatRes createMedicine(int userIdx, MedicineDTO medicineDTO) throws BaseException {
+    public GetChatRes createMedicine(int userIdx, MedicineDTO medicineDTO) throws BaseException {
 
         int days = intArrayToInt(medicineDTO.getDays());
         ArrayList<String> timeSlot = toTimeSlot(medicineDTO.getTimes());
@@ -53,7 +53,7 @@ public class MedicineService {
             scenarioIdx = 2;
             groupId = "MED_ADD_EXITS";
             String medicineReplace = "%medicine_name%";
-            GetMedChatRes getMedChatRes = medicineProvider.getMedChatExist(groupId, scenarioIdx);
+            GetChatRes getMedChatRes = medicineProvider.getMedChatExist(groupId, scenarioIdx);
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
                 if(getMedChatRes.getChat().get(i).getContent().contains(medicineReplace))
                     getMedChatRes.getChat().get(i).setContent(getMedChatRes.getChat().get(i).getContent().replace(medicineReplace, medicineDTO.getName()));
@@ -79,7 +79,7 @@ public class MedicineService {
                 scenarioIdx = 0;
                 groupId = "SAVE_FAIL";
             }
-            GetMedChatRes getMedChatRes = medicineProvider.getMedChats(postMedicineReq.getUserIdx(), groupId, scenarioIdx);
+            GetChatRes getMedChatRes = medicineProvider.getMedChats(postMedicineReq.getUserIdx(), groupId, scenarioIdx);
             int toBeFirst = getMedChatRes.getAction().getChoiceList()
                     .indexOf(getMedChatRes.getAction().getChoiceList().stream().filter(e -> e.getContent().equals("약 복용 기록할래")).findFirst().get());
             int lastIndex = getMedChatRes.getAction().getChoiceList().size() - 1;
