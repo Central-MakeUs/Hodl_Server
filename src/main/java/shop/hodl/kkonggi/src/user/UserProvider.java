@@ -48,15 +48,20 @@ public class UserProvider {
         catch (Exception exception) {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
-                    }
+    }
 
+    public int checkUserInfo(int userIdx)throws BaseException {
+        try{
+            return userDao.checkUserInfo(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
 
     public GetUserInfo getUser(int userIdx) throws BaseException {
         try {
-            GetUserInfo getUserRes = userDao.getUser(userIdx);
             // 이메일 마스킹
-            getUserRes.setEmail(getMaskedEmail(getUserRes.getEmail()));
-            logger.info("Email masking = " + getUserRes.getEmail());
+            GetUserInfo getUserRes = userDao.getUser(userIdx);
             return getUserRes;
         } catch (Exception exception) {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

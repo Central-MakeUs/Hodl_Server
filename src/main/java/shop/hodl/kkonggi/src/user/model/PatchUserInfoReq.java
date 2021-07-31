@@ -9,10 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetUserInfo {
-    private String name;
-    private String email;
-    private String signUpType;
-    private String birthYear;
-    private String sex;
+public class PatchUserInfoReq {
+    private String nickName;
+    private String birthYear;   // YYYY
+    private String sex; // F, M
 }

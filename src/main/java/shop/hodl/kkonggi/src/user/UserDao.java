@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.List;
 
+import static shop.hodl.kkonggi.utils.ValidationRegex.getMaskedEmail;
+
 @Repository
 public class UserDao {
 
@@ -45,14 +47,37 @@ public class UserDao {
     }
 
     public GetUserInfo getUser(int userIdx){
-        String getUserQuery = "select email, ifnull(nickName, '') as nickName, '이메일 회원가입' as signUpType from User where status = 'Y' and userIdx = ?";
+        String getUserQuery = "select email, ifnull(nickName, '') as nickName, '이메일 회원가입' as signUpType, date_format(birthYear, '%Y') as birthYear, sex from User\n" +
+                "    left join UserInfo on User.userIdx = UserInfo.userIdx and UserInfo.status = 'Y'\n" +
+                "where User.status = 'Y' and User.userIdx = ?";
         int getUserParams = userIdx;
         return this.jdbcTemplate.queryForObject(getUserQuery,
                 (rs, rowNum) -> new GetUserInfo(
                         rs.getString("nickName"),
-                        rs.getString("email"),
-                        rs.getString("signUpType")),
+                        getMaskedEmail(rs.getString("email")),
+                        rs.getString("signUpType"),
+                        rs.getString("birthYear"),
+                        rs.getString("sex")),
                 getUserParams);
+    }
+
+    public int checkUserInfo(int userIdx){
+        String checkQuery = "select exists(select userIdx from UserInfo where userIdx = ? and status = 'Y')";
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, userIdx);
+    }
+
+    public int updateUserInfo(int userIdx, PatchUserInfoReq patchReq){
+        String updateQuery = "update User left join UserInfo on User.userIdx = UserInfo.userIdx\n" +
+                "    set nickName = ?, sex = ?, birthYear = ?\n" +
+                "where User.userIdx = ?";
+        Object[] updateParams = new Object[]{patchReq.getNickName(), patchReq.getSex(), patchReq.getBirthYear(), userIdx};
+        return this.jdbcTemplate.update(updateQuery, updateParams);
+    }
+
+    public int createUserInfo(int userIdx, PatchUserInfoReq patchReq){
+        String createQuery = "insert into UserInfo (useridx, sex, birthyear) values (?,?,?)";
+        Object[] createParams = new Object[]{userIdx, patchReq.getSex(), patchReq.getBirthYear()};
+        return this.jdbcTemplate.update(createQuery, createParams);
     }
 
     public int checkUser(int userIdx){
@@ -90,46 +115,10 @@ public class UserDao {
     }
 
     public int modifyUserName(PatchUserReq patchUserReq){
-        String modifyUserNameQuery = "update User set nickName = ? where userIdx = ?";
+        String modifyUserNameQuery = "update User set nickName = ? where userIdx = ? and status = 'Y'";
         Object[] modifyUserNameParams = new Object[]{patchUserReq.getUserNickName(), patchUserReq.getUserIdx()};
 
         return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
-    }
-
-    public List<String> getSuccessModifyUserNickName(int groupId){
-        String getPwdQuery = "select content from Chat where Chat.groupId = ? and status = 'Y'";
-        int getPwdParams = groupId;
-
-        List<String> chatArr = this.jdbcTemplate.queryForList(
-                getPwdQuery,
-                String.class,
-                getPwdParams
-        );
-        return chatArr;
-    }
-
-    public List<String> getFalseModifyUserNickName(){
-        String getPwdQuery = "select content from Chat where Chat.groupId = ? and status = 'Y'";
-        int getPwdParams = 3;
-
-        List<String> chatArr = this.jdbcTemplate.queryForList(
-                getPwdQuery,
-                String.class,
-                getPwdParams
-        );
-        return chatArr;
-    }
-
-    public List<String> getFailModifyNickName(){
-        String getPwdQuery = "select content from Chat where Chat.groupId = ? and status = 'Y'";
-        int getPwdParams = 2;
-
-        List<String> chatArr = this.jdbcTemplate.queryForList(
-                getPwdQuery,
-                String.class,
-                getPwdParams
-        );
-        return chatArr;
     }
 
     public String getUserNickName(int userIdx){

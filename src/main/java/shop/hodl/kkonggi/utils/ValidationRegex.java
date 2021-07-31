@@ -1,10 +1,14 @@
 package shop.hodl.kkonggi.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ValidationRegex {
+    static final Logger logger = LoggerFactory.getLogger("ValidationRegex");;
     public static boolean isRegexEmail(String target) {
         String regex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
@@ -15,6 +19,14 @@ public class ValidationRegex {
     // yyyyMMdd
     public static boolean isRegexDate(String target){
         String regex = "(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CANON_EQ);
+        Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
+
+    // yyyy
+    public static boolean isRegexYear(String target){
+        String regex = "(19|20)\\d{2}$";
         Pattern pattern = Pattern.compile(regex, Pattern.CANON_EQ);
         Matcher matcher = pattern.matcher(target);
         return matcher.find();

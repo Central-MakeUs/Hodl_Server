@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static shop.hodl.kkonggi.config.BaseResponseStatus.*;
-import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexEmail;
+import static shop.hodl.kkonggi.utils.ValidationRegex.*;
 
 @RestController
 @RequestMapping("/app/v1/users")
@@ -58,9 +58,8 @@ public class UserController {
     }
 
     /**
-     * 회원 1명 조회 API
+     * 마이프로필
      * [GET] /users/:userIdx
-     * @return BaseResponse<GetUserRes>
      */
     // Path-variable
     @ResponseBody
@@ -69,14 +68,39 @@ public class UserController {
         // Get Users
         try{
             int userIdxByJwt = jwtService.getUserIdx();
-            if(userIdxByJwt != userIdx) throw new BaseException(BaseResponseStatus.INVALID_USER_JWT);
+            if(userIdxByJwt != userIdx)
+                throw new BaseException(BaseResponseStatus.INVALID_USER_JWT);
 
             GetUserInfo getUserRes = userProvider.getUser(userIdx);
             return new BaseResponse<>(getUserRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
+    }
 
+    /**
+     * 마이프로필 수정
+     * [PATCH] app/v1/users/:userIdx
+     */
+    // Path-variable
+    @ResponseBody
+    @PatchMapping("/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
+    public BaseResponse<Integer> updateUserInfo(@PathVariable("userIdx") int userIdx, @RequestBody PatchUserInfoReq patchUserInfoReq) {
+        // Get Users
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(userIdxByJwt != userIdx)
+                throw new BaseException(BaseResponseStatus.INVALID_USER_JWT);
+            if(patchUserInfoReq.getBirthYear() != null && !isRegexYear(patchUserInfoReq.getBirthYear()))
+                throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_DATE);  // 날짜 형식을 확인해주세요.
+            if(patchUserInfoReq.getSex() != null && !patchUserInfoReq.getSex().equals("F") && !patchUserInfoReq.getSex().equals("M"))
+                throw new BaseException(BaseResponseStatus.USERS_INVALID_SEX);  // 성별 형식을 확인해주세요.
+
+            Integer getUserRes = userService.updateUserInfo(userIdx, patchUserInfoReq);
+            return new BaseResponse<>(getUserRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
     }
 
     /**
@@ -259,5 +283,18 @@ public class UserController {
         }
     }
 
+    /**
+     * 토큰 유효성 검사 api
+     */
+    @ResponseBody
+    @GetMapping("/jwt")
+    public BaseResponse<Integer> checkJwt(){
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            return new BaseResponse<>(userIdxByJwt);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 }

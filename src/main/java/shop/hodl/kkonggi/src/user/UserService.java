@@ -2,7 +2,6 @@ package shop.hodl.kkonggi.src.user;
 
 
 
-import org.jboss.jandex.Index;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.secret.Secret;
 import shop.hodl.kkonggi.src.user.model.*;
@@ -15,7 +14,9 @@ import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 
 import javax.transaction.Transactional;
-import java.util.List;
+
+import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
+import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
 // Service Create, Update, Delete 의 로직 처리
 @Service
@@ -57,6 +58,7 @@ public class UserService {
             logger.info(getClass().getSimpleName() + userIdx);
             return new PostUserRes(userIdx);
         } catch (Exception exception) {
+            logger.error(getCurrentDateStr() + " Fail to create User, userIdx = " + postUserReq.getEmail());
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -98,17 +100,19 @@ public class UserService {
                     }
                 return getChatRes;
             }
-
         } catch(Exception exception){
+            logger.error(getCurrentDateStr() + " Fail to re-update My Profile, userIdx = " + patchUserReq.getUserIdx());
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
 
+    @Transactional
     public PatchNickNameRes modifyUserName(PatchUserReq patchUserReq) throws BaseException{
         int result = 0;
         try{
             result = userDao.modifyUserName(patchUserReq);
         }catch(Exception exception){
+            logger.error(getCurrentDateStr() + " Fail to modify userNickName, userIdx = " + patchUserReq.getUserIdx());
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
         if(result == 0) throw new BaseException(BaseResponseStatus.MODIFY_FAIL_USERNAME);
@@ -116,4 +120,21 @@ public class UserService {
         return patchNickNameRes;
     }
 
+    @Transactional
+    public Integer updateUserInfo(int userIdx, PatchUserInfoReq pathReq) throws BaseException {
+        pathReq.setBirthYear(pathReq.getBirthYear() + "0000");
+        try{
+            if(userProvider.checkUserInfo(userIdx) == 0) {
+                userDao.createUserInfo(userIdx, pathReq);   // UserInfo
+                userDao.modifyUserName(new PatchUserReq(userIdx, pathReq.getNickName()));   // User
+            }
+            else{
+                userDao.updateUserInfo(userIdx, pathReq);
+            }
+            return userIdx;
+        } catch(Exception exception){
+            logger.error(getCurrentDateStr() + " Fail to update My Profile, userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
 }
