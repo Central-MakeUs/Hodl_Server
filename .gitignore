@@ -13,3 +13,5 @@ Secret
 Secret.java
 
 nohup.out
+
+*.json
