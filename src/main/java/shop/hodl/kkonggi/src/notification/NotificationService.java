@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.notification.model.GetMedicineNotificationRes;
-import shop.hodl.kkonggi.src.notification.model.GetNotificationRes;
-import shop.hodl.kkonggi.src.notification.model.PatchMedicineNotificationReq;
-import shop.hodl.kkonggi.src.notification.model.PatchNotificationReq;
+import shop.hodl.kkonggi.src.notification.model.*;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.sound.midi.Patch;
@@ -39,7 +36,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public Integer updateNotification(int userIdx, GetNotificationRes getNotificationRes) throws BaseException {
+    public Integer updateNotification(int userIdx, PatchNotificationReqForToken getNotificationRes) throws BaseException {
         try{
             PatchNotificationReq patReq = new PatchNotificationReq();
             if(getNotificationRes.getIsServicePush() == 1) patReq.setIsServicePush("Y"); else patReq.setIsServicePush("N");
@@ -47,15 +44,18 @@ public class NotificationService {
             if(getNotificationRes.getIsEventPush() == 1) patReq.setIsEventPush("Y"); else patReq.setIsEventPush("N");
             if(getNotificationRes.getIsMarketingPush() == 1) patReq.setIsMarketingPush("Y"); else patReq.setIsMarketingPush("N");
 
+            if(notificationProvider.checkUserDeviceToken(userIdx) == 0) notificationDao.createUserDeviceToken(userIdx, getNotificationRes.getDeviceToken());
+            else notificationDao.updateUserDeviceToken(userIdx, getNotificationRes.getDeviceToken());
+
             Integer result = notificationDao.updateNotification(userIdx, patReq);
             if(result > 0) result = userIdx;
             return result;
         } catch (Exception exception){
+            exception.printStackTrace();
             logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY Notification, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
-
 
     @Transactional
     public Integer updateMedicineNotification(int userIdx, List<PatchMedicineNotificationReq> patchReq) throws BaseException{

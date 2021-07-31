@@ -66,8 +66,15 @@ public class NotificationProvider {
 
             return get;
         } catch (Exception exception){
-            exception.printStackTrace();
             logger.error(LogDateFormat.format(System.currentTimeMillis()) + " Fail to CREATE or GET MedicineNotification, userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    public int checkUserDeviceToken(int userIdx) throws BaseException{
+        try{
+            return notificationDao.checkUserDeviceToken(userIdx);
+        } catch (Exception exception) {
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

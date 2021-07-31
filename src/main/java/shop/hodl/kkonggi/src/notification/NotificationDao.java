@@ -64,6 +64,23 @@ public class NotificationDao {
         return this.jdbcTemplate.update(updateQuery, updateParamsTimeSlot);
     }
 
+    public int checkUserDeviceToken(int userIdx){
+        String getQuery = "select exists(select deviceToken from UserToken where userIdx = ? and status = 'Y')";
+        return this.jdbcTemplate.queryForObject(getQuery, int.class, userIdx);
+    }
+
+    public int createUserDeviceToken(int userIdx, String deviceToken){
+        String createQuery = "insert into UserToken (userIdx, deviceToken) values (?,?)";
+        Object[] createParams = new Object[]{userIdx, deviceToken};
+        return this.jdbcTemplate.update(createQuery, createParams);
+    }
+
+    public int updateUserDeviceToken(int userIdx, String deviceToken){
+        String updateQuery = "update UserToken set deviceToken = ? where userIdx = ? and status = 'Y'";
+        Object[] updateParams = new Object[]{deviceToken, userIdx};
+        return this.jdbcTemplate.update(updateQuery, updateParams);
+    }
+
     public int checkNotification(int userIdx){
         String checkQuery = "select exists(select userIdx from Notification where userIdx = ? and status = 'Y')";
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, userIdx);

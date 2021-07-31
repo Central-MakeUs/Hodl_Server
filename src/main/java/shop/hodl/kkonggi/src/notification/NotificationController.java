@@ -10,6 +10,7 @@ import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.notification.model.GetMedicineNotificationRes;
 import shop.hodl.kkonggi.src.notification.model.GetNotificationRes;
 import shop.hodl.kkonggi.src.notification.model.PatchMedicineNotificationReq;
+import shop.hodl.kkonggi.src.notification.model.PatchNotificationReqForToken;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.List;
@@ -53,9 +54,12 @@ public class NotificationController {
      */
     @ResponseBody
     @PatchMapping("")
-    public BaseResponse<Integer> updateNotification(@RequestBody GetNotificationRes getNotificationRes) {
+    public BaseResponse<Integer> updateNotification(@RequestBody PatchNotificationReqForToken getNotificationRes) {
         try{
             int userIdx = jwtService.getUserIdx();
+            if(getNotificationRes.getDeviceToken() == null)
+                return new BaseResponse<>(BaseResponseStatus.FCM_EMPTY_DEVICE_TOKEN);   // 기기 토큰을 입력해주세요.
+
             Integer result = notificationService.updateNotification(userIdx, getNotificationRes);
             return new BaseResponse<>(result);
         } catch (BaseException exception){
