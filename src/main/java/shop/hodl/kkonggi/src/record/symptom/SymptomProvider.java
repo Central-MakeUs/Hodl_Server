@@ -96,7 +96,9 @@ public class SymptomProvider {
         try{
             GetChatRes getChatRes = symptomDao.getChatsNoAction(groupId, scenarioIdx);
             replaceNickName(getChatRes, getUserNickName(userIdx));
-            getChatRes.getChat().add(0, symptomDao.getImage("LAGOM_SAD"));
+            if(groupId.equals("SYM_REC_ASK_NO")) {
+                getChatRes.getChat().add(1, symptomDao.getImage("LAGOM_SAD"));
+            }
             return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

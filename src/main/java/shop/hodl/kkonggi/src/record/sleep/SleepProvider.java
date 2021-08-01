@@ -84,7 +84,7 @@ public class SleepProvider {
     public GetChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws BaseException {
         try{
             GetChatRes getChatRes = sleepDao.getChats(groupId, scenarioIdx);
-            getChatRes.getChat().add(sleepDao.getImage("LAGOM_SAD"));
+            if(groupId.equals("SLEEP_REC_LESS_INSOMNIA")) getChatRes.getChat().add(sleepDao.getImage("LAGOM_SAD"));
             replaceNickName(getChatRes, getUserNickName(userIdx));
             return getChatRes;
         } catch (Exception exception){
