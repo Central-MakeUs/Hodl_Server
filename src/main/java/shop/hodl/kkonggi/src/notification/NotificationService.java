@@ -51,7 +51,6 @@ public class NotificationService {
             if(result > 0) result = userIdx;
             return result;
         } catch (Exception exception){
-            exception.printStackTrace();
             logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY Notification, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -72,8 +71,20 @@ public class NotificationService {
             if(result > 0) result = userIdx;
             return result;
         } catch (Exception exception){
-            exception.printStackTrace();
             logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY MedicineNotification, " + "userIdx = " + userIdx);
+            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+        }
+    }
+
+    @Transactional
+    public Integer deviceToken(int userIdx, PatchTokenReq patchTokenReq) throws BaseException{
+        try{
+            int result = 0;
+            if(notificationProvider.checkUserDeviceToken(userIdx) == 0) result= notificationDao.createUserDeviceToken(userIdx, patchTokenReq.getDeviceToken());
+            else result = notificationDao.updateUserDeviceToken(userIdx, patchTokenReq.getDeviceToken());
+            return result;
+        } catch (Exception exception){
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE or MODIFY userDeviceToken, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

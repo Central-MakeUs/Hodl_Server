@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
-import shop.hodl.kkonggi.src.notification.model.GetMedicineNotificationRes;
-import shop.hodl.kkonggi.src.notification.model.GetNotificationRes;
-import shop.hodl.kkonggi.src.notification.model.PatchMedicineNotificationReq;
-import shop.hodl.kkonggi.src.notification.model.PatchNotificationReqForToken;
+import shop.hodl.kkonggi.src.notification.model.*;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import java.util.List;
@@ -91,12 +88,12 @@ public class NotificationController {
     public BaseResponse<Integer> updateMedicineNotification(@RequestBody List<PatchMedicineNotificationReq> patchReq){
         try{
             int userIdx = jwtService.getUserIdx();
-            for(int i = 0; i < patchReq.size(); i++) {
-                if( !patchReq.get(i).getTimeSlot().equals("D") && !patchReq.get(i).getTimeSlot().equals("M") && !patchReq.get(i).getTimeSlot().equals("L") && !patchReq.get(i).getTimeSlot().equals("E") && !patchReq.get(i).getTimeSlot().equals("N"))
+            for (PatchMedicineNotificationReq patchMedicineNotificationReq : patchReq) {
+                if (!patchMedicineNotificationReq.getTimeSlot().equals("D") && !patchMedicineNotificationReq.getTimeSlot().equals("M") && !patchMedicineNotificationReq.getTimeSlot().equals("L") && !patchMedicineNotificationReq.getTimeSlot().equals("E") && !patchMedicineNotificationReq.getTimeSlot().equals("N"))
                     throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_SLOT);  // 시간대 형식 확인
-                else if( !patchReq.get(i).getStatus().equals("A") && !patchReq.get(i).getStatus().equals("I"))
+                else if (!patchMedicineNotificationReq.getStatus().equals("A") && !patchMedicineNotificationReq.getStatus().equals("I"))
                     throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_STATUS);    // 상태 형식 확인
-                else if( !isRegexTime(patchReq.get(i).getNotificationTime()))
+                else if (!isRegexTime(patchMedicineNotificationReq.getNotificationTime()))
                     throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_INVALID_TIME);  // 시간 형식 확인
             }
             Integer result = notificationService.updateMedicineNotification(userIdx, patchReq);
@@ -106,4 +103,19 @@ public class NotificationController {
         }
     }
 
+    /**
+     * 기기 토큰 등록
+     */
+    @ResponseBody
+    @PatchMapping("/token")
+    public BaseResponse<Integer> deviceToken(@RequestBody PatchTokenReq patchTokenReq){
+        try{
+            if(patchTokenReq.getDeviceToken() == null) throw new BaseException(BaseResponseStatus.FCM_EMPTY_DEVICE_TOKEN);
+            int userIdx = jwtService.getUserIdx();
+            int result = notificationService.deviceToken(userIdx, patchTokenReq);
+            return new BaseResponse<>(userIdx);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
