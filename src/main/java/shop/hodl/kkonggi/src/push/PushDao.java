@@ -18,7 +18,7 @@ public class PushDao {
     }
 
     public List<GetMedicineNotification> getMedicineNotificationInfo(){
-        String getQuery = "select deviceToken, nickName,\n" +
+        String getQuery = "select deviceToken, nickName, Medicine.medicineIdx, medicineRealName,\n" +
                 "       case\n" +
                 "           when timeSlot = 'D' then '새벽'\n" +
                 "           when timeSlot = 'M' then '아침'\n" +
@@ -32,7 +32,8 @@ public class PushDao {
                 "    inner join Medicine\n" +
                 "        on User.userIdx = Medicine.userIdx and Medicine.status = 'Y' and pow(2, weekday(DATE(now()))) & days != 0 and (datediff(DATE(now()), startDay) > -1) and if(endDay is null, TRUE, datediff(endDay, DATE(now())) > -1)\n" +
                 "    inner join MedicineTime on MedicineTime.medicineIdx = Medicine.medicineIdx and slot = timeSlot and MedicineTime.status = 'Y'\n" +
-                "    where MedicineNotification.status = 'A' group by timeSlot";
+                "    inner join Notification on Notification.userIdx = User.userIdx and medicinePush = 'Y' and Notification.status = 'Y'\n" +
+                "    where MedicineNotification.status = 'A' and TIMESTAMPDIFF(MINUTE , now(), MedicineNotification.notificationTime) = 0 group by timeSlot";
         return this.jdbcTemplate.query(getQuery,
                 (rs,rowNum) -> new GetMedicineNotification(
                         rs.getString("deviceToken"),

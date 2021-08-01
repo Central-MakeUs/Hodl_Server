@@ -1,6 +1,7 @@
 package shop.hodl.kkonggi.src.user;
 
 
+import shop.hodl.kkonggi.src.notification.model.PostMedicineNotificationReq;
 import shop.hodl.kkonggi.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,6 +20,25 @@ public class UserDao {
     @Autowired
     public void setDataSource(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    // Notification 테이블 만들기
+    public int createNotification(int userIdx){
+        String createQuery = "insert into Notification (userIdx) values (?)";
+        return this.jdbcTemplate.update(createQuery, userIdx);
+    }
+
+    // MedicineNotification 테이블 만들기
+    public int createMedicineNotification(List<PostMedicineNotificationReq> postReq){
+        String createQuery = "insert into MedicineNotification (userIdx, timeslot, notificationTime) VALUES (?,?,?), (?,?,?), (?,?,?), (?,?,?), (?,?,?)";
+        Object[] createParams = new Object[]{
+                postReq.get(0).getUserIdx(), postReq.get(0).getTimeSlot(), postReq.get(0).getNotificationTime(),
+                postReq.get(1).getUserIdx(), postReq.get(1).getTimeSlot(), postReq.get(1).getNotificationTime(),
+                postReq.get(2).getUserIdx(), postReq.get(2).getTimeSlot(), postReq.get(2).getNotificationTime(),
+                postReq.get(3).getUserIdx(), postReq.get(3).getTimeSlot(), postReq.get(3).getNotificationTime(),
+                postReq.get(4).getUserIdx(), postReq.get(4).getTimeSlot(), postReq.get(4).getNotificationTime(),
+        };
+        return this.jdbcTemplate.update(createQuery, createParams);
     }
 
     public List<GetUserRes> getUsers(){

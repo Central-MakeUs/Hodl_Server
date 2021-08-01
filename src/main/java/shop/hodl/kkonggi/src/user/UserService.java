@@ -4,6 +4,7 @@ package shop.hodl.kkonggi.src.user;
 
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.secret.Secret;
+import shop.hodl.kkonggi.src.notification.model.PostMedicineNotificationReq;
 import shop.hodl.kkonggi.src.user.model.*;
 import shop.hodl.kkonggi.utils.AES128;
 import shop.hodl.kkonggi.utils.JwtService;
@@ -15,6 +16,10 @@ import shop.hodl.kkonggi.config.BaseResponseStatus;
 
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static shop.hodl.kkonggi.config.Constant.TIMES;
 import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
@@ -55,7 +60,15 @@ public class UserService {
         }
         try{
             int userIdx = userDao.createUser(postUserReq, userInfoToString);
-            logger.info(getClass().getSimpleName() + userIdx);
+            // createNotification
+            userDao.createNotification(userIdx);
+            // createMedicineNotification
+            List<PostMedicineNotificationReq> postMedicineNotificationReqList = new ArrayList<>();
+            for(int i = 0; i < TIMES.get(0).size(); i++){
+                postMedicineNotificationReqList.add(new PostMedicineNotificationReq(userIdx, TIMES.get(0).get(i), TIMES.get(1).get(i)));
+            }
+            userDao.createMedicineNotification(postMedicineNotificationReqList);
+
             return new PostUserRes(userIdx);
         } catch (Exception exception) {
             logger.error(getCurrentDateStr() + " Fail to create User, userIdx = " + postUserReq.getEmail());
