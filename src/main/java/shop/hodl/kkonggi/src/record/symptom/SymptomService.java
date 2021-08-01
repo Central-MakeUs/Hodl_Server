@@ -12,6 +12,7 @@ import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.Chat.makeSymptoms;
@@ -38,7 +39,6 @@ public class SymptomService {
         if(postReq.getDate() == null || currentTimeStr.equals(postReq.getDate()) || postReq.getDate().isEmpty()) postReq.setDate(currentTimeStr);
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
         try{
-            // todo : date에 기록되어 있는 지 체크
             if(symptomProvider.checkSymptomOfDay(userIdx, postReq.getDate()) == 1){
                 throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
             }
@@ -67,6 +67,7 @@ public class SymptomService {
             return getChatRes;
 
         } catch (Exception e){
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE SymptomRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -79,7 +80,6 @@ public class SymptomService {
         else if(!isRegexDate(postReq.getDate()) || postReq.getDate().length() != 8) throw new BaseException(BaseResponseStatus.POST_MEDICINE_INVALID_DAYS);
 
         try{
-            // todo : date에 기록되어 있는 지 체크
             if(symptomProvider.checkSymptomOfDay(userIdx, postReq.getDate()) == 0){
                 throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
             }
@@ -108,7 +108,7 @@ public class SymptomService {
             }
             return getChatRes;
         } catch (Exception e){
-            e.printStackTrace();
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY SymptomRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

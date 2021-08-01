@@ -19,6 +19,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.config.Constant.TIMES;
 import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
@@ -71,7 +72,7 @@ public class UserService {
 
             return new PostUserRes(userIdx);
         } catch (Exception exception) {
-            logger.error(getCurrentDateStr() + " Fail to create User, userIdx = " + postUserReq.getEmail());
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE User, " + "email = " + postUserReq.getEmail());
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -114,7 +115,7 @@ public class UserService {
                 return getChatRes;
             }
         } catch(Exception exception){
-            logger.error(getCurrentDateStr() + " Fail to re-update My Profile, userIdx = " + patchUserReq.getUserIdx());
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY userNickName, userIdx = " + patchUserReq.getUserIdx());
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -125,7 +126,7 @@ public class UserService {
         try{
             result = userDao.modifyUserName(patchUserReq);
         }catch(Exception exception){
-            logger.error(getCurrentDateStr() + " Fail to modify userNickName, userIdx = " + patchUserReq.getUserIdx());
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY userNickName, userIdx = " + patchUserReq.getUserIdx());
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
         if(result == 0) throw new BaseException(BaseResponseStatus.MODIFY_FAIL_USERNAME);
@@ -147,8 +148,7 @@ public class UserService {
             }
             return userIdx;
         } catch(Exception exception){
-            exception.printStackTrace();
-            logger.error(getCurrentDateStr() + " Fail to update My Profile, userIdx = " + userIdx);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY UserInfo, userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

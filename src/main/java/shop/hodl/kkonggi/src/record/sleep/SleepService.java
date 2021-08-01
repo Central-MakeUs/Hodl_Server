@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.SleepTime.subTimeSleep;
@@ -73,7 +74,7 @@ public class SleepService {
             getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error("userIdx = " + userIdx + "post sleep fail");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE SleepRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -117,7 +118,7 @@ public class SleepService {
             getChatRes = sleepProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error("userIdx = " + userIdx + "patch sleep fail");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY SleepRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

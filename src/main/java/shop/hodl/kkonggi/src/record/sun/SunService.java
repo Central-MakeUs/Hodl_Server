@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
@@ -77,7 +78,7 @@ public class SunService {
             getChatRes = sunProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error("userIdx = " + userIdx + "post sun fail");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE SunRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -125,7 +126,7 @@ public class SunService {
             getChatRes = sunProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error("userIdx = " + userIdx + "patch sun fail");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY SunRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

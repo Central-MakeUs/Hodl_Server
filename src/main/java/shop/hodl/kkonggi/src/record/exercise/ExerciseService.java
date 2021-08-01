@@ -12,6 +12,7 @@ import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
 
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.utils.Time.getCurrentDateStr;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
@@ -55,7 +56,7 @@ public class ExerciseService {
             getChatRes = exerciseProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error(getCurrentDateStr() + " userIdx = " + userIdx + "post exercise fail");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE ExerciseRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -86,7 +87,7 @@ public class ExerciseService {
             getChatRes = exerciseProvider.getChats(userIdx, scenarioIdx, groupId);
             return getChatRes;
         } catch (Exception exception){
-            logger.error( getCurrentDateStr() + " userIdx = " + userIdx + "patch exercise fail");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY ExerciseRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }

@@ -39,7 +39,7 @@ public class PushService {
         }
     }
 
-    @Scheduled(cron = "30 * * * * *")    // 매 30초마다
+    @Scheduled(cron = "20 * * * * *")    // 매 30초마다
     // @Scheduled(fixedDelay = 60000)  // 작업이 끝난 후, 1분 후
     public void getMedicineNotificationInfo(){
         try{

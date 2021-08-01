@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static shop.hodl.kkonggi.config.BaseResponseStatus.POST_MEDICINE_RECORD_ALREADY;
+import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
 import static shop.hodl.kkonggi.utils.ValidationRegex.isRegexDate;
 
 @Service
@@ -46,7 +47,6 @@ public class RecordMedicineService {
         // 들어온 모든 약물들이 새로 등록되어야 할 약물들인 지 확인
         for(int i = 0; i <postReq.getMedicineIdx().length; i++){
             int isRec = recordMedicineProvider.checkRecordIdx(postReq.getMedicineIdx()[i], postReq.getTimeSlot(), postReq.getDate());
-            logger.info(postReq.getMedicineIdx()[i] + "가 이미 투약한 약물입니다.");
             if(isRec == 1) throw new BaseException(BaseResponseStatus.POST_MEDICINE_RECORD_ALL_ALREADY);
         }
 
@@ -58,7 +58,7 @@ public class RecordMedicineService {
             }
             return new PostAllMedicineRecordRes(postReq.getDate());
         } catch (Exception exception) {
-            logger.error(currentTimeStr + "userIdx = " + userIdx + " fail to createAllMedicineRecord");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE AllMedicineRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -94,7 +94,7 @@ public class RecordMedicineService {
             }
             return new PostAllMedicineRecordRes(patchReq.getDate());
         } catch (Exception exception) {
-            logger.error(currentTimeStr + "userIdx = " + userIdx + " fail to updateAllMedicineRecord");
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY AllMedicineRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -126,7 +126,7 @@ public class RecordMedicineService {
             return postMedicineRecordRes;
 
         } catch (Exception exception) {
-            logger.error("userIdx = " + userIdx);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to CREATE MedicineRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
@@ -153,7 +153,7 @@ public class RecordMedicineService {
             return result;
 
         } catch (Exception exception) {
-            logger.error("userIdx = " + userIdx);
+            logger.error(LogDateFormat.format(System.currentTimeMillis()) + "Fail to MODIFY MedicineRecord, " + "userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
     }
