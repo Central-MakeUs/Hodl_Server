@@ -23,7 +23,7 @@ public class PushController {
             FirebaseCloudMessageService fm = new FirebaseCloudMessageService();
             String token = "cZZLgiP3QdavHtdeUT2WPi:APA91bGZ84BQHEvQFOUSUycjVMg1RGhD2qkeODrJUF-sCdf_Jn7IhBihtlMHH3r4qY-1BssjPzkI7Ns0p0clIV3btwIfwWdJo_QZH6H7ssScaoYhnprYGqHiDDObApMsKWDJEt32kVPA";
             String title = "아침 물약";
-            String body = "오늘 아침에 먹을 약물은 몇 개가 있어요!";
+            String body = "오늘 아침에 먹을 약은 몇 개가 있어요!";
 
             fm.sendMessageTo(token, title, body);
             logger.info(getCurrentDateStr() + " FCM 성공");

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import shop.hodl.kkonggi.src.notification.model.*;
-import shop.hodl.kkonggi.src.record.medicine.model.PostAllMedicineRecordReq;
 
 import javax.sql.DataSource;
 import java.util.List;
