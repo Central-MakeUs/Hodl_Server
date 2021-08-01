@@ -57,7 +57,9 @@ public class SleepProvider {
             // 오늘 잠 기록 했는 지,
             String currentTimeStr =  getCurrentDateStr();
             if(checkSleepRecord(userIdx,currentTimeStr) == 1) groupId = "SLEEP_REC_MOD";
-            return getChats(userIdx, scenarioIdx, groupId);
+            GetChatRes getChatRes = getChats(userIdx, scenarioIdx, groupId);
+            if(groupId.equals("SLEEP_REC_INPUT")) getChatRes.getChat().add(sleepDao.getImage("LAGOM_TWINKLE"));
+            return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -82,7 +84,8 @@ public class SleepProvider {
     public GetChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws BaseException {
         try{
             GetChatRes getChatRes = sleepDao.getChats(groupId, scenarioIdx);
-            getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
+            getChatRes.getChat().add(sleepDao.getImage("LAGOM_SAD"));
+            replaceNickName(getChatRes, getUserNickName(userIdx));
             return getChatRes;
         } catch (Exception exception){
             exception.printStackTrace();
@@ -93,7 +96,7 @@ public class SleepProvider {
     public GetChatRes getChatsNoAction(int userIdx, int scenarioIdx, String groupId) throws BaseException{
         try{
             GetChatRes getChatRes = sleepDao.getChatsNoAction(groupId, scenarioIdx);
-            getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
+            replaceNickName(getChatRes, getUserNickName(userIdx));
             return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

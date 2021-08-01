@@ -45,7 +45,11 @@ public class ExerciseProvider {
         try{
             String currentTimeStr =  getCurrentDateStr();
             if(checkExerciseRecord(userIdx, currentTimeStr) == 1) groupId = "EXE_REC_MOD";
-            return getChats(userIdx, scenarioIdx, groupId);
+            GetChatRes getChatRes = getChats(userIdx, scenarioIdx, groupId);
+            if(groupId.equals("EXE_REC_INPUT")) getChatRes.getChat().add(exerciseDao.getImage("LAGOM_TWINKLE"));
+
+
+            return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -70,7 +74,11 @@ public class ExerciseProvider {
     public GetChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws BaseException {
         try{
             GetChatRes getChatRes = exerciseDao.getChats(groupId, scenarioIdx);
-            getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
+            if(groupId.equals("EXE_REC_GOOD")) getChatRes.getChat().add(1, exerciseDao.getImage("LAGOM_TWINKLE"));
+            if(groupId.equals("EXE_REC_HARD") || groupId.equals("EXE_REC_BAD")) getChatRes.getChat().add(1, exerciseDao.getImage("LAGOM_SAD"));
+            if(groupId.equals("EXE_REC_FEEL_BAD")) getChatRes.getChat().add(2, exerciseDao.getImage("LAGOM_TWINKLE"));
+
+            replaceNickName(getChatRes, getUserNickName(userIdx));
             return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
@@ -80,7 +88,7 @@ public class ExerciseProvider {
     public GetChatRes getChatsNoAction(int userIdx, int scenarioIdx, String groupId) throws BaseException{
         try{
             GetChatRes getChatRes = exerciseDao.getChatsNoAction(groupId, scenarioIdx);
-            getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
+            replaceNickName(getChatRes, getUserNickName(userIdx));
             return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

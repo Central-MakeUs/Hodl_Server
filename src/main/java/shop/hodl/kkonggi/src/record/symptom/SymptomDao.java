@@ -18,6 +18,17 @@ public class SymptomDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    public GetChatRes.Chat getImage(String imageName){
+        String getImageQuery = "select 'BOT_IMAGE' as chatType, (select (DATE_FORMAT(now(),'%Y%m%d') )) as date, (select (DATE_FORMAT(now(),'%h:%i %p'))) as time, imageUrl as content from LagomImage where imageName = ? and status = 'Y'";
+        return this.jdbcTemplate.queryForObject(getImageQuery,
+                (rs, rowNum) -> new GetChatRes.Chat(
+                        rs.getString("chatType"),
+                        rs.getString("date"),
+                        rs.getString("time"),
+                        rs.getString("content")
+                ) , imageName);
+    }
+
     public int checkSymptomOfDay(int userIdx, String date){
         String checkQuery = "select exists(select recordIdx from SymptomRecord where userIdx = ? and date = ? and status = 'Y')";
         Object[] checkParams = new Object[]{userIdx, date};

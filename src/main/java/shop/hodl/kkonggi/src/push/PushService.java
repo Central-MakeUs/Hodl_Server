@@ -36,7 +36,6 @@ public class PushService {
 
         } catch (IOException ioException){
             logger.error(LogDateFormat.format(System.currentTimeMillis()) + " FCM 전송 실패");
-            // ioException.printStackTrace();
         }
     }
 
@@ -48,6 +47,8 @@ public class PushService {
 
             if(getPush == null) ;
 
+            assert getPush != null;
+            logger.info("리스트 사이즈 = " + getPush.size());
             for(int i = 0; i < Objects.requireNonNull(getPush).size(); i++){
                 medicinePush(getPush.get(i).getDeviceToken(),
                         getPush.get(i).getTimeSlot() + " 알림",

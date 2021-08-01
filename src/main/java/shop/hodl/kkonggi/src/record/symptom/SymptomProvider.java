@@ -38,9 +38,9 @@ public class SymptomProvider {
             if(groupId.equals("SYM_REC_IS") && checkSymptomOfDay(userIdx, date) == 1) groupId = "SYM_REC_MOD";
 
             GetChatRes getChatRes = symptomDao.getChats(groupId, scenarioIdx);
-            getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
+            if(groupId.equals("SYM_REC_IS")) getChatRes.getChat().add(symptomDao.getImage("LAGOM_SAD"));
+            replaceNickName(getChatRes, getUserNickName(userIdx));
             return getChatRes;
-
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -95,7 +95,8 @@ public class SymptomProvider {
     public GetChatRes getChatsNoAction(int userIdx, int scenarioIdx, String groupId) throws BaseException{
         try{
             GetChatRes getChatRes = symptomDao.getChatsNoAction(groupId, scenarioIdx);
-            getChatRes = replaceNickName(getChatRes, getUserNickName(userIdx));
+            replaceNickName(getChatRes, getUserNickName(userIdx));
+            getChatRes.getChat().add(0, symptomDao.getImage("LAGOM_SAD"));
             return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);

@@ -46,7 +46,9 @@ public class SunProvider {
         try{
             String currentTimeStr =  getCurrentDateStr();
             if(checkSunRecord(userIdx, currentTimeStr) == 1) groupId = "SUN_REC_MOD";
-            return getChats(userIdx, scenarioIdx, groupId);
+            GetChatRes getChatRes = getChats(userIdx, scenarioIdx, groupId);
+            if(groupId.equals("SUN_REC_INPUT")) getChatRes.getChat().add(sunDao.getImage("LAGOM_TWINKLE"));
+            return getChatRes;
         } catch (Exception exception){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }

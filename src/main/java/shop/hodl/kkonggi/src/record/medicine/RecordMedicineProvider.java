@@ -303,6 +303,10 @@ public class RecordMedicineProvider {
                 }
             }
             GetChatRes getMedChatRes = recordMedicineDao.getChats(gorupId, scenarioIdx);
+            if(gorupId.equals("MED_REC_ALL_TAKE")){
+                getMedChatRes.getChat().add(2, recordMedicineDao.getImage("LAGOM_TWINKLE"));
+            }
+
             String nickReplace = "%user_nickname%";
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
                 if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))
@@ -342,6 +346,7 @@ public class RecordMedicineProvider {
     public GetChatRes getChats(int userIdx, int scenarioIdx, String groupId) throws  BaseException{
         try{
             GetChatRes getMedChatRes = recordMedicineDao.getChats(groupId, scenarioIdx);
+            getMedChatRes.getChat().add(recordMedicineDao.getImage("LAGOM_TWINKLE"));
             String nickReplace = "%user_nickname%";
             for(int i = 0; i < getMedChatRes.getChat().size(); i++){
                 if(getMedChatRes.getChat().get(i).getContent().contains(nickReplace))
