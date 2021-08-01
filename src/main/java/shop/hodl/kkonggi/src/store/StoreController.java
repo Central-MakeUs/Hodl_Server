@@ -4,16 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponse;
 import shop.hodl.kkonggi.src.store.model.GetStoreRes;
 import shop.hodl.kkonggi.utils.JwtService;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
+@RestController
+@RequestMapping("/app/v1/store")
 public class StoreController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
