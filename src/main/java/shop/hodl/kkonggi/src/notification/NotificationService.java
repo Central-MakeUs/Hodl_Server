@@ -8,11 +8,8 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.notification.model.*;
 import shop.hodl.kkonggi.utils.JwtService;
-
-import javax.sound.midi.Patch;
 import javax.transaction.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;

@@ -8,16 +8,13 @@ import shop.hodl.kkonggi.config.BaseException;
 import shop.hodl.kkonggi.config.BaseResponseStatus;
 import shop.hodl.kkonggi.src.notification.model.GetMedicineNotificationRes;
 import shop.hodl.kkonggi.src.notification.model.GetNotificationRes;
-import shop.hodl.kkonggi.src.notification.model.PatchMedicineNotificationReq;
 import shop.hodl.kkonggi.src.notification.model.PostMedicineNotificationReq;
 import shop.hodl.kkonggi.utils.JwtService;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static shop.hodl.kkonggi.config.Constant.TIMES;
 import static shop.hodl.kkonggi.config.Constant.LogDateFormat;
@@ -41,7 +38,6 @@ public class NotificationProvider {
             if(checkNotification(userIdx) == 0) notificationDao.createNotification(userIdx);
             return notificationDao.getNotification(userIdx);
         } catch (Exception exception){
-            exception.printStackTrace();
             logger.error(LogDateFormat.format(System.currentTimeMillis()) + " Fail to CREATE or GET Notification, userIdx = " + userIdx);
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
@@ -59,7 +55,6 @@ public class NotificationProvider {
                 notificationDao.createMedicineNotification(postMedicineNotificationReqList);
             }
             GetMedicineNotificationRes get = notificationDao.getMedicineNotification(userIdx);
-            // get = (GetMedicineNotificationRes) get.getMedicineNotifications().stream().sorted(Comparator.comparing(GetMedicineNotificationRes.MedicineNotification::getTimeSlot));
             int mIndex = get.getMedicineNotifications().indexOf(get.getMedicineNotifications().stream().filter(e -> e.getTimeSlot().equals("M")).findFirst().get());
             int eIndex = get.getMedicineNotifications().indexOf(get.getMedicineNotifications().stream().filter(e -> e.getTimeSlot().equals("E")).findFirst().get());
             Collections.swap(get.getMedicineNotifications(), mIndex, eIndex);

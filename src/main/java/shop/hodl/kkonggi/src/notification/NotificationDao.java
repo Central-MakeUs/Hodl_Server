@@ -98,7 +98,7 @@ public class NotificationDao {
 
     public int createMedicineNotification(List<PostMedicineNotificationReq> postReq){
         String createQuery = "insert into MedicineNotification (userIdx, timeslot, notificationTime) VALUES (?,?,?), (?,?,?), (?,?,?), (?,?,?), (?,?,?)";
-        Object createParams = new Object[]{
+        Object[] createParams = new Object[]{
                 postReq.get(0).getUserIdx(), postReq.get(0).getTimeSlot(), postReq.get(0).getNotificationTime(),
                 postReq.get(1).getUserIdx(), postReq.get(1).getTimeSlot(), postReq.get(1).getNotificationTime(),
                 postReq.get(2).getUserIdx(), postReq.get(2).getTimeSlot(), postReq.get(2).getNotificationTime(),
