@@ -18,8 +18,6 @@ import static shop.hodl.kkonggi.config.secret.Secret.API_URI;
 
 @RequiredArgsConstructor
 public class FirebaseCloudMessageService {
-    // private final String API_URL = "https://fcm.googleapis.com/v1/projects/kkonggi-ca5b9/messages:send";
-
     public void sendMessageTo(String targetToken, String title, String body) throws IOException {
         String message = makeMessage(targetToken, title, body);
 
@@ -42,10 +40,14 @@ public class FirebaseCloudMessageService {
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
                         .token(targetToken)
-                        .notification(FcmMessage.Notification.builder()
+                        .data(FcmMessage.Notification.builder()
                                 .title(title)
                                 .body(body)
                                 .image(null)
+                                .build()
+                        )
+                        .android(FcmMessage.Android.builder()
+                                .ttl("1200s")
                                 .build()
                         )
                         .build()
@@ -77,8 +79,9 @@ public class FirebaseCloudMessageService {
         @AllArgsConstructor
         @Getter
         public static class Message {
-            private Notification notification;
+            private Notification data;
             private String token;
+            private Android android;
         }
 
         @Builder
@@ -88,6 +91,13 @@ public class FirebaseCloudMessageService {
             private String title;
             private String body;
             private String image;
+        }
+
+        @Builder
+        @AllArgsConstructor
+        @Getter
+        public static class Android {
+            private String ttl;
         }
     }
 }
