@@ -73,10 +73,9 @@ public class MedicineDao {
 
     public GetMedicine getMyMedicines(int userIdx){
         String getCntQuery = "select count(medicineidx) as count from Medicine where userIdx = ? and status = 'Y'";
-        String getMyMedicineQuery = "select * from\n" +
-                "              (select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount, endDay\n" +
-                "              from Medicine left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx where userIdx = ? and Medicine.status = 'Y' order by day desc limit 18446744073709551615) as orderby\n" +
-                "group by medicineIdx";
+        String getMyMedicineQuery = "select * from (select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount, endDay \n" +
+                "from Medicine left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx\n" +
+                "where userIdx = ? and if(endDay is null, TRUE, datediff(endDay, now()) > -1) and Medicine.status = 'Y' order by day desc limit 18446744073709551615) as orderby group by medicineIdx";
         Object[] getMyMedicineParams = new Object[]{userIdx};
 
         return this.jdbcTemplate.queryForObject(getCntQuery,
@@ -95,12 +94,11 @@ public class MedicineDao {
 
     public GetMedicine getMyMedicinesHasSlot(int userIdx, String[] arr){
         String getCntQuery = "select count(medicineidx) as count from Medicine where userIdx = ? and status = 'Y'";
-        String getMyMedicineQuery = "select * from (select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount, endDay\n" +
-                "                from Medicine\n" +
-                "                        inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
-                "                                                        and slot in (substring_index(?, ',', 1), substring_index(?, ',', 2), substring_index(?, ',', 3), substring_index(?, ',', 4), substring_index(?, ',', 5))\n" +
-                "                         left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx\n" +
-                "                where userIdx = ? and Medicine.status = 'Y' order by day desc limit 18446744073709551615) orderby group by medicineidx";
+        String getMyMedicineQuery = "select * from (select Medicine.medicineIdx, medicineRealName, days, ifnull(amount, 1) as amount, endDay from Medicine\n" +
+                "                                        inner join MedicineTime on Medicine.medicineIdx = MedicineTime.medicineIdx\n" +
+                "                                                                        and slot in (substring_index(?, ',', 1), substring_index(?, ',', 2), substring_index(?, ',', 3), substring_index(?, ',', 4), substring_index(?, ',', 5))\n" +
+                "                                        left join MedicineRecord on MedicineRecord.medicineIdx = Medicine.medicineIdx\n" +
+                "                                where userIdx = ? and if(endDay is null, TRUE, datediff(endDay, now()) > -1) and Medicine.status = 'Y' order by day desc limit 18446744073709551615) orderby group by medicineidx";
         Object[] getMyMedicineParams = new Object[]{arr[0], arr[1], arr[2], arr[3], arr[4], userIdx};
 
         return this.jdbcTemplate.queryForObject(getCntQuery,
